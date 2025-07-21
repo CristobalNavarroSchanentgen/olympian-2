@@ -75,7 +75,21 @@ This project follows an **AI-native architecture** that treats context minimizat
 
 ## 🚧 PENDING LAYERS
 
-### Layer 6: Configuration Schemas (NEXT)
+### Layer 6: Configuration Schemas ✅
+- **Location**: `config/features/` directory
+- **Purpose**: Validation schemas for feature configuration
+- **Status**: Complete - 9 configuration schemas implemented
+- **Files Created**:
+  - `config/features/chat/conversation-manager/schema.ts`
+  - `config/features/chat/message-processor/schema.ts`
+  - `config/features/chat/memory-manager/schema.ts`
+  - `config/features/mcp/server-manager/schema.ts`
+  - `config/features/mcp/tool-executor/schema.ts`
+  - `config/features/connection/ollama-connector/schema.ts`
+  - `config/features/connection/model-detector/schema.ts`
+  - `config/features/vision/image-processor/schema.ts`
+  - `config/features/artifacts/artifact-manager/schema.ts`
+- **Dependencies**: models/ only
 - **Location**: `config/features/` directory
 - **Purpose**: Validation schemas for feature configuration
 - **Files Needed**:
@@ -90,7 +104,7 @@ This project follows an **AI-native architecture** that treats context minimizat
   - `config/features/artifacts/artifact-manager/schema.ts`
 - **Dependencies**: models/ only
 
-### Layer 7: Feature Contracts (CRITICAL)
+### Layer 7: Feature Contracts ✅
 - **Location**: `features/*/contract.ts`
 - **Purpose**: Define what each feature can and cannot do - the single source of truth
 - **Files Needed**:
@@ -105,7 +119,7 @@ This project follows an **AI-native architecture** that treats context minimizat
   - `features/artifacts/artifact-manager/contract.ts`
 - **Dependencies**: models/, services/, events/, config/
 
-### Layer 8: Adapters (FEATURE-SPECIFIC)
+### Layer 8: Adapters (NEXT - FEATURE-SPECIFIC)
 - **Location**: `adapters/features/` directory
 - **Purpose**: Transform utility outputs to feature-specific needs (1 adapter per feature)
 - **Files Needed**: 20+ adapters as defined in manifest
@@ -199,7 +213,7 @@ packages/
 
 ## 📊 PROGRESS METRICS
 
-- **Architecture Layers**: 5/10 complete (50%)
+- **Architecture Layers**: 7/10 complete (70%)
 - **Foundation Strength**: 100% (manifest, models, utilities, events, services)
 - **Business Requirements**: ~20% (utilities ready, implementation needed)
 - **AI-Native Compliance**: 100% (all current code follows context minimization)

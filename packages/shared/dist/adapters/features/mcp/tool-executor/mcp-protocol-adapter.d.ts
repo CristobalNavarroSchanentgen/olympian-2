@@ -1,5 +1,5 @@
-import { ToolDefinition } from '../../../models/mcp/tool-definition';
-import { ExecutionResult } from '../../../models/mcp/execution-result';
+import { ToolDefinition } from '../../../models/mcp';
+import { ExecutionResult } from '../../../models/mcp';
 /**
  * MCP protocol adapter for tool execution
  * Transforms protocol handling utilities for tool-executor feature

@@ -1,5 +1,5 @@
-import { Message } from '../../../models/chat/message';
-import { MemoryContext } from '../../../models/chat/memory-context';
+import { Message } from '../../../models/chat';
+import { MemoryContext } from '../../../models/chat';
 /**
  * Context adapter for memory management
  * Transforms context optimization utilities for memory-manager feature

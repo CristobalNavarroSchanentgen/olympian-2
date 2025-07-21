@@ -4,7 +4,7 @@
  * Handles message processing, streaming, and communication with Ollama.
  */
 
-import { Message } from '../../../models/chat/message';
+import { Message } from '../../../models/chat';
 import { MessageService, StreamingService } from '../../../services';
 import { MessageSent, MessageReceived, TokensProcessed } from '../../../events';
 import { MessageProcessorConfig } from '../../../config/features/chat/message-processor/schema';

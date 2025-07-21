@@ -37,7 +37,7 @@ export function ChatLayout() {
     <div className="flex h-screen bg-background">
       {sidebarOpen && (
         <div className="w-80 border-r border-border bg-muted/30">
-          <Sidebar />
+          <Sidebar conversations={conversations} connected={true} onNewConversation={() => {}} />
         </div>
       )}
       

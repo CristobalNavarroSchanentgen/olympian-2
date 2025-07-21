@@ -3,7 +3,7 @@
  *
  * Manages lifecycle of MCP servers running as stdio child processes.
  */
-import { ServerConfig } from '../../../models/mcp/server-config';
+import { ServerConfig } from '../../../models/mcp';
 import { McpService } from '../../../services/mcp-service';
 import { ServerStarted, ServerStopped, ServerError } from '../../../events';
 import { ServerManagerConfig } from '../../../config/features/mcp/server-manager/schema';

@@ -3,9 +3,9 @@
  *
  * Detects and analyzes model capabilities through comprehensive testing.
  */
-import { ModelCapability } from '../../../models/connection/model-capability';
+import { ModelCapability } from '../../../models/connection';
 import { DetectionService } from '../../../services/detection-service';
-import { ModelsDetected, CapabilitiesUpdated } from '../../../events';
+import { ModelsDetectedEvent, CapabilitiesUpdated } from '../../../events';
 import { ModelDetectorConfig } from '../../../config/features/connection/model-detector/schema';
 export interface ModelDetectorContract {
     /**
@@ -169,7 +169,7 @@ export interface ModelMetadataAdapter {
     applyHeuristics(modelName: string, testResults: unknown[]): ModelCapability;
 }
 export interface DetectionEventPublisher {
-    publishModelsDetected(event: ModelsDetected): void;
+    publishModelsDetectedEvent(event: ModelsDetectedEvent): void;
     publishCapabilitiesUpdated(event: CapabilitiesUpdated): void;
 }
 export interface ModelDetectorDependencies {

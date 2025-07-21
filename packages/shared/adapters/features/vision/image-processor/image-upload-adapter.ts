@@ -1,4 +1,4 @@
-import { ImageData } from '../../../models/vision/image-data';
+import { ImageData } from '../../../models/vision';
 import { validateImage, processImage } from '../../../utils/image-processor';
 
 /**

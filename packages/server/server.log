@@ -1,0 +1,14 @@
+
+> @olympian/server@1.0.0 start
+> node dist/index.js
+
+Database connected (mock)
+📊 Database connected
+MCP Manager stub initialized
+🔧 MCP Manager initialized
+🦙 Ollama service initialized
+🔌 WebSocket handler initialized
+📡 Simple API routes configured
+🛣️  API routes configured
+🚀 Server running on port 3001
+❌ Failed to connect to Ollama

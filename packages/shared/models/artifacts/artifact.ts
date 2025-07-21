@@ -27,3 +27,14 @@ export interface Artifact {
   updatedAt: Date;
   metadata: ArtifactMetadata;
 }
+
+// Version-related types
+
+// Search and filtering types
+export interface ArtifactFilter {
+  type?: ArtifactType;
+  conversationId?: string;
+  tags?: string[];
+  createdAfter?: Date;
+  createdBefore?: Date;
+}

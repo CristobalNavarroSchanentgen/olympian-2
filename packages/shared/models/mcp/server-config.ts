@@ -20,3 +20,14 @@ export interface ServerConfig extends McpServerConfig {
   name: string;
   id: string;
 }
+
+// Server status type
+export interface McpServerStatus {
+  serverId: string;
+  name: string;
+  status: 'running' | 'stopped' | 'failed' | 'starting';
+  processId?: number;
+  uptime: number;
+  lastError?: string;
+  capabilities: string[];
+}

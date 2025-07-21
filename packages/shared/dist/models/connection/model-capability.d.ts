@@ -27,4 +27,17 @@ export interface ModelCapability {
     detectedAt: Date;
     metadata: Record<string, unknown>;
 }
+export interface DetectionResult {
+    modelName: string;
+    capabilities: CapabilitySet;
+    metadata: ModelMetadata;
+    confidence: number;
+    testResults: {
+        method: string;
+        success: boolean;
+        confidence: number;
+        duration: number;
+        error?: string;
+    }[];
+}
 //# sourceMappingURL=model-capability.d.ts.map

@@ -17,4 +17,16 @@ export interface Message {
     };
     metadata: Record<string, unknown>;
 }
+export interface MessageDraft {
+    content: string;
+    role: MessageRole;
+    images?: string[];
+    metadata?: Record<string, unknown>;
+}
+export interface StreamingToken {
+    content: string;
+    delta?: string;
+    complete: boolean;
+    metadata?: Record<string, unknown>;
+}
 //# sourceMappingURL=message.d.ts.map

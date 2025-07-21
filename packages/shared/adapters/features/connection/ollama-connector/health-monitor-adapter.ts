@@ -1,4 +1,4 @@
-import { HealthStatus } from '../../../models/connection/health-status';
+import { HealthStatus } from '../../../models/connection';
 import { checkHealth } from '../../../utils/health-checker';
 
 /**

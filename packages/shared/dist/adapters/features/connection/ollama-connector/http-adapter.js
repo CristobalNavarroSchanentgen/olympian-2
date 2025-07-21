@@ -48,7 +48,7 @@ function createHttpAdapter() {
             if (!response.ok) {
                 throw new Error('Failed to list models');
             }
-            const data = await responseon();
+            const data = await response();
             return data.models || [];
         },
         async checkHealth(connection) {

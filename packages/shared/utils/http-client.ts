@@ -1,14 +1,10 @@
 /**
  * HTTP Client Utility
  * Pure functions for HTTP requests
- * Follows AI-Native architecture - utility functions only
  */
 
-/**
- * HTTP request configuration
- */
 export interface HttpRequestConfig {
-  method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
+  method?: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
   headers?: Record<string, string>;
   body?: unknown;
   timeout?: number;
@@ -16,9 +12,6 @@ export interface HttpRequestConfig {
   retryDelay?: number;
 }
 
-/**
- * HTTP response wrapper
- */
 export interface HttpResponse<T = unknown> {
   data: T;
   status: number;
@@ -27,187 +20,113 @@ export interface HttpResponse<T = unknown> {
   duration: number;
 }
 
-/**
- * HTTP client error
- */
-export class HttpClientError extends Error {
+export class HttpError extends Error {
   constructor(
     message: string,
-    public status?: number,
-    public response?: Response
+    public status: number,
+    public statusText: string,
+    public data?: unknown
   ) {
     super(message);
-    this.name = 'HttpClientError';
+    this.name = 'HttpError';
   }
 }
 
-/**
- * Make HTTP request with configuration
- */
 export async function makeHttpRequest<T = unknown>(
   url: string,
-  config: HttpRequestConfig = { method: 'GET' }
+  config: HttpRequestConfig
 ): Promise<HttpResponse<T>> {
   const startTime = Date.now();
-  let lastError: Error | null = null;
-  const maxRetries = config.retries || 0;
+  const {
+    method = 'GET',
+    headers = {},
+    body,
+    timeout = 30000,
+    retries = 3,
+    retryDelay = 1000
+  } = config;
+
+  let lastError: Error;
   
-  for (let attempt = 0; attempt <= maxRetries; attempt++) {
+  for (let attempt = 0; attempt <= retries; attempt++) {
     try {
       const controller = new AbortController();
-      const timeout = config.timeout || 10000;
-      
       const timeoutId = setTimeout(() => controller.abort(), timeout);
       
-      const fetchConfig: RequestInit = {
-        method: config.method,
+      const response = await fetch(url, {
+        method,
         headers: {
           'Content-Type': 'application/json',
-          ...config.headers
+          ...headers
         },
+        body: body ? JSON.stringify(body) : undefined,
         signal: controller.signal
-      };
+      });
       
-      if (config.body && config.method !== 'GET') {
-        fetchConfig.body = typeof config.body === 'string' 
-          ? config.body 
-          : JSON.stringify(config.body);
-      }
-      
-      const response = await fetch(url, fetchConfig);
       clearTimeout(timeoutId);
       
+      let data: any;
+      const contentType = response.headers.get('content-type') || '';
+      
+      if (contentType.includes('application/json')) {
+        data = await response.json();
+      } else if (contentType.includes('text/')) {
+        data = await response.text();
+      } else {
+        data = await response.arrayBuffer();
+      }
+      
+      const duration = Date.now() - startTime;
+      
       if (!response.ok) {
-        throw new HttpClientError(
-          `HTTP Error: ${response.status} ${response.statusText}`,
+        throw new HttpError(
+          `HTTP ${response.status}: ${response.statusText}`,
           response.status,
-          response
+          response.statusText,
+          data
         );
       }
       
-      const contentType = response.headers.get('content-type') || '';
-      let data: T;
-      
-      if (contentType.includes('application/json')) {
-        data = await response();
-      } else if (contentType.includes('text/')) {
-        data = await response.text() as T;
-      } else {
-        data = await response.arrayBuffer() as T;
-      }
-      
-      const headers: Record<string, string> = {};
-      response.headers.forEach((value, key) => {
-        headers[key] = value;
-      });
-      
       return {
-        data,
+        data: data as T,
         status: response.status,
         statusText: response.statusText,
-        headers,
-        duration: Date.now() - startTime
+        headers: Object.fromEntries(response.headers.entries()),
+        duration
       };
       
     } catch (error) {
-      lastError = error instanceof Error ? error : new Error('Unknown error');
+      lastError = error instanceof Error ? error : new Error(String(error));
       
-      if (attempt < maxRetries) {
-        const delay = config.retryDelay || 1000 * Math.pow(2, attempt);
-        await new Promise(resolve => setTimeout(resolve, delay));
+      if (attempt < retries && !(error instanceof HttpError && error.status < 500)) {
+        await new Promise(resolve => setTimeout(resolve, retryDelay * (attempt + 1)));
         continue;
       }
       
-      break;
+      throw lastError;
     }
   }
   
-  throw lastError || new Error('Request failed');
+  throw lastError!;
 }
 
-/**
- * GET request helper
- */
-export async function get<T = unknown>(
-  url: string,
-  config: HttpRequestConfig = { method: "GET" }
-): Promise<HttpResponse<T>> {
-  return makeHttpRequest<T>(url, { ...config, method: 'GET' });
-}
-
-/**
- * POST request helper
- */
-export async function post<T = unknown>(
-  url: string,
-  body?: unknown,
-  config: HttpRequestConfig = { method: "GET" }
-): Promise<HttpResponse<T>> {
-  return makeHttpRequest<T>(url, { ...config, method: 'POST', body });
-}
-
-/**
- * PUT request helper
- */
-export async function put<T = unknown>(
-  url: string,
-  body?: unknown,
-  config: HttpRequestConfig = { method: "GET" }
-): Promise<HttpResponse<T>> {
-  return makeHttpRequest<T>(url, { ...config, method: 'PUT', body });
-}
-
-/**
- * DELETE request helper
- */
-export async function del<T = unknown>(
-  url: string,
-  config: HttpRequestConfig = { method: "GET" }
-): Promise<HttpResponse<T>> {
-  return makeHttpRequest<T>(url, { ...config, method: 'DELETE' });
-}
-
-/**
- * Check if URL is reachable
- */
-export async function ping(url: string, timeout: number = 5000): Promise<boolean> {
-  try {
-    const response = await makeHttpRequest(url, {
-      method: 'GET',
-      timeout
-    });
-    return response.status < 400;
-  } catch {
-    return false;
-  }
-}
-
-/**
- * Create HTTP client with base configuration
- */
 export function createHttpClient(baseConfig: Partial<HttpRequestConfig> = {}) {
   return {
     async request<T = unknown>(
       url: string,
       config: Partial<HttpRequestConfig> = {}
     ): Promise<HttpResponse<T>> {
-      return makeHttpRequest<T>(url, { ...baseConfig, ...config });
+      return makeHttpRequest<T>(url, { method: 'GET', ...baseConfig, ...config });
     },
     
-    async get<T = unknown>(url: string, config: HttpRequestConfig = { method: "GET" }): Promise<HttpResponse<T>> {
+    async get<T = unknown>(url: string, config: Partial<HttpRequestConfig> = {}): Promise<HttpResponse<T>> {
       return this.request<T>(url, { ...config, method: 'GET' });
     },
     
-    async post<T = unknown>(url: string, body?: unknown, config: HttpRequestConfig = { method: "GET" }): Promise<HttpResponse<T>> {
+    async post<T = unknown>(url: string, body: unknown, config: Partial<HttpRequestConfig> = {}): Promise<HttpResponse<T>> {
       return this.request<T>(url, { ...config, method: 'POST', body });
-    },
-    
-    async put<T = unknown>(url: string, body?: unknown, config: HttpRequestConfig = { method: "GET" }): Promise<HttpResponse<T>> {
-      return this.request<T>(url, { ...config, method: 'PUT', body });
-    },
-    
-    async delete<T = unknown>(url: string, config: HttpRequestConfig = { method: "GET" }): Promise<HttpResponse<T>> {
-      return this.request<T>(url, { ...config, method: 'DELETE' });
     }
   };
 }
+
+export const httpClient = createHttpClient();

@@ -1,4 +1,4 @@
-import { Message } from '../../../models/chat/message';
+import { Message } from '../../../models/chat';
 /**
  * Token budget adapter for memory management
  * Transforms token budget utilities for memory-manager feature

@@ -8,7 +8,7 @@ COPY package.json package-lock.json* ./
 COPY packages/shared/package.json ./packages/shared/
 COPY packages/server/package.json ./packages/server/
 
-RUN npm ci --only=production
+RUN npm ci
 
 COPY packages/shared/ ./packages/shared/
 COPY packages/server/ ./packages/server/

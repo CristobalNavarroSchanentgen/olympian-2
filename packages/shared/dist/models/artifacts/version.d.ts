@@ -18,4 +18,5 @@ export interface VersionMetadata {
     author?: string;
     changes?: string[];
 }
+export type ArtifactVersion = Version;
 //# sourceMappingURL=version.d.ts.map

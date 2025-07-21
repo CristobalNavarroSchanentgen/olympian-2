@@ -1,4 +1,4 @@
-import { ImageData } from '../../../models/vision/image-data';
+import { ImageData } from '../../../models/vision';
 /**
  * Format converter adapter for vision processing
  * Transforms image format utilities for image-processor feature

@@ -4,8 +4,8 @@
  * Follows AI-Native architecture - focused contract under 200 lines
  */
 
-import type { ToolDefinition } from '../../../models/mcp/tool-definition';
-import type { ExecutionResult } from '../../../models/mcp/execution-result';
+import type { ToolDefinition } from '../../../models/mcp';
+import type { ExecutionResult } from '../../../models/mcp';
 
 /**
  * Tool execution parameters

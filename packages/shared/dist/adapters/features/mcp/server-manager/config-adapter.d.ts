@@ -1,4 +1,4 @@
-import { ServerConfig } from '../../../models/mcp/server-config';
+import { ServerConfig } from '../../../models/mcp';
 import { ConfigParseResult } from '../../../utils/config-parser';
 /**
  * Config adapter for MCP server configuration

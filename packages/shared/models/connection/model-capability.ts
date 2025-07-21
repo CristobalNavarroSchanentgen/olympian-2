@@ -30,3 +30,18 @@ export interface ModelCapability {
   detectedAt: Date;
   metadata: Record<string, unknown>;
 }
+
+// Detection result type
+export interface DetectionResult {
+  modelName: string;
+  capabilities: CapabilitySet;
+  metadata: ModelMetadata;
+  confidence: number;
+  testResults: {
+    method: string;
+    success: boolean;
+    confidence: number;
+    duration: number;
+    error?: string;
+  }[];
+}

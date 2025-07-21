@@ -25,7 +25,7 @@ function createOllamaAdapter(baseUrl) {
             if (!response.ok) {
                 throw new Error(`Ollama request failed: ${response.status}`);
             }
-            const data = await responseon();
+            const data = await response();
             return data.message.content;
         },
         async streamMessage(model, messages, onToken) {
@@ -81,7 +81,7 @@ function createOllamaAdapter(baseUrl) {
             if (!response.ok) {
                 throw new Error(`Failed to list models: ${response.status}`);
             }
-            const data = await responseon();
+            const data = await response();
             return data.models.map(transformModelInfo);
         },
         async getModelInfo(name) {
@@ -95,7 +95,7 @@ function createOllamaAdapter(baseUrl) {
             if (!response.ok) {
                 throw new Error(`Failed to get model info: ${response.status}`);
             }
-            const data = await responseon();
+            const data = await response();
             return transformModelInfo(data);
         },
         async checkHealth() {
@@ -120,7 +120,7 @@ function createOllamaAdapter(baseUrl) {
             if (!response.ok) {
                 throw new Error(`Failed to get version: ${response.status}`);
             }
-            const data = await responseon();
+            const data = await response();
             return data.version || 'unknown';
         }
     };

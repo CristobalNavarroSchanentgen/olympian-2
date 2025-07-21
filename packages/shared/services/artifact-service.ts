@@ -2,7 +2,7 @@
  * Artifact management service interface
  */
 
-import { Artifact, ArtifactVersion, ArtifactFilter } from '../models/artifacts/artifact';
+import { Artifact, ArtifactVersion, ArtifactFilter } from '../models/artifacts';
 
 export interface ArtifactService {
   /**

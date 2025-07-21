@@ -1,4 +1,4 @@
-import { Artifact } from '../../../models/artifacts/artifact';
+import { Artifact } from '../../../models/artifacts';
 import { validateArtifact } from '../../../utils/artifact-validator';
 
 /**

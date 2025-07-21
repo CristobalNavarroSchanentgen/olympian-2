@@ -11,3 +11,18 @@ export interface MemoryContext {
   lastUpdated: Date;
   metadata: Record<string, unknown>;
 }
+
+// Additional context types
+export interface ContextWindow {
+  maxTokens: number;
+  usedTokens: number;
+  availableTokens: number;
+  messageIds: string[];
+}
+
+export interface ContextStats {
+  totalMessages: number;
+  tokenUsage: number;
+  compressionRatio: number;
+  lastOptimizedAt: Date;
+}

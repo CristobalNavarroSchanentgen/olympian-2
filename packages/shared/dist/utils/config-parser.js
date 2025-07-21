@@ -31,7 +31,6 @@ function parseMcpConfig(rawConfig) {
     if (errors.length > 0) {
         return { success: false, errors, warnings };
     }
-    const servers = {};
     const servers = config.servers;
     for (const [name, serverConfig] of Object.entries(servers)) {
         const serverResult = parseServerConfig(name, serverConfig);

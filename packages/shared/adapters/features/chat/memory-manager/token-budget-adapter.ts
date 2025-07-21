@@ -1,4 +1,4 @@
-import { Message } from '../../../models/chat/message';
+import { Message } from '../../../models/chat';
 import { countTokens } from '../../../utils/token-counter';
 
 /**

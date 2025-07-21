@@ -24,4 +24,11 @@ export interface Artifact {
     updatedAt: Date;
     metadata: ArtifactMetadata;
 }
+export interface ArtifactFilter {
+    type?: ArtifactType;
+    conversationId?: string;
+    tags?: string[];
+    createdAfter?: Date;
+    createdBefore?: Date;
+}
 //# sourceMappingURL=artifact.d.ts.map

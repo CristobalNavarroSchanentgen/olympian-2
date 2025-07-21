@@ -1,5 +1,5 @@
 import { httpRequest } from '../../../utils/http-client';
-import { OllamaConnection } from '../../../models/connection/ollama-connection';
+import { OllamaConnection } from '../../../models/connection';
 
 export interface HttpAdapter {
   testConnection(connection: OllamaConnection): Promise<any>;
@@ -59,7 +59,7 @@ export function createHttpAdapter(): HttpAdapter {
         throw new Error('Failed to list models');
       }
       
-      const data = await responseon();
+      const data = await response();
       return data.models || [];
     },
 

@@ -51,7 +51,6 @@ export function parseMcpConfig(rawConfig: unknown): ParseResult<McpConfigFile> {
     return { success: false, errors, warnings };
   }
 
-  const servers: Record<string, McpServerConfig> = {};
   const servers = config.servers as Record<string, unknown>;
 
   for (const [name, serverConfig] of Object.entries(servers)) {
@@ -71,7 +70,7 @@ export function parseMcpConfig(rawConfig: unknown): ParseResult<McpConfigFile> {
   return {
     success: true,
     data: {
-      servers: servers,
+      servers: servers as Record<string, McpServerConfig>,
       version: config.version as string || '1.0.0',
       metadata: config.metadata as Record<string, unknown> || {}
     },

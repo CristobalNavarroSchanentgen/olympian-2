@@ -20,3 +20,6 @@ export interface VersionMetadata {
   author?: string;
   changes?: string[];
 }
+
+// Re-export as ArtifactVersion for compatibility
+export type ArtifactVersion = Version;

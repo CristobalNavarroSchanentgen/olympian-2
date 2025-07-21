@@ -1,4 +1,4 @@
-import { ModelCapability } from '../../../models/connection/model-capability';
+import { ModelCapability } from '../../../models/connection';
 import { detectCapabilities } from '../../../utils/capability-detector';
 
 /**

@@ -6,7 +6,7 @@
  * what this feature can and cannot do.
  */
 
-import { Conversation } from '../../../models/chat/conversation';
+import { Conversation } from '../../../models/chat';
 import { ConversationService } from '../../../services/conversation-service';
 import { ConversationCreated, ConversationUpdated, ConversationDeleted } from '../../../events';
 import { ConversationManagerConfig } from '../../../config/features/chat/conversation-manager/schema';

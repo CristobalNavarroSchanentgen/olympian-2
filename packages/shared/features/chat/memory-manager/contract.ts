@@ -4,8 +4,8 @@
  * Manages conversation context, token budgets, and memory optimization.
  */
 
-import { Message } from '../../../models/chat/message';
-import { MemoryContext } from '../../../models/chat/memory-context';
+import { Message } from '../../../models/chat';
+import { MemoryContext } from '../../../models/chat';
 import { MemoryService } from '../../../services/memory-service';
 import { ContextUpdated, MemoryCleaned } from '../../../events';
 import { MemoryManagerConfig } from '../../../config/features/chat/memory-manager/schema';

@@ -2,7 +2,7 @@
  * Model capability detection service interface
  */
 
-import { ModelCapability, DetectionResult } from '../models/connection/model-capability.js';
+import { ModelCapability, DetectionResult } from '../models/connection/model-capability';
 
 export interface DetectionService {
   /**

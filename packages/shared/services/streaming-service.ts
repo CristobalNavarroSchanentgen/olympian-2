@@ -2,7 +2,7 @@
  * Streaming service interface
  */
 
-import { StreamingToken } from '../models/chat/message.js';
+import { StreamingToken } from '../models/chat/message';
 
 export interface StreamingService {
   /**

@@ -2,7 +2,7 @@
  * Memory management service interface
  */
 
-import { MemoryContext, ContextWindow, ContextStats } from '../models/chat/memory-context.js';
+import { MemoryContext, ContextWindow, ContextStats } from '../models/chat/memory-context';
 
 export interface MemoryService {
   /**

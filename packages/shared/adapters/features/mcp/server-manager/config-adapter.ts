@@ -1,5 +1,5 @@
-import { ServerConfig } from '../../../models/mcp/server-config.js';
-import { parseConfig, validateConfig, ConfigParseResult } from '../../../utils/config-parser.js';
+import { ServerConfig } from '../../../models/mcp/server-config';
+import { parseConfig, validateConfig, ConfigParseResult } from '../../../utils/config-parser';
 
 /**
  * Config adapter for MCP server configuration

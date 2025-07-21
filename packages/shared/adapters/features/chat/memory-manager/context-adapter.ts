@@ -1,6 +1,6 @@
-import { Message } from '../../../models/chat/message.js';
-import { MemoryContext } from '../../../models/chat/memory-context.js';
-import { optimizeContext, buildContext } from '../../../utils/context-manager.js';
+import { Message } from '../../../models/chat/message';
+import { MemoryContext } from '../../../models/chat/memory-context';
+import { optimizeContext, buildContext } from '../../../utils/context-manager';
 
 /**
  * Context adapter for memory management

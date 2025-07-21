@@ -2,9 +2,9 @@
  * MCP service interface
  */
 
-import { McpServerConfig, McpServerStatus } from '../models/mcp/server-config.js';
-import { ToolDefinition } from '../models/mcp/tool-definition.js';
-import { ExecutionResult } from '../models/mcp/execution-result.js';
+import { McpServerConfig, McpServerStatus } from '../models/mcp/server-config';
+import { ToolDefinition } from '../models/mcp/tool-definition';
+import { ExecutionResult } from '../models/mcp/execution-result';
 
 export interface McpService {
   /**

@@ -1,5 +1,5 @@
-import { HealthStatus } from '../../../models/connection/health-status.js';
-import { checkHealth } from '../../../utils/health-checker.js';
+import { HealthStatus } from '../../../models/connection/health-status';
+import { checkHealth } from '../../../utils/health-checker';
 
 /**
  * Health monitor adapter for Ollama connections

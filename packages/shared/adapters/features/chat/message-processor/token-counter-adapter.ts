@@ -1,5 +1,5 @@
-import { Message } from '../../../models/chat/message.js';
-import { countTokens, estimateTokens } from '../../../utils/token-counter.js';
+import { Message } from '../../../models/chat/message';
+import { countTokens, estimateTokens } from '../../../utils/token-counter';
 
 /**
  * Token counter adapter for message processing

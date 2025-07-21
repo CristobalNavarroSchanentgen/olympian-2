@@ -1,4 +1,4 @@
-import { Conversation } from '../../../models/chat/conversation.js';
+import { Conversation } from '../../../models/chat/conversation';
 
 /**
  * Database adapter for conversation operations

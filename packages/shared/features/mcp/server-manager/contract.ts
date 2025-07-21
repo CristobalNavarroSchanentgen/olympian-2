@@ -54,7 +54,7 @@ export interface ServerManagerContract {
   // === CONFIGURATION MANAGEMENT ===
   
   /**
-   * Load server configurations from mcp.config.json
+   * Load server configurations from mcp.configon
    */
   loadConfiguration(configPath?: string): Promise<{
     serversLoaded: number;

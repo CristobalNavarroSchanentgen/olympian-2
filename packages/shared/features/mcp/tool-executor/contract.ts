@@ -1,160 +1,138 @@
- MCP tool with parameters
+/**
+ * MCP Tool Executor Contract
+ * Defines the interface for executing MCP tools
+ * Follows AI-Native architecture - focused contract under 200 lines
+ */
+
+import type { ToolDefinition } from '../../../models/mcp/tool-definition';
+import type { ExecutionResult } from '../../../models/mcp/execution-result';
+
+/**
+ * Tool execution parameters
+ */
+export interface ToolExecutionParams {
+  toolName: string;
+  arguments: Record<string, unknown>;
+  serverId?: string;
+  timeout?: number;
+  requireConfirmation?: boolean;
+}
+
+/**
+ * Tool execution result with metadata
+ */
+export interface ToolExecutionResponse {
+  executionId: string;
+  result: ExecutionResult;
+  duration: number;
+  toolUsed: ToolDefinition;
+}
+
+/**
+ * Batch execution parameters
+ */
+export interface BatchExecutionParams {
+  executions: ToolExecutionParams[];
+  mode: 'sequential' | 'parallel';
+  stopOnError?: boolean;
+  maxConcurrency?: number;
+}
+
+/**
+ * Tool validation result
+ */
+export interface ToolValidationResult {
+  isValid: boolean;
+  errors: string[];
+  warnings: string[];
+  suggestions: string[];
+}
+
+/**
+ * Tool execution capabilities
+ */
+export interface ToolCapabilities {
+  maxConcurrentExecutions: number;
+  supportedTimeouts: number[];
+  requiresConfirmation: boolean;
+  supportsBatch: boolean;
+}
+
+/**
+ * Contract for MCP tool execution feature
+ * Defines all external interfaces this feature provides
+ */
+export interface ToolExecutorContract {
+  /**
+   * Execute a single MCP tool with parameters
    */
-  executeTool(params: {
-    toolName: string;
-    arguments: Record<string, unknown>;
-    serverId?: string;
-    timeout?: number;
-    requireConfirmation?: boolean;
-  }): Promise<{
-    executionId: string;
-    result: ExecutionResult;
-    duration: number;
-    toolUsed: ToolDefinition;
-  }>;
+  executeTool(params: ToolExecutionParams): Promise<ToolExecutionResponse>;
   
   /**
-   * Execute multiple tools in sequence or parallel
+   * Execute multiple tools in batch
    */
-  executeTools(executions: Array<{
-    toolName: string;
-    arguments: Record<string, unknown>;
-    serverId?: string;
-  }>, options?: {
-    parallel?: boolean;
-    stopOnError?: boolean;
-    timeout?: number;
-  }): Promise<Array<{
-    toolName: string;
-    result: ExecutionResult;
-    success: boolean;
-    error?: string;
-  }>>;
+  executeTools(params: BatchExecutionParams): Promise<ToolExecutionResponse[]>;
   
   /**
-   * Cancel ongoing tool execution
+   * Validate tool parameters before execution
+   */
+  validateToolExecution(params: ToolExecutionParams): Promise<ToolValidationResult>;
+  
+  /**
+   * Get available tools from connected servers
+   */
+  getAvailableTools(serverId?: string): Promise<ToolDefinition[]>;
+  
+  /**
+   * Get tool definition by name
+   */
+  getToolDefinition(toolName: string, serverId?: string): Promise<ToolDefinition | null>;
+  
+  /**
+   * Cancel running tool execution
    */
   cancelExecution(executionId: string): Promise<boolean>;
   
-  // === EXECUTION MANAGEMENT ===
+  /**
+   * Get execution status
+   */
+  getExecutionStatus(executionId: string): Promise<'pending' | 'running' | 'completed' | 'failed' | 'cancelled'>;
   
   /**
-   * Get execution status and progress
+   * Get execution history for debugging
    */
-  getExecutionStatus(executionId: string): Promise<{
-    status: 'pending' | 'running' | 'completed' | 'failed' | 'cancelled';
-    progress?: number;
-    startTime: Date;
-    endTime?: Date;
-    result?: ExecutionResult;
-  }>;
+  getExecutionHistory(limit?: number): Promise<ToolExecutionResponse[]>;
   
   /**
-   * List recent executions with filtering
+   * Get tool execution capabilities
    */
-  getExecutionHistory(options?: {
-    toolName?: string;
-    serverId?: string;
-    limit?: number;
-    status?: string;
-    since?: Date;
-  }): Promise<Array<{
-    executionId: string;
-    toolName: string;
-    status: string;
-    startTime: Date;
-    duration: number;
-    success: boolean;
-  }>>;
-  
-  // === RESULT MANAGEMENT ===
+  getCapabilities(): Promise<ToolCapabilities>;
   
   /**
-   * Get cached execution result
+   * Clear execution history
    */
-  getCachedResult(params: {
-    toolName: string;
-    arguments: Record<string, unknown>;
-    maxAge?: number;
-  }): Promise<ExecutionResult | null>;
-  
-  /**
-   * Cache execution result for reuse
-   */
-  cacheResult(params: {
-    toolName: string;
-    arguments: Record<string, unknown>;
-    result: ExecutionResult;
-    ttl?: number;
-  }): Promise<void>;
-  
-  /**
-   * Clear cached results
-   */
-  clearCache(options?: {
-    toolName?: string;
-    olderThan?: Date;
-  }): Promise<number>;
-  
-  // === SECURITY & VALIDATION ===
-  
-  /**
-   * Validate tool arguments against schema
-   */
-  validateArguments(toolName: string, arguments: Record<string, unknown>): Promise<{
-    isValid: boolean;
-    errors: string[];
-    sanitizedArgs: Record<string, unknown>;
-  }>;
-  
-  /**
-   * Check if tool execution is allowed
-   */
-  checkPermissions(toolName: string, arguments: Record<string, unknown>): Promise<{
-    allowed: boolean;
-    reason?: string;
-    requiresConfirmation: boolean;
-  }>;
-  
-  // === CONFIGURATION ===
-  
-  updateConfig(config: Partial<ToolExecutorConfig>): Promise<void>;
-  getConfig(): ToolExecutorConfig;
+  clearHistory(): Promise<void>;
 }
 
-// === ADAPTER INTERFACES ===
-
-export interface McpProtocolAdapter {
-  sendToolRequest(params: {
-    serverId: string;
-    toolName: string;
-    arguments: Record<string, unknown>;
-  }): Promise<ExecutionResult>;
-  
-  discoverServerTools(serverId: string): Promise<ToolDefinition[]>;
-  validateConnection(serverId: string): Promise<boolean>;
-  cancelRequest(serverId: string, requestId: string): Promise<void>;
+/**
+ * Events that the tool executor can emit
+ */
+export interface ToolExecutorEvents {
+  onToolStarted: (executionId: string, toolName: string) => void;
+  onToolCompleted: (response: ToolExecutionResponse) => void;
+  onToolFailed: (executionId: string, error: Error) => void;
+  onToolCancelled: (executionId: string) => void;
+  onValidationFailed: (toolName: string, errors: string[]) => void;
 }
 
-export interface ResultTransformerAdapter {
-  transformResult(result: unknown, toolDefinition: ToolDefinition): ExecutionResult;
-  sanitizeResult(result: ExecutionResult): ExecutionResult;
-  validateResult(result: ExecutionResult): { isValid: boolean; errors: string[] };
-}
-
-// === EVENT PUBLISHERS ===
-
-export interface ToolEventPublisher {
-  publishToolInvoked(event: ToolInvoked): void;
-  publishToolCompleted(event: ToolCompleted): void;
-  publishToolFailed(event: ToolFailed): void;
-}
-
-// === EXTERNAL DEPENDENCIES ===
-
-export interface ToolExecutorDependencies {
-  mcpProtocolAdapter: McpProtocolAdapter;
-  resultTransformerAdapter: ResultTransformerAdapter;
-  eventPublisher: ToolEventPublisher;
-  config: ToolExecutorConfig;
+/**
+ * Configuration for tool executor
+ */
+export interface ToolExecutorConfig {
+  defaultTimeout: number;
+  maxConcurrentExecutions: number;
+  enableValidation: boolean;
+  requireConfirmationByDefault: boolean;
+  retryAttempts: number;
+  retryDelay: number;
 }

@@ -10,7 +10,7 @@
     "test": "jest"
   },
   "dependencies": {
-    "@olympian/shared": "workspace:*",
+    "@olympian/shared": "file:../shared",
     "express": "^4.18.0",
     "socket.io": "^4.7.0",
     "mongodb": "^6.0.0",

@@ -1,5 +1,5 @@
-import { Artifact } from '../../../models/artifacts/artifact.js';
-import { validateArtifact } from '../../../utils/artifact-validator.js';
+import { Artifact } from '../../../models/artifacts/artifact';
+import { validateArtifact } from '../../../utils/artifact-validator';
 
 /**
  * Artifact storage adapter for artifact management

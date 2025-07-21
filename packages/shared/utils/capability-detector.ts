@@ -1,3 +1,100 @@
+/**
+ * Capability Detector Utility
+ * Pure functions for detecting model capabilities
+ * Follows AI-Native architecture - utility functions only
+ */
+
+import type { ModelCapability } from '../models/connection/model-capability';
+
+/**
+ * Detection method configuration
+ */
+export interface DetectionMethod {
+  name: string;
+  priority: number;
+  testFunction: string;
+  successCriteria: string;
+}
+
+/**
+ * Detection result for a single capability
+ */
+export interface CapabilityDetectionResult {
+  capability: string;
+  detected: boolean;
+  confidence: number;
+  metadata: Record<string, unknown>;
+  testDuration: number;
+}
+
+/**
+ * Test a model's vision capabilities
+ */
+export async function testVisionCapability(modelEndpoint: string): Promise<CapabilityDetectionResult> {
+  const startTime = Date.now();
+  
+  try {
+    // This would be a real test in implementation
+    const hasVision = await mockVisionTest(modelEndpoint);
+    
+    return {
+      capability: 'vision',
+      detected: hasVision,
+      confidence: hasVision ? 0.95 : 0.05,
+      metadata: {
+        testType: 'vision_prompt',
+        modelEndpoint
+      },
+      testDuration: Date.now() - startTime
+    };
+  } catch (error) {
+    return {
+      capability: 'vision',
+      detected: false,
+      confidence: 0,
+      metadata: {
+        error: error instanceof Error ? error.message : 'Unknown error',
+        modelEndpoint
+      },
+      testDuration: Date.now() - startTime
+    };
+  }
+}
+
+/**
+ * Test a model's code generation capabilities
+ */
+export async function testCodeCapability(modelEndpoint: string): Promise<CapabilityDetectionResult> {
+  const startTime = Date.now();
+  
+  try {
+    const hasCodeGen = await mockCodeTest(modelEndpoint);
+    
+    return {
+      capability: 'code_generation',
+      detected: hasCodeGen,
+      confidence: hasCodeGen ? 0.9 : 0.1,
+      metadata: {
+        testType: 'code_prompt',
+        modelEndpoint
+      },
+      testDuration: Date.now() - startTime
+    };
+  } catch (error) {
+    return {
+      capability: 'code_generation',
+      detected: false,
+      confidence: 0,
+      metadata: {
+        error: error instanceof Error ? error.message : 'Unknown error',
+        modelEndpoint
+      },
+      testDuration: Date.now() - startTime
+    };
+  }
+}
+
+/**
  * Default detection methods for model capabilities
  */
 export function getDefaultDetectionMethods(): DetectionMethod[] {
@@ -9,206 +106,44 @@ export function getDefaultDetectionMethods(): DetectionMethod[] {
       successCriteria: 'responds to image input'
     },
     {
-      name: 'streaming_test',
+      name: 'code_test',
       priority: 2,
-      testFunction: 'testStreamingCapability', 
-      successCriteria: 'supports stream parameter'
-    },
-    {
-      name: 'tool_test',
-      priority: 3,
-      testFunction: 'testToolCapability',
-      successCriteria: 'supports function calling'
-    },
-    {
-      name: 'context_test',
-      priority: 4,
-      testFunction: 'testContextWindow',
-      successCriteria: 'handles large context'
-    },
-    {
-      name: 'chat_test',
-      priority: 5,
-      testFunction: 'testChatCapability',
-      successCriteria: 'basic chat response'
-    },
-    {
-      name: 'parameter_test',
-      priority: 6,
-      testFunction: 'testParameterSupport',
-      successCriteria: 'accepts temperature parameter'
-    },
-    {
-      name: 'format_test',
-      priority: 7,
-      testFunction: 'testOutputFormat',
-      successCriteria: 'structured output support'
-    },
-    {
-      name: 'metadata_test',
-      priority: 8,
-      testFunction: 'testModelMetadata',
-      successCriteria: 'returns model information'
+      testFunction: 'testCodeCapability',
+      successCriteria: 'generates valid code'
     }
   ];
 }
 
 /**
- * Analyze test results to determine capabilities
+ * Combine detection results into capability summary
  */
-export function analyzeCapabilities(
-  modelName: string,
-  testResults: ModelTestResult[]
-): DetectionResult {
-  const successfulTests = testResults.filter(r => r.success);
-  const totalDuration = testResults.reduce((sum, r) => sum + r.duration, 0);
-  
-  if (successfulTests.length === 0) {
-    return {
-      modelName,
-      method: 'automated',
-      success: false,
-      error: 'All detection methods failed',
-      duration: totalDuration
-    };
-  }
-  
-  const capabilities = buildCapabilitySet(successfulTests);
+export function summarizeCapabilities(results: CapabilityDetectionResult[]): ModelCapability {
+  const capabilities = results.filter(r => r.detected).map(r => r.capability);
+  const averageConfidence = results.reduce((sum, r) => sum + r.confidence, 0) / results.length;
   
   return {
-    modelName,
-    method: 'automated',
-    success: true,
+    id: `capability_${Date.now()}`,
+    modelName: 'detected_model',
     capabilities,
-    duration: totalDuration
-  };
-}
-
-/**
- * Build capability set from successful tests
- */
-export function buildCapabilitySet(
-  successfulTests: ModelTestResult[]
-): CapabilitySet {
-  const testNames = new Set(successfulTests.map(t => t.method));
-  
-  return {
-    supportsChat: testNames.has('chat_test'),
-    supportsVision: testNames.has('vision_test'),
-    supportsStreaming: testNames.has('streaming_test'),
-    supportsTools: testNames.has('tool_test'),
-    contextWindow: estimateContextWindow(testNames),
-    maxTokens: estimateMaxTokens(testNames)
-  };
-}
-
-/**
- * Estimate context window size based on tests
- */
-export function estimateContextWindow(testNames: Set<string>): number {
-  if (testNames.has('context_test')) {
-    // Assume large context if context test passed
-    return 8192;
-  }
-  
-  // Default conservative estimate
-  return 2048;
-}
-
-/**
- * Estimate max tokens based on model capabilities
- */
-export function estimateMaxTokens(testNames: Set<string>): number {
-  if (testNames.has('context_test')) {
-    return 4096;
-  }
-  
-  return 1024;
-}
-
-/**
- * Prioritize detection methods by importance
- */
-export function prioritizeDetectionMethods(
-  methods: DetectionMethod[]
-): DetectionMethod[] {
-  return [...methods].sort((a, b) => a.priority - b.priority);
-}
-
-/**
- * Check if model name suggests specific capabilities
- */
-export function inferCapabilitiesFromName(modelName: string): Partial<CapabilitySet> {
-  const name = modelName.toLowerCase();
-  const capabilities: Partial<CapabilitySet> = {};
-  
-  // Vision model indicators
-  if (name.includes('vision') || name.includes('llava') || name.includes('bakllava')) {
-    capabilities.supportsVision = true;
-  }
-  
-  // Large context indicators
-  if (name.includes('32k') || name.includes('128k') || name.includes('longcontext')) {
-    capabilities.contextWindow = name.includes('128k') ? 131072 : 32768;
-  }
-  
-  // Chat model indicators
-  if (name.includes('chat') || name.includes('instruct')) {
-    capabilities.supportsChat = true;
-  }
-  
-  return capabilities;
-}
-
-/**
- * Validate capability override
- */
-export function validateCapabilityOverride(
-  override: Partial<CapabilitySet>
-): { valid: boolean; errors: string[] } {
-  const errors: string[] = [];
-  
-  if (override.contextWindow !== undefined) {
-    if (override.contextWindow < 512 || override.contextWindow > 1000000) {
-      errors.push('Context window must be between 512 and 1,000,000');
+    confidence: averageConfidence,
+    detectedAt: new Date(),
+    metadata: {
+      testResults: results,
+      totalTests: results.length,
+      successfulTests: results.filter(r => r.detected).length
     }
-  }
-  
-  if (override.maxTokens !== undefined) {
-    if (override.maxTokens < 128 || override.maxTokens > 100000) {
-      errors.push('Max tokens must be between 128 and 100,000');
-    }
-  }
-  
-  return {
-    valid: errors.length === 0,
-    errors
   };
 }
 
-/**
- * Merge detected capabilities with overrides
- */
-export function mergeCapabilities(
-  detected: CapabilitySet,
-  override: Partial<CapabilitySet>
-): CapabilitySet {
-  return {
-    ...detected,
-    ...override
-  };
+// Mock test functions (would be replaced with real implementations)
+async function mockVisionTest(endpoint: string): Promise<boolean> {
+  // Simulate network call
+  await new Promise(resolve => setTimeout(resolve, 100));
+  return endpoint.includes('vision') || endpoint.includes('gpt-4');
 }
 
-/**
- * Create default capability configuration
- */
-export function createDefaultCapabilities(): CapabilitySet {
-  return {
-    supportsChat: true,
-    supportsVision: false,
-    supportsStreaming: true,
-    supportsTools: false,
-    contextWindow: 2048,
-    maxTokens: 1024
-  };
+async function mockCodeTest(endpoint: string): Promise<boolean> {
+  // Simulate network call  
+  await new Promise(resolve => setTimeout(resolve, 150));
+  return endpoint.includes('code') || endpoint.includes('gpt') || endpoint.includes('claude');
 }

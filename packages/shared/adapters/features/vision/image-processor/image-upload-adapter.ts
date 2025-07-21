@@ -1,5 +1,5 @@
-import { ImageData } from '../../../models/vision/image-data.js';
-import { validateImage, processImage } from '../../../utils/image-processor.js';
+import { ImageData } from '../../../models/vision/image-data';
+import { validateImage, processImage } from '../../../utils/image-processor';
 
 /**
  * Image upload adapter for vision processing

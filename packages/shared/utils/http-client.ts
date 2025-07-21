@@ -1,162 +1,213 @@
 /**
- * HTTP client utility - pure functions for HTTP operations
+ * HTTP Client Utility
+ * Pure functions for HTTP requests
+ * Follows AI-Native architecture - utility functions only
  */
 
-export interface HttpRequest {
-  readonly url: string;
-  readonly method: HttpMethod;
-  readonly headers?: Record<string, string>;
-  readonly body?: string;
-  readonly timeout?: number;
-}
-
-export type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH' | 'HEAD';
-
-export interface HttpResponse {
-  readonly status: number;
-  readonly statusText: string;
-  readonly headers: Record<string, string>;
-  readonly body: string;
-  readonly ok: boolean;
-}
-
-export interface HttpError {
-  readonly code: string;
-  readonly message: string;
-  readonly status?: number;
-  readonly response?: HttpResponse;
+/**
+ * HTTP request configuration
+ */
+export interface HttpRequestConfig {
+  method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
+  headers?: Record<string, string>;
+  body?: unknown;
+  timeout?: number;
+  retries?: number;
+  retryDelay?: number;
 }
 
 /**
- * Build HTTP request configuration
+ * HTTP response wrapper
  */
-export function buildRequest(
+export interface HttpResponse<T = unknown> {
+  data: T;
+  status: number;
+  statusText: string;
+  headers: Record<string, string>;
+  duration: number;
+}
+
+/**
+ * HTTP client error
+ */
+export class HttpClientError extends Error {
+  constructor(
+    message: string,
+    public status?: number,
+    public response?: Response
+  ) {
+    super(message);
+    this.name = 'HttpClientError';
+  }
+}
+
+/**
+ * Make HTTP request with configuration
+ */
+export async function makeHttpRequest<T = unknown>(
   url: string,
-  method: HttpMethod = 'GET',
-  options: Partial<HttpRequest> = {}
-): HttpRequest {
-  return {
-    url,
-    method,
-    headers: {
-      'Content-Type': 'application/json',
-      ...options.headers
-    },
-    body: options.body,
-    timeout: options.timeout || 10000
-  };
-}
-
-/**
- * Build Ollama API request
- */
-export function buildOllamaRequest(
-  endpoint: string,
-  path: string,
-  body?: unknown
-): HttpRequest {
-  const url = \`\${endpoint.replace(/\/$/, '')}/\${path.replace(/^\//, '')}\`;
+  config: HttpRequestConfig = { method: 'GET' }
+): Promise<HttpResponse<T>> {
+  const startTime = Date.now();
+  let lastError: Error | null = null;
+  const maxRetries = config.retries || 0;
   
-  return buildRequest(url, body ? 'POST' : 'GET', {
-    body: body ? JSON.stringify(body) : undefined,
-    headers: {
-      'Content-Type': 'application/json'
+  for (let attempt = 0; attempt <= maxRetries; attempt++) {
+    try {
+      const controller = new AbortController();
+      const timeout = config.timeout || 10000;
+      
+      const timeoutId = setTimeout(() => controller.abort(), timeout);
+      
+      const fetchConfig: RequestInit = {
+        method: config.method,
+        headers: {
+          'Content-Type': 'application/json',
+          ...config.headers
+        },
+        signal: controller.signal
+      };
+      
+      if (config.body && config.method !== 'GET') {
+        fetchConfig.body = typeof config.body === 'string' 
+          ? config.body 
+          : JSON.stringify(config.body);
+      }
+      
+      const response = await fetch(url, fetchConfig);
+      clearTimeout(timeoutId);
+      
+      if (!response.ok) {
+        throw new HttpClientError(
+          `HTTP Error: ${response.status} ${response.statusText}`,
+          response.status,
+          response
+        );
+      }
+      
+      const contentType = response.headers.get('content-type') || '';
+      let data: T;
+      
+      if (contentType.includes('application/json')) {
+        data = await response();
+      } else if (contentType.includes('text/')) {
+        data = await response.text() as T;
+      } else {
+        data = await response.arrayBuffer() as T;
+      }
+      
+      const headers: Record<string, string> = {};
+      response.headers.forEach((value, key) => {
+        headers[key] = value;
+      });
+      
+      return {
+        data,
+        status: response.status,
+        statusText: response.statusText,
+        headers,
+        duration: Date.now() - startTime
+      };
+      
+    } catch (error) {
+      lastError = error instanceof Error ? error : new Error('Unknown error');
+      
+      if (attempt < maxRetries) {
+        const delay = config.retryDelay || 1000 * Math.pow(2, attempt);
+        await new Promise(resolve => setTimeout(resolve, delay));
+        continue;
+      }
+      
+      break;
     }
-  });
-}
-
-/**
- * Parse HTTP error from response
- */
-export function parseHttpError(
-  response: HttpResponse,
-  context?: string
-): HttpError {
-  const message = context 
-    ? \`\${context}: \${response.statusText}\`
-    : response.statusText;
+  }
   
-  return {
-    code: getErrorCode(response.status),
-    message,
-    status: response.status,
-    response
-  };
+  throw lastError || new Error('Request failed');
 }
 
 /**
- * Check if URL is valid
+ * GET request helper
  */
-export function isValidUrl(url: string): boolean {
+export async function get<T = unknown>(
+  url: string,
+  config: HttpRequestConfig = { method: "GET" }
+): Promise<HttpResponse<T>> {
+  return makeHttpRequest<T>(url, { ...config, method: 'GET' });
+}
+
+/**
+ * POST request helper
+ */
+export async function post<T = unknown>(
+  url: string,
+  body?: unknown,
+  config: HttpRequestConfig = { method: "GET" }
+): Promise<HttpResponse<T>> {
+  return makeHttpRequest<T>(url, { ...config, method: 'POST', body });
+}
+
+/**
+ * PUT request helper
+ */
+export async function put<T = unknown>(
+  url: string,
+  body?: unknown,
+  config: HttpRequestConfig = { method: "GET" }
+): Promise<HttpResponse<T>> {
+  return makeHttpRequest<T>(url, { ...config, method: 'PUT', body });
+}
+
+/**
+ * DELETE request helper
+ */
+export async function del<T = unknown>(
+  url: string,
+  config: HttpRequestConfig = { method: "GET" }
+): Promise<HttpResponse<T>> {
+  return makeHttpRequest<T>(url, { ...config, method: 'DELETE' });
+}
+
+/**
+ * Check if URL is reachable
+ */
+export async function ping(url: string, timeout: number = 5000): Promise<boolean> {
   try {
-    new URL(url);
-    return true;
+    const response = await makeHttpRequest(url, {
+      method: 'GET',
+      timeout
+    });
+    return response.status < 400;
   } catch {
     return false;
   }
 }
 
 /**
- * Build query string from parameters
+ * Create HTTP client with base configuration
  */
-export function buildQueryString(params: Record<string, string | number | boolean>): string {
-  const entries = Object.entries(params)
-    .filter(([_, value]) => value !== undefined && value !== null)
-    .map(([key, value]) => \`\${encodeURIComponent(key)}=\${encodeURIComponent(String(value))}\`);
-  
-  return entries.length > 0 ? \`?\${entries.join('&')}\` : '';
-}
-
-/**
- * Parse response content type
- */
-export function parseContentType(headers: Record<string, string>): string {
-  const contentType = headers['content-type'] || headers['Content-Type'] || '';
-  return contentType.split(';')[0].trim().toLowerCase();
-}
-
-/**
- * Check if response is JSON
- */
-export function isJsonResponse(response: HttpResponse): boolean {
-  const contentType = parseContentType(response.headers);
-  return contentType === 'application/json';
-}
-
-/**
- * Check if request should be retried
- */
-export function shouldRetryRequest(
-  status: number,
-  retryCount: number,
-  maxRetries: number = 3
-): boolean {
-  if (retryCount >= maxRetries) {
-    return false;
-  }
-  
-  // Retry on server errors and specific client errors
-  return status >= 500 || status === 429 || status === 408;
-}
-
-/**
- * Calculate retry delay with exponential backoff
- */
-export function calculateRetryDelay(retryCount: number): number {
-  const baseDelay = 1000; // 1 second
-  const maxDelay = 10000; // 10 seconds
-  
-  const delay = baseDelay * Math.pow(2, retryCount);
-  return Math.min(delay, maxDelay);
-}
-
-function getErrorCode(status: number): string {
-  if (status >= 500) return 'SERVER_ERROR';
-  if (status === 429) return 'RATE_LIMITED';
-  if (status === 408) return 'TIMEOUT';
-  if (status === 404) return 'NOT_FOUND';
-  if (status === 401) return 'UNAUTHORIZED';
-  if (status === 403) return 'FORBIDDEN';
-  if (status >= 400) return 'CLIENT_ERROR';
-  return 'UNKNOWN_ERROR';
+export function createHttpClient(baseConfig: Partial<HttpRequestConfig> = {}) {
+  return {
+    async request<T = unknown>(
+      url: string,
+      config: Partial<HttpRequestConfig> = {}
+    ): Promise<HttpResponse<T>> {
+      return makeHttpRequest<T>(url, { ...baseConfig, ...config });
+    },
+    
+    async get<T = unknown>(url: string, config: HttpRequestConfig = { method: "GET" }): Promise<HttpResponse<T>> {
+      return this.request<T>(url, { ...config, method: 'GET' });
+    },
+    
+    async post<T = unknown>(url: string, body?: unknown, config: HttpRequestConfig = { method: "GET" }): Promise<HttpResponse<T>> {
+      return this.request<T>(url, { ...config, method: 'POST', body });
+    },
+    
+    async put<T = unknown>(url: string, body?: unknown, config: HttpRequestConfig = { method: "GET" }): Promise<HttpResponse<T>> {
+      return this.request<T>(url, { ...config, method: 'PUT', body });
+    },
+    
+    async delete<T = unknown>(url: string, config: HttpRequestConfig = { method: "GET" }): Promise<HttpResponse<T>> {
+      return this.request<T>(url, { ...config, method: 'DELETE' });
+    }
+  };
 }

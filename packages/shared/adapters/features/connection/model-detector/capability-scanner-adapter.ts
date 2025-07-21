@@ -1,5 +1,5 @@
-import { ModelCapability } from '../../../models/connection/model-capability.js';
-import { detectCapabilities } from '../../../utils/capability-detector.js';
+import { ModelCapability } from '../../../models/connection/model-capability';
+import { detectCapabilities } from '../../../utils/capability-detector';
 
 /**
  * Capability scanner adapter for model detection

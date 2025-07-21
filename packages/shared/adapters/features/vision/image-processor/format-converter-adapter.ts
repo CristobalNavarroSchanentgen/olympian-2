@@ -1,5 +1,5 @@
-import { ImageData } from '../../../models/vision/image-data.js';
-import { processImage } from '../../../utils/image-processor.js';
+import { ImageData } from '../../../models/vision/image-data';
+import { processImage } from '../../../utils/image-processor';
 
 /**
  * Format converter adapter for vision processing

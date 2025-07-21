@@ -3,7 +3,7 @@
  * All methods return Promises for consistency
  */
 
-import { Conversation, ConversationSummary, ConversationFilter } from '../models/chat/conversation.js';
+import { Conversation, ConversationSummary, ConversationFilter } from '../models/chat/conversation';
 
 export interface ConversationService {
   /**

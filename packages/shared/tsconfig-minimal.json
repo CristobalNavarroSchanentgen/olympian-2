@@ -1,0 +1,20 @@
+{
+  "extends": "./tsconfig.json",
+  "include": [
+    "models/**/*",
+    "utils/token-counter.ts",
+    "utils/artifact-validator.ts", 
+    "utils/context-manager.ts",
+    "utils/capability-detector.ts",
+    "utils/health-checker.ts",
+    "utils/process-manager.ts",
+    "utils/protocol-handler.ts",
+    "utils/image-processor.ts",
+    "index-minimal.ts"
+  ],
+  "exclude": [
+    "**/*.test.ts",
+    "adapters/**/*",
+    "features/**/*"
+  ]
+}

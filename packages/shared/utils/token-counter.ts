@@ -1,92 +1,73 @@
 /**
- * Token counting utility - pure function
- * Estimates token count for various models
+ * Token Counter Utility
+ * Pure functions for counting tokens
  */
 
 export interface TokenCount {
-  readonly tokens: number;
-  readonly characters: number;
-  readonly words: number;
+  prompt: number;
+  completion: number;
+  total: number;
 }
 
-export interface TokenCountOptions {
-  readonly model?: string;
-  readonly encoding?: 'gpt' | 'claude' | 'llama';
+export interface TokenBreakdown {
+  messages: number;
+  context: number;
+  system: number;
+  images: number;
+  total: number;
 }
 
-/**
- * Count tokens in text content
- */
-export function countTokens(
-  content: string, 
-  options: TokenCountOptions = {}
-): TokenCount {
-  const characters = content.length;
-  const words = content.trim().split(/\s+/).length;
-  
-  // Simple estimation - 4 characters per token average
-  // Different models have different ratios
-  const ratio = getTokenRatio(options.encoding || 'gpt');
-  const tokens = Math.ceil(characters / ratio);
+export function countTokens(text: string): number {
+  // Rough estimation: ~4 characters per token for English
+  return Math.ceil(text.length / 4);
+}
+
+export function countMessageTokens(content: string, role: string = 'user'): TokenCount {
+  const contentTokens = countTokens(content);
+  const roleTokens = countTokens(role);
+  const formatTokens = 4; // For message formatting
+
+  const total = contentTokens + roleTokens + formatTokens;
   
   return {
-    tokens,
-    characters,
-    words
+    prompt: role === 'user' ? total : 0,
+    completion: role === 'assistant' ? total : 0,
+    total
   };
 }
 
-/**
- * Count tokens in multiple text pieces
- */
-export function countTokensBatch(
-  contents: string[], 
-  options: TokenCountOptions = {}
-): TokenCount {
-  const results = contents.map(content => countTokens(content, options));
-  
-  return results.reduce((total, current) => ({
-    tokens: total.tokens + current.tokens,
-    characters: total.characters + current.characters,
-    words: total.words + current.words
-  }), { tokens: 0, characters: 0, words: 0 });
-}
+export function calculateTokenBreakdown(messages: any[]): TokenBreakdown {
+  let messagesTokens = 0;
+  let contextTokens = 0;
+  let systemTokens = 0;
+  let imagesTokens = 0;
 
-/**
- * Check if content fits within token limit
- */
-export function fitsInTokenLimit(
-  content: string, 
-  limit: number, 
-  options: TokenCountOptions = {}
-): boolean {
-  const count = countTokens(content, options);
-  return count.tokens <= limit;
-}
+  for (const message of messages) {
+    const tokens = countTokens(message.content || '');
+    
+    switch (message.role) {
+      case 'system':
+        systemTokens += tokens;
+        break;
+      case 'user':
+      case 'assistant':
+        messagesTokens += tokens;
+        break;
+      default:
+        contextTokens += tokens;
+    }
 
-/**
- * Truncate content to fit token limit
- */
-export function truncateToTokenLimit(
-  content: string, 
-  limit: number, 
-  options: TokenCountOptions = {}
-): string {
-  if (fitsInTokenLimit(content, limit, options)) {
-    return content;
+    // Count image tokens (rough estimate)
+    if (message.images && Array.isArray(message.images)) {
+      imagesTokens += message.images.length * 765; // ~765 tokens per image
+    }
   }
-  
-  const ratio = getTokenRatio(options.encoding || 'gpt');
-  const maxChars = Math.floor(limit * ratio);
-  
-  return content.substring(0, maxChars);
-}
 
-function getTokenRatio(encoding: string): number {
-  switch (encoding) {
-    case 'gpt': return 4;
-    case 'claude': return 3.5;
-    case 'llama': return 4.5;
-    default: return 4;
-  }
+  return {
+    messages: messagesTokens,
+    context: contextTokens,
+    system: systemTokens,
+    images: imagesTokens,
+    total: messagesTokens + contextTokens + systemTokens + imagesTokens
+  };
 }

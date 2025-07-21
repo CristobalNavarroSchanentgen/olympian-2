@@ -1,5 +1,5 @@
-import { Message } from '../../../models/chat/message.js';
-import { countTokens } from '../../../utils/token-counter.js';
+import { Message } from '../../../models/chat/message';
+import { countTokens } from '../../../utils/token-counter';
 
 /**
  * Token budget adapter for memory management

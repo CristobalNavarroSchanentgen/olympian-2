@@ -59,7 +59,7 @@ export const modelDetectorDefaults: ModelDetectorConfig = {
   overrides: {
     allowManualOverride: true,
     validateOverrides: true,
-    overrideFile: 'model-capabilities.json',
+    overrideFile: 'model-capabilitieson',
     backupOverrides: true,
   },
 };

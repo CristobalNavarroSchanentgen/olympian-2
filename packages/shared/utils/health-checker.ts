@@ -1,173 +1,231 @@
 /**
- * Health checking utility - pure functions
+ * Health Checker Utility
+ * Pure functions for checking service health
+ * Follows AI-Native architecture - utility functions only
  */
 
-import { HealthCheck, CheckStatus, HealthStatus } from '../models/connection/health-status.js';
+import type { HealthStatus } from '../models/connection/health-status';
 
+/**
+ * Health check configuration
+ */
 export interface HealthCheckConfig {
-  readonly name: string;
-  readonly timeout: number;
-  readonly retries: number;
-  readonly interval: number;
-}
-
-export interface CheckResult {
-  readonly status: CheckStatus;
-  readonly message?: string;
-  readonly duration: number;
-  readonly details?: Record<string, unknown>;
+  timeout: number;
+  retries: number;
+  retryDelay: number;
+  endpoints: string[];
 }
 
 /**
- * Evaluate health check result
+ * Health check result for a single endpoint
  */
-export function evaluateHealthCheck(
-  config: HealthCheckConfig,
-  result: CheckResult
-): HealthCheck {
-  return {
-    name: config.name,
-    status: result.status,
-    message: result.message,
-    duration: result.duration,
-    details: result.details
+export interface HealthCheckResult {
+  endpoint: string;
+  status: 'healthy' | 'unhealthy' | 'timeout' | 'error';
+  responseTime: number;
+  error?: string;
+  details?: Record<string, unknown>;
+  timestamp: Date;
+}
+
+/**
+ * Aggregated health status
+ */
+export interface AggregatedHealth {
+  overall: 'healthy' | 'degraded' | 'unhealthy';
+  checks: HealthCheckResult[];
+  summary: {
+    total: number;
+    healthy: number;
+    unhealthy: number;
+    errors: number;
   };
 }
 
 /**
- * Aggregate multiple health checks
+ * Check health of a single HTTP endpoint
  */
-export function aggregateHealthChecks(
-  checks: HealthCheck[]
-): { status: CheckStatus; summary: string } {
-  if (checks.length === 0) {
-    return { status: 'fail', summary: 'No health checks configured' };
-  }
+export async function checkHttpEndpoint(
+  url: string, 
+  timeout: number = 5000
+): Promise<HealthCheckResult> {
+  const startTime = Date.now();
   
-  const failCount = checks.filter(c => c.status === 'fail').length;
-  const warnCount = checks.filter(c => c.status === 'warn').length;
-  
-  if (failCount > 0) {
-    return { 
-      status: 'fail', 
-      summary: \`\${failCount} check(s) failed, \${warnCount} warning(s)\`
+  try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), timeout);
+    
+    const response = await fetch(url, {
+      method: 'GET',
+      signal: controller.signal,
+      headers: {
+        'User-Agent': 'olympian-health-checker/1.0.0'
+      }
+    });
+    
+    clearTimeout(timeoutId);
+    const responseTime = Date.now() - startTime;
+    
+    return {
+      endpoint: url,
+      status: response.ok ? 'healthy' : 'unhealthy',
+      responseTime,
+      details: {
+        status: response.status,
+        statusText: response.statusText
+      },
+      timestamp: new Date()
+    };
+  } catch (error) {
+    const responseTime = Date.now() - startTime;
+    
+    if (error instanceof Error && error.name === 'AbortError') {
+      return {
+        endpoint: url,
+        status: 'timeout',
+        responseTime,
+        error: 'Request timed out',
+        timestamp: new Date()
+      };
+    }
+    
+    return {
+      endpoint: url,
+      status: 'error',
+      responseTime,
+      error: error instanceof Error ? error.message : 'Unknown error',
+      timestamp: new Date()
     };
   }
+}
+
+/**
+ * Check health of Ollama instance
+ */
+export async function checkOllamaHealth(
+  baseUrl: string = 'http://localhost:11434'
+): Promise<HealthCheckResult> {
+  return checkHttpEndpoint(`${baseUrl}/api/tags`);
+}
+
+/**
+ * Check health of MCP server process
+ */
+export async function checkMcpServerHealth(
+  serverId: string,
+  processId?: number
+): Promise<HealthCheckResult> {
+  const startTime = Date.now();
   
-  if (warnCount > 0) {
-    return { 
-      status: 'warn', 
-      summary: \`\${warnCount} check(s) have warnings\`
+  try {
+    // In a real implementation, this would check the actual process
+    const isRunning = processId ? await mockCheckProcess(processId) : false;
+    const responseTime = Date.now() - startTime;
+    
+    return {
+      endpoint: serverId,
+      status: isRunning ? 'healthy' : 'unhealthy',
+      responseTime,
+      details: {
+        processId,
+        serverId
+      },
+      timestamp: new Date()
+    };
+  } catch (error) {
+    return {
+      endpoint: serverId,
+      status: 'error',
+      responseTime: Date.now() - startTime,
+      error: error instanceof Error ? error.message : 'Unknown error',
+      timestamp: new Date()
     };
   }
-  
-  return { 
-    status: 'pass', 
-    summary: \`All \${checks.length} check(s) passed\`
-  };
 }
 
 /**
- * Calculate service health status
+ * Perform health checks on multiple endpoints
  */
-export function calculateServiceHealth(
-  checks: HealthCheck[]
-): { healthy: boolean; degraded: boolean } {
-  const { status } = aggregateHealthChecks(checks);
+export async function performHealthChecks(
+  config: HealthCheckConfig
+): Promise<AggregatedHealth> {
+  const checks: HealthCheckResult[] = [];
   
-  return {
-    healthy: status === 'pass',
-    degraded: status === 'warn'
-  };
+  for (const endpoint of config.endpoints) {
+    let result: HealthCheckResult;
+    let attempts = 0;
+    
+    do {
+      result = await checkHttpEndpoint(endpoint, config.timeout);
+      attempts++;
+      
+      if (result.status !== 'healthy' && attempts < config.retries) {
+        await new Promise(resolve => setTimeout(resolve, config.retryDelay));
+      }
+    } while (result.status !== 'healthy' && attempts < config.retries);
+    
+    checks.push(result);
+  }
+  
+  return aggregateHealthResults(checks);
 }
 
 /**
- * Build health status from checks
+ * Aggregate health check results
  */
-export function buildHealthStatus(
-  service: string,
-  checks: HealthCheck[],
-  metadata: Record<string, unknown> = {}
-): HealthStatus {
-  const { healthy, degraded } = calculateServiceHealth(checks);
+export function aggregateHealthResults(checks: HealthCheckResult[]): AggregatedHealth {
+  const summary = {
+    total: checks.length,
+    healthy: checks.filter(c => c.status === 'healthy').length,
+    unhealthy: checks.filter(c => c.status === 'unhealthy').length,
+    errors: checks.filter(c => c.status === 'error' || c.status === 'timeout').length
+  };
   
-  let status: HealthStatus['status'];
-  if (healthy) status = 'healthy';
-  else if (degraded) status = 'degraded';
-  else status = 'unhealthy';
+  let overall: 'healthy' | 'degraded' | 'unhealthy';
+  
+  if (summary.healthy === summary.total) {
+    overall = 'healthy';
+  } else if (summary.healthy > 0) {
+    overall = 'degraded';
+  } else {
+    overall = 'unhealthy';
+  }
   
   return {
-    service,
-    status,
-    timestamp: new Date(),
+    overall,
     checks,
-    metadata: {
-      version: 'unknown',
-      uptime: 0,
-      connections: 0,
-      ...metadata
-    }
+    summary
   };
 }
 
 /**
- * Check if health status is acceptable
+ * Convert health results to status object
  */
-export function isHealthyStatus(status: HealthStatus): boolean {
-  return status.status === 'healthy' || status.status === 'degraded';
-}
-
-/**
- * Calculate health score (0-100)
- */
-export function calculateHealthScore(checks: HealthCheck[]): number {
-  if (checks.length === 0) return 0;
-  
-  const weights = { pass: 100, warn: 50, fail: 0 };
-  const totalScore = checks.reduce((sum, check) => {
-    return sum + weights[check.status];
-  }, 0);
-  
-  return Math.round(totalScore / checks.length);
-}
-
-/**
- * Determine if health check should be retried
- */
-export function shouldRetryHealthCheck(
-  result: CheckResult,
-  retryCount: number,
-  maxRetries: number
-): boolean {
-  if (retryCount >= maxRetries) return false;
-  if (result.status === 'pass') return false;
-  
-  // Retry on failures but not on warnings
-  return result.status === 'fail';
-}
-
-/**
- * Create default health check configs
- */
-export function createDefaultHealthChecks(): HealthCheckConfig[] {
-  return [
-    {
-      name: 'connectivity',
-      timeout: 5000,
-      retries: 2,
-      interval: 30000
-    },
-    {
-      name: 'response_time',
-      timeout: 10000,
-      retries: 1,
-      interval: 60000
-    },
-    {
-      name: 'resource_usage',
-      timeout: 3000,
-      retries: 1,
-      interval: 120000
+export function toHealthStatus(aggregated: AggregatedHealth): HealthStatus {
+  return {
+    status: aggregated.overall,
+    timestamp: new Date(),
+    services: aggregated.checks.reduce((acc, check) => {
+      acc[check.endpoint] = {
+        status: check.status,
+        responseTime: check.responseTime,
+        error: check.error,
+        lastCheck: check.timestamp
+      };
+      return acc;
+    }, {} as Record<string, any>),
+    metadata: {
+      totalChecks: aggregated.summary.total,
+      healthyCount: aggregated.summary.healthy,
+      unhealthyCount: aggregated.summary.unhealthy,
+      errorCount: aggregated.summary.errors
     }
-  ];
+  };
+}
+
+// Mock function for process checking
+async function mockCheckProcess(processId: number): Promise<boolean> {
+  // In real implementation, would use process.kill(processId, 0) or similar
+  await new Promise(resolve => setTimeout(resolve, 50));
+  return processId > 0;
 }

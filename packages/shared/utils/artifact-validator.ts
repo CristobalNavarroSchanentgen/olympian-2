@@ -1,119 +1,59 @@
 /**
- * Artifact validation utility - pure functions
+ * Artifact Validator Utility
+ * Pure functions for validating artifacts
  */
 
-import { ArtifactType, ArtifactValidation, ValidationError } from '../models/artifacts/artifact.js';
+import type { Artifact, ArtifactType } from '../models/artifacts/artifact';
 
-export interface ValidationConfig {
-  readonly maxSize: number;
-  readonly allowedTypes: ArtifactType[];
-  readonly strictMode: boolean;
+export interface ValidationResult {
+  isValid: boolean;
+  warnings: string[];
+  suggestions: string[];
+  errors: string[];
 }
 
-/**
- * Default validation configuration
- */
-export function getDefaultValidationConfig(): ValidationConfig {
-  return {
-    maxSize: 1024 * 1024, // 1MB
-    allowedTypes: ['code', 'html', 'react', 'svg', 'mermaid', 'json', 'csv', 'markdown', 'text'],
-    strictMode: false
-  };
-}
-
-/**
- * Validate artifact content
- */
-export function validateArtifact(
-  type: ArtifactType,
-  content: string,
-  config: ValidationConfig = getDefaultValidationConfig()
-): ArtifactValidation {
-  const errors: ValidationError[] = [];
+export function validateArtifact(artifact: Partial<Artifact>): ValidationResult {
   const warnings: string[] = [];
-  
-  // Check if type is allowed
-  if (!config.allowedTypes.includes(type)) {
-    errors.push({
-      code: 'INVALID_TYPE',
-      message: 'Artifact type is not allowed'
-    });
+  const suggestions: string[] = [];
+  const errors: string[] = [];
+
+  // Required fields
+  if (!artifact.title) {
+    errors.push('Title is required');
   }
   
-  // Type-specific validation
-  const typeErrors = validateByType(type, content);
-  errors.push(...typeErrors);
+  if (!artifact.content) {
+    errors.push('Content is required');
+  }
   
+  if (!artifact.type) {
+    errors.push('Type is required');
+  }
+
+  // Type validation
+  if (artifact.type && !isValidArtifactType(artifact.type)) {
+    errors.push('Invalid artifact type');
+  }
+
+  // Content validation
+  if (artifact.content && artifact.content.length > 100000) {
+    warnings.push('Content is very large, consider splitting');
+  }
+
+  // Title validation
+  if (artifact.title && artifact.title.length > 100) {
+    warnings.push('Title is quite long');
+  }
+
   return {
-    valid: errors.length === 0,
-    errors,
+    isValid: errors.length === 0,
     warnings,
-    size: new TextEncoder().encode(content).length
+    suggestions,
+    errors
   };
 }
 
-/**
- * Validate content by artifact type
- */
-export function validateByType(
-  type: ArtifactType,
-  content: string
-): ValidationError[] {
-  switch (type) {
-    case 'json':
-      return validateJson(content);
-    case 'html':
-      return validateHtml(content);
-    case 'react':
-      return validateReact(content);
-    default:
-      return [];
-  }
-}
-
-/**
- * Validate JSON content
- */
-export function validateJson(content: string): ValidationError[] {
-  try {
-    JSON.parse(content);
-    return [];
-  } catch (error) {
-    return [{
-      code: 'INVALID_JSON',
-      message: 'Invalid JSON format'
-    }];
-  }
-}
-
-/**
- * Validate HTML content
- */
-export function validateHtml(content: string): ValidationError[] {
-  const errors: ValidationError[] = [];
-  
-  if (!content.includes('<') || !content.includes('>')) {
-    errors.push({
-      code: 'INVALID_HTML',
-      message: 'Content does not appear to be valid HTML'
-    });
-  }
-  
-  return errors;
-}
-
-/**
- * Validate React component
- */
-export function validateReact(content: string): ValidationError[] {
-  const errors: ValidationError[] = [];
-  
-  if (!content.includes('export default')) {
-    errors.push({
-      code: 'MISSING_EXPORT',
-      message: 'React component should have default export'
-    });
-  }
-  
-  return errors;
+function isValidArtifactType(type: string): type is ArtifactType {
+  const validTypes: ArtifactType[] = ['code', 'text', 'html', 'svg', 'react', 'mermaid'];
+  return validTypes.includes(type as ArtifactType);
 }

@@ -2,7 +2,7 @@
  * Message service interface
  */
 
-import { Message, MessageDraft } from '../models/chat/message.js';
+import { Message, MessageDraft } from '../models/chat/message';
 
 export interface MessageService {
   /**

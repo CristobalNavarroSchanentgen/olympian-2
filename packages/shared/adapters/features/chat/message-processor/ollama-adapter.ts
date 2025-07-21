@@ -1,5 +1,5 @@
-import { Message } from '../../../models/chat/message.js';
-import { httpRequest } from '../../../utils/http-client.js';
+import { Message } from '../../../models/chat/message';
+import { httpRequest } from '../../../utils/http-client';
 
 /**
  * Ollama adapter for message processing
@@ -62,7 +62,7 @@ export function createOllamaAdapter(baseUrl: string): OllamaAdapter {
         throw new Error(`Ollama request failed: ${response.status}`);
       }
 
-      const data = await response.json();
+      const data = await responseon();
       return data.message.content;
     },
 
@@ -125,7 +125,7 @@ export function createOllamaAdapter(baseUrl: string): OllamaAdapter {
         throw new Error(`Failed to list models: ${response.status}`);
       }
 
-      const data = await response.json();
+      const data = await responseon();
       return data.models.map(transformModelInfo);
     },
 
@@ -142,7 +142,7 @@ export function createOllamaAdapter(baseUrl: string): OllamaAdapter {
         throw new Error(`Failed to get model info: ${response.status}`);
       }
 
-      const data = await response.json();
+      const data = await responseon();
       return transformModelInfo(data);
     },
 
@@ -170,7 +170,7 @@ export function createOllamaAdapter(baseUrl: string): OllamaAdapter {
         throw new Error(`Failed to get version: ${response.status}`);
       }
 
-      const data = await response.json();
+      const data = await responseon();
       return data.version || 'unknown';
     }
   };

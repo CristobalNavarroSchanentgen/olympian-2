@@ -1,4 +1,4 @@
-import { ModelCapability } from '../../../models/connection/model-capability.js';
+import { ModelCapability } from '../../../models/connection/model-capability';
 
 /**
  * Model metadata adapter for model detection

@@ -2,7 +2,7 @@
  * Connection service interface
  */
 
-import { OllamaConnection, ConnectionHealth } from '../models/connection/ollama-connection.js';
+import { OllamaConnection, ConnectionHealth } from '../models/connection/ollama-connection';
 
 export interface ConnectionService {
   /**

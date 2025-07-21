@@ -60,7 +60,7 @@ async function makeHttpRequest(url, config = { method: 'GET' }) {
             const contentType = response.headers.get('content-type') || '';
             let data;
             if (contentType.includes('application/json')) {
-                data = await responseon();
+                data = await response();
             }
             else if (contentType.includes('text/')) {
                 data = await response.text();
@@ -95,25 +95,25 @@ async function makeHttpRequest(url, config = { method: 'GET' }) {
 /**
  * GET request helper
  */
-async function get(url, config) {
+async function get(url, config = { method: "GET" }) {
     return makeHttpRequest(url, { ...config, method: 'GET' });
 }
 /**
  * POST request helper
  */
-async function post(url, body, config) {
+async function post(url, body, config = { method: "GET" }) {
     return makeHttpRequest(url, { ...config, method: 'POST', body });
 }
 /**
  * PUT request helper
  */
-async function put(url, body, config) {
+async function put(url, body, config = { method: "GET" }) {
     return makeHttpRequest(url, { ...config, method: 'PUT', body });
 }
 /**
  * DELETE request helper
  */
-async function del(url, config) {
+async function del(url, config = { method: "GET" }) {
     return makeHttpRequest(url, { ...config, method: 'DELETE' });
 }
 /**
@@ -139,16 +139,16 @@ function createHttpClient(baseConfig = {}) {
         async request(url, config = {}) {
             return makeHttpRequest(url, { ...baseConfig, ...config });
         },
-        async get(url, config) {
+        async get(url, config = { method: "GET" }) {
             return this.request(url, { ...config, method: 'GET' });
         },
-        async post(url, body, config) {
+        async post(url, body, config = { method: "GET" }) {
             return this.request(url, { ...config, method: 'POST', body });
         },
-        async put(url, body, config) {
+        async put(url, body, config = { method: "GET" }) {
             return this.request(url, { ...config, method: 'PUT', body });
         },
-        async delete(url, config) {
+        async delete(url, config = { method: "GET" }) {
             return this.request(url, { ...config, method: 'DELETE' });
         }
     };

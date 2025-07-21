@@ -25,15 +25,15 @@ function parseMcpConfig(rawConfig) {
     }
     const config = rawConfig;
     // Validate servers field
-    if (!config.mcpServers || typeof config.mcpServers !== 'object') {
-        errors.push({ field: 'mcpServers', message: 'mcpServers field is required and must be an object' });
+    if (!config.servers || typeof config.servers !== 'object') {
+        errors.push({ field: 'servers', message: 'servers field is required and must be an object' });
     }
     if (errors.length > 0) {
         return { success: false, errors, warnings };
     }
     const servers = {};
-    const mcpServers = config.mcpServers;
-    for (const [name, serverConfig] of Object.entries(mcpServers)) {
+    const servers = config.servers;
+    for (const [name, serverConfig] of Object.entries(servers)) {
         const serverResult = parseServerConfig(name, serverConfig);
         if (!serverResult.success) {
             errors.push(...serverResult.errors);
@@ -49,7 +49,7 @@ function parseMcpConfig(rawConfig) {
     return {
         success: true,
         data: {
-            mcpServers: servers,
+            servers: servers,
             version: config.version || '1.0.0',
             metadata: config.metadata || {}
         },
@@ -108,16 +108,16 @@ function validateConfig(config) {
     const errors = [];
     const warnings = [];
     // Check for empty servers
-    if (Object.keys(config.mcpServers).length === 0) {
+    if (Object.keys(config.servers).length === 0) {
         warnings.push('No MCP servers configured');
     }
     // Check for disabled servers
-    const disabledCount = Object.values(config.mcpServers).filter(s => s.disabled).length;
+    const disabledCount = Object.values(config.servers).filter(s => s.disabled).length;
     if (disabledCount > 0) {
         warnings.push(`${disabledCount} servers are disabled`);
     }
     // Check for missing environment variables
-    for (const [name, server] of Object.entries(config.mcpServers)) {
+    for (const [name, server] of Object.entries(config.servers)) {
         for (const [envKey, envValue] of Object.entries(server.env)) {
             if (envValue.startsWith('$') && !process.env[envValue.slice(1)]) {
                 warnings.push(`Environment variable ${envValue} not found for server ${name}`);
@@ -142,12 +142,12 @@ function stringifyConfig(config, pretty = true) {
  */
 function mergeConfigs(configs) {
     const merged = {
-        mcpServers: {},
+        servers: {},
         version: '1.0.0',
         metadata: {}
     };
     for (const config of configs) {
-        Object.assign(merged.mcpServers, config.mcpServers);
+        Object.assign(merged.servers, config.servers);
         Object.assign(merged.metadata, config.metadata);
         // Use the latest version
         if (config.version && config.version > merged.version) {

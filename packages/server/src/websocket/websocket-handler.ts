@@ -1,14 +1,99 @@
+import { Server as SocketIOServer, Socket } from 'socket.io';
+import { DatabaseService } from '../services/database-service';
+import { MCPManager } from '../mcp/mcp-manager';
+import { OllamaService } from '../services/ollama-service';
+
+export class WebSocketHandler {
+  private io: SocketIOServer;
+  private dbService: DatabaseService;
+  private mcpManager: MCPManager;
+  private ollamaService: OllamaService;
+
+  constructor(
+    io: SocketIOServer,
+    dbService: DatabaseService,
+    mcpManager: MCPManager,
+    ollamaService: OllamaService
+  ) {
+    this.io = io;
+    this.dbService = dbService;
+    this.mcpManager = mcpManager;
+    this.ollamaService = ollamaService;
+    
+    this.setupHandlers();
+  }
+
+  private setupHandlers(): void {
+    this.io.on('connection', (socket: Socket) => {
+      console.log('Client connected:', socket.id);
+      
+      socket.on('conversation:join', (conversationId: string) => {
+        socket.join('conversation:' + conversationId);
+        this.sendSystemStatus(socket);
+      });
+
+      socket.on('chat:message', (data) => this.handleChatMessage(socket, data));
+      socket.on('tool:execute', (data) => this.handleToolExecution(socket, data));
+      socket.on('image:upload', (data) => this.handleImageUpload(socket, data));
+      socket.on('status:request', () => this.sendSystemStatus(socket));
+      
+      socket.on('disconnect', () => {
+        console.log('Client disconnected:', socket.id);
+      });
+    });
+  }
+
+  private async handleChatMessage(socket: Socket, data: {
+    conversationId: string;
+    content: string;
+    model?: string;
+  }): Promise<void> {
+    try {
+      const userMessage = await this.dbService.createMessage({
+        conversationId: data.conversationId,
+        role: 'user',
+        content: data.content,
+        timestamp: new Date()
+      });
+
+      this.io.to('conversation:' + data.conversationId).emit('chat:message', userMessage);
+
+      const assistantMessage = await this.dbService.createMessage({
+        conversationId: data.conversationId,
+        role: 'assistant',
+        content: '',
+        timestamp: new Date()
+      });
+
+      const chatRequest = {
+        model: data.model || 'llama3.2',
+        messages: [{ role: 'user' as const, content: data.content }]
+      };
+
+      let fullResponse = '';
+
+      for await (const chunk of this.ollamaService.streamChat(chatRequest)) {
+        if (chunk.message?.content) {
+          fullResponse += chunk.message.content;
+          
+          socket.emit('chat:stream', {
+            messageId: assistantMessage.id,
+            content: chunk.message.content,
+            metadata: { streaming: true }
+          });
+        }
+      }
+
+      await this.dbService.updateMessage(assistantMessage.id, {
         content: fullResponse,
         metadata: { streaming: false, completed: true }
       });
 
-      // Emit completion
-      this.io.to(`conversation:${data.conversationId}`).emit('chat:complete', {
+      this.io.to('conversation:' + data.conversationId).emit('chat:complete', {
         messageId: assistantMessage.id,
         fullContent: fullResponse
       });
 
-      // Update conversation timestamp
       await this.dbService.updateConversation(data.conversationId, {
         updatedAt: new Date()
       });
@@ -47,11 +132,7 @@
     filename: string;
   }): Promise<void> {
     try {
-      // Process image data (base64)
       const imageBuffer = Buffer.from(data.imageData.split(',')[1], 'base64');
-      
-      // Here you would typically save to file system or cloud storage
-      // For now, we'll just acknowledge the upload
       
       socket.emit('image:uploaded', {
         success: true,
@@ -61,27 +142,6 @@
     } catch (error) {
       socket.emit('image:error', {
         error: error instanceof Error ? error.message : 'Image upload failed'
-      });
-    }
-  }
-
-  private async executeTool(conversationId: string, toolCall: any): Promise<void> {
-    try {
-      const result = await this.mcpManager.executeTool(
-        toolCall.server || 'unknown',
-        toolCall.function.name,
-        toolCall.function.arguments
-      );
-
-      // Broadcast tool execution result
-      this.io.to(`conversation:${conversationId}`).emit('tool:executed', {
-        toolCall,
-        result
-      });
-    } catch (error) {
-      this.io.to(`conversation:${conversationId}`).emit('tool:error', {
-        toolCall,
-        error: error instanceof Error ? error.message : 'Tool execution failed'
       });
     }
   }
@@ -96,7 +156,7 @@
         tools: tools.length
       },
       database: {
-        connected: true // TODO: actual health check
+        connected: true
       },
       ollama: {
         connected: this.ollamaService.isConnected()

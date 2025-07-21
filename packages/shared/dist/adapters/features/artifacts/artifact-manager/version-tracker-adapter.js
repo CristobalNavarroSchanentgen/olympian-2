@@ -67,10 +67,7 @@ function createVersionTrackerAdapter() {
                 messageId: '',
                 createdAt: new Date(),
                 updatedAt: new Date(),
-                metadata: {
-                    restoredFromVersion: versionNumber,
-                    restoredAt: new Date()
-                }
+                metadata: {}
             };
             return restoredArtifact;
         },

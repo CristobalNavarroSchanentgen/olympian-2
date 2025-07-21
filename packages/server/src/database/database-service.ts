@@ -3,7 +3,7 @@ import {
   Conversation, 
   Message, 
   Artifact,
-  ConnectionStatus,
+  HealthStatus as ConnectionStatus,
   ModelCapability 
 } from '@olympian/shared';
 

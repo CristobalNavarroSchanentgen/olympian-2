@@ -39,19 +39,19 @@ export declare function makeHttpRequest<T = unknown>(url: string, config?: HttpR
 /**
  * GET request helper
  */
-export declare function get<T = unknown>(url: string, config?: Partial<HttpRequestConfig>): Promise<HttpResponse<T>>;
+export declare function get<T = unknown>(url: string, config?: HttpRequestConfig): Promise<HttpResponse<T>>;
 /**
  * POST request helper
  */
-export declare function post<T = unknown>(url: string, body?: unknown, config?: Partial<HttpRequestConfig>): Promise<HttpResponse<T>>;
+export declare function post<T = unknown>(url: string, body?: unknown, config?: HttpRequestConfig): Promise<HttpResponse<T>>;
 /**
  * PUT request helper
  */
-export declare function put<T = unknown>(url: string, body?: unknown, config?: Partial<HttpRequestConfig>): Promise<HttpResponse<T>>;
+export declare function put<T = unknown>(url: string, body?: unknown, config?: HttpRequestConfig): Promise<HttpResponse<T>>;
 /**
  * DELETE request helper
  */
-export declare function del<T = unknown>(url: string, config?: Partial<HttpRequestConfig>): Promise<HttpResponse<T>>;
+export declare function del<T = unknown>(url: string, config?: HttpRequestConfig): Promise<HttpResponse<T>>;
 /**
  * Check if URL is reachable
  */
@@ -61,9 +61,9 @@ export declare function ping(url: string, timeout?: number): Promise<boolean>;
  */
 export declare function createHttpClient(baseConfig?: Partial<HttpRequestConfig>): {
     request<T = unknown>(url: string, config?: Partial<HttpRequestConfig>): Promise<HttpResponse<T>>;
-    get<T = unknown>(url: string, config?: Partial<HttpRequestConfig>): Promise<HttpResponse<T>>;
-    post<T = unknown>(url: string, body?: unknown, config?: Partial<HttpRequestConfig>): Promise<HttpResponse<T>>;
-    put<T = unknown>(url: string, body?: unknown, config?: Partial<HttpRequestConfig>): Promise<HttpResponse<T>>;
-    delete<T = unknown>(url: string, config?: Partial<HttpRequestConfig>): Promise<HttpResponse<T>>;
+    get<T = unknown>(url: string, config?: HttpRequestConfig): Promise<HttpResponse<T>>;
+    post<T = unknown>(url: string, body?: unknown, config?: HttpRequestConfig): Promise<HttpResponse<T>>;
+    put<T = unknown>(url: string, body?: unknown, config?: HttpRequestConfig): Promise<HttpResponse<T>>;
+    delete<T = unknown>(url: string, config?: HttpRequestConfig): Promise<HttpResponse<T>>;
 };
 //# sourceMappingURL=http-client.d.ts.map

@@ -13,7 +13,7 @@ export type { ToolDefinition } from './models/mcp/tool-definition';
 export type { ExecutionResult } from './models/mcp/execution-result';
 export type { OllamaConnection } from './models/connection/ollama-connection';
 export type { ModelCapability } from './models/connection/model-capability';
-export type { HealthStatus } from './models/connection/health-status';
+export type { HealthStatus, HealthStatus as ConnectionStatus } from './models/connection/health-status';
 export type { ImageData } from './models/vision/image-data';
 export type { ProcessingResult } from './models/vision/processing-result';
 

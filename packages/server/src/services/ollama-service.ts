@@ -83,8 +83,7 @@ export class OllamaService {
       for await (const chunk of response.data) {
         buffer += chunk.toString();
         
-        const lines = buffer.split('
-');
+        const lines = buffer.split("\n");
         buffer = lines.pop() || '';
         
         for (const line of lines) {

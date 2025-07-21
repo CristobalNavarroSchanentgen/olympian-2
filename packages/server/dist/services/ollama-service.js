@@ -85,6 +85,30 @@ class OllamaService {
     getBaseUrl() {
         return this.baseUrl;
     }
+    async getModelInfo(modelName) {
+        try {
+            const response = await this.client.get("/api/show", {
+                params: { name: modelName }
+            });
+            return response.data;
+        }
+        catch (error) {
+            return null;
+        }
+    }
+    async pullModel(modelName) {
+        try {
+            await this.client.post("/api/pull", { name: modelName });
+            return true;
+        }
+        catch (error) {
+            return false;
+        }
+    }
+    async checkModel(modelName) {
+        const models = await this.getModels();
+        return models.some(model => model.name === modelName);
+    }
 }
 exports.OllamaService = OllamaService;
 //# sourceMappingURL=ollama-service.js.map

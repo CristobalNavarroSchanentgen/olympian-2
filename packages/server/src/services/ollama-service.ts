@@ -118,4 +118,30 @@ export class OllamaService {
   getBaseUrl(): string {
     return this.baseUrl;
   }
+
+  async getModelInfo(modelName: string): Promise<any> {
+    try {
+      const response = await this.client.get("/api/show", {
+        params: { name: modelName }
+      });
+      return response.data;
+    } catch (error) {
+      return null;
+    }
+  }
+
+  async pullModel(modelName: string): Promise<boolean> {
+    try {
+      await this.client.post("/api/pull", { name: modelName });
+      return true;
+    } catch (error) {
+      return false;
+    }
+  }
+
+  async checkModel(modelName: string): Promise<boolean> {
+    const models = await this.getModels();
+    return models.some(model => model.name === modelName);
+  }
 }
+

@@ -35,5 +35,8 @@ export declare class OllamaService {
     streamChat(request: ChatRequest): AsyncGenerator<ChatResponse>;
     chat(request: ChatRequest): Promise<ChatResponse>;
     getBaseUrl(): string;
+    getModelInfo(modelName: string): Promise<any>;
+    pullModel(modelName: string): Promise<boolean>;
+    checkModel(modelName: string): Promise<boolean>;
 }
 export {};

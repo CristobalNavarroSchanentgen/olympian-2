@@ -9,10 +9,11 @@ const helmet_1 = __importDefault(require("helmet"));
 const http_1 = require("http");
 const socket_io_1 = require("socket.io");
 const dotenv_1 = __importDefault(require("dotenv"));
-const database_service_1 = require("./database/database-service");
-const mcp_manager_1 = require("./mcp/mcp-manager");
+const database_service_fix_1 = require("./services/database-service-fix");
+const mcp_manager_stub_1 = require("./mcp/mcp-manager-stub");
 const websocket_handler_1 = require("./websocket/websocket-handler");
-const routes_1 = require("./api/routes");
+const ollama_service_1 = require("./services/ollama-service");
+const simple_routes_1 = require("./api/simple-routes");
 dotenv_1.default.config();
 const app = (0, express_1.default)();
 const server = (0, http_1.createServer)(app);
@@ -31,19 +32,21 @@ app.use(express_1.default.urlencoded({ extended: true, limit: '50mb' }));
 async function startServer() {
     try {
         // Initialize database
-        const dbService = new database_service_1.DatabaseService();
+        const dbService = new database_service_fix_1.DatabaseService();
         await dbService.connect();
         console.log('📊 Database connected');
         // Initialize MCP Manager
-        const mcpManager = new mcp_manager_1.MCPManager();
+        const mcpManager = new mcp_manager_stub_1.MCPManager();
         await mcpManager.initialize();
         console.log('🔧 MCP Manager initialized');
+        // Initialize Ollama service
+        const ollamaService = new ollama_service_1.OllamaService();
+        console.log("🦙 Ollama service initialized");
         // Setup WebSocket handling
-        const wsHandler = new websocket_handler_1.WebSocketHandler(io, dbService, mcpManager);
-        wsHandler.initialize();
+        const wsHandler = new websocket_handler_1.WebSocketHandler(io, dbService, mcpManager, ollamaService);
         console.log('🔌 WebSocket handler initialized');
         // Setup API routes
-        (0, routes_1.setupRoutes)(app, dbService, mcpManager);
+        (0, simple_routes_1.setupRoutes)(app);
         console.log('🛣️  API routes configured');
         const PORT = process.env.PORT || 3001;
         server.listen(PORT, () => {

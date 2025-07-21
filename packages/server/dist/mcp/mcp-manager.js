@@ -24,7 +24,7 @@ class MCPManager extends events_1.EventEmitter {
     }
     async startServer(name, config) {
         try {
-            const process = (0, child_process_1.spawn)(config.command, config.args || [], {
+            const childProcess = (0, child_process_1.spawn)(config.command, config.args || [], {
                 stdio: ['pipe', 'pipe', 'pipe'],
                 env: {
                     ...process.env,
@@ -33,26 +33,26 @@ class MCPManager extends events_1.EventEmitter {
             });
             const mcpProcess = {
                 name,
-                process,
+                process: childProcess,
                 config,
                 status: 'starting',
                 tools: []
             };
             this.processes.set(name, mcpProcess);
             // Handle process events
-            process.on('error', (error) => {
+            childProcess.on('error', (error) => {
                 console.error(`MCP server ${name} error:`, error);
                 mcpProcess.status = 'error';
                 this.emit('server:error', name, error);
             });
-            process.on('exit', (code) => {
+            childProcess.on('exit', (code) => {
                 console.log(`MCP server ${name} exited with code ${code}`);
                 mcpProcess.status = 'stopped';
                 this.processes.delete(name);
                 this.emit('server:stopped', name, code);
             });
             // Handle stdout for MCP protocol
-            process.stdout?.on('data', (data) => {
+            childProcess.stdout?.on('data', (data) => {
                 this.handleMCPMessage(name, data.toString());
             });
             // Send initialize request

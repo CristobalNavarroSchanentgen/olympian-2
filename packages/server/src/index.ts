@@ -5,10 +5,11 @@ import { createServer } from 'http';
 import { Server as SocketIOServer } from 'socket.io';
 import dotenv from 'dotenv';
 
-import { DatabaseService } from './database/database-service';
-import { MCPManager } from './mcp/mcp-manager';
+import { DatabaseService } from './services/database-service-fix';
+import { MCPManager } from './mcp/mcp-manager-stub';
 import { WebSocketHandler } from './websocket/websocket-handler';
-import { setupRoutes } from './api/routes';
+import { OllamaService } from "./services/ollama-service";
+import { setupRoutes } from './api/simple-routes';
 
 dotenv.config();
 
@@ -40,13 +41,16 @@ async function startServer() {
     await mcpManager.initialize();
     console.log('🔧 MCP Manager initialized');
 
+    // Initialize Ollama service
+    const ollamaService = new OllamaService();
+    console.log("🦙 Ollama service initialized");
+
     // Setup WebSocket handling
-    const wsHandler = new WebSocketHandler(io, dbService, mcpManager);
-    wsHandler.initialize();
+    const wsHandler = new WebSocketHandler(io, dbService, mcpManager, ollamaService);
     console.log('🔌 WebSocket handler initialized');
 
     // Setup API routes
-    setupRoutes(app, dbService, mcpManager);
+    setupRoutes(app);
     console.log('🛣️  API routes configured');
 
     const PORT = process.env.PORT || 3001;

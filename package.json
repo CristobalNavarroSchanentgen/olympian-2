@@ -1,0 +1,25 @@
+{
+  "name": "olympian-ai-lightweight",
+  "version": "1.0.0",
+  "description": "AI-Native Chat Application with Integrated MCP Servers",
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "setup": "node scripts/setup.js",
+    "dev": "npm run dev --workspace=packages/client & npm run dev --workspace=packages/server",
+    "build": "npm run build --workspace=packages/shared && npm run build --workspace=packages/server && npm run build --workspace=packages/client",
+    "docker:build": "docker-compose build",
+    "docker:up": "docker-compose up -d",
+    "docker:down": "docker-compose down",
+    "quick-docker-multi": "npm run build && docker-compose up --build -d"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.0.0"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}

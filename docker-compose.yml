@@ -1,0 +1,72 @@
+version: '3.8'
+
+services:
+  mongodb:
+    image: mongo:7
+    container_name: olympian-mongodb
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: olympian123
+      MONGO_INITDB_DATABASE: olympian
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+      - ./scripts/init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
+    networks:
+      - olympian-network
+    command: mongod --replSet rs0 --bind_ip_all
+
+  mongodb-setup:
+    image: mongo:7
+    container_name: olympian-mongodb-setup
+    depends_on:
+      - mongodb
+    networks:
+      - olympian-network
+    volumes:
+      - ./scripts/setup-replica.sh:/setup-replica.sh:ro
+    command: ["sh", "/setup-replica.sh"]
+    restart: "no"
+
+  server:
+    build:
+      context: .
+      dockerfile: packages/server/Dockerfile
+    container_name: olympian-server
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      PORT: 3001
+      MONGODB_URI: mongodb://root:olympian123@mongodb:27017/olympian?authSource=admin&replicaSet=rs0
+      CLIENT_URL: http://localhost:3000
+    ports:
+      - "3001:3001"
+    depends_on:
+      - mongodb-setup
+    volumes:
+      - ./mcp.config.json:/app/mcp.config.json:ro
+      - /tmp:/tmp
+    networks:
+      - olympian-network
+
+  client:
+    build:
+      context: .
+      dockerfile: packages/client/Dockerfile
+    container_name: olympian-client
+    restart: unless-stopped
+    ports:
+      - "3000:80"
+    depends_on:
+      - server
+    networks:
+      - olympian-network
+
+volumes:
+  mongodb_data:
+
+networks:
+  olympian-network:
+    driver: bridge

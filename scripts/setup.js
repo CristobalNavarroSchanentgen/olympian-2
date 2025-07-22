@@ -15,34 +15,34 @@ function question(query) {
 
 async function setup() {
   console.log('🎯 Olympian-2 AI-Native Chat Setup');
-  console.log('=====================================
-');
+  console.log('=====================================');
 
   const ollamaUrl = await question('🔗 Enter Ollama URL (default: http://localhost:11434): ') || 'http://localhost:11434';
   
-  console.log('
-🔍 Model Capability Detection:');
+  console.log('');
+  console.log('🔍 Model Capability Detection:');
   console.log('1. Auto-scan (recommended)');
   console.log('2. Custom configuration');
   const detectionChoice = await question('Choose detection method (1 or 2): ');
   const autoScan = detectionChoice === '1' || detectionChoice === '';
 
-  console.log('
-🔑 MCP Server Configuration:');
+  console.log('');
+  console.log('🔑 MCP Server Configuration:');
   const nasaApiKey = await question('NASA API Key (optional): ');
   const githubToken = await question('GitHub Personal Access Token (optional): ');
 
-  const envContent = `NODE_ENV=development
-PORT=3001
-MONGODB_URI=mongodb://root:olympian123@localhost:27017/olympian?authSource=admin&replicaSet=rs0
-CLIENT_URL=http://localhost:3000
-OLLAMA_URL=${ollamaUrl}
-AUTO_SCAN_MODELS=${autoScan}
-NASA_API_KEY=${nasaApiKey}
-GITHUB_TOKEN=${githubToken}
-`;
+  const envParts = [
+    'NODE_ENV=development',
+    'PORT=3001',
+    'MONGODB_URI=mongodb://root:olympian123@localhost:27017/olympian?authSource=admin&replicaSet=rs0',
+    'CLIENT_URL=http://localhost:3000',
+    'OLLAMA_URL=' + ollamaUrl,
+    'AUTO_SCAN_MODELS=' + autoScan,
+    'NASA_API_KEY=' + nasaApiKey,
+    'GITHUB_TOKEN=' + githubToken
+  ];
 
-  fs.writeFileSync('../.env', envContent);
+  fs.writeFileSync('../.env', envParts.join('\n'));
 
   const mcpConfig = {
     servers: {
@@ -71,24 +71,24 @@ GITHUB_TOKEN=${githubToken}
 
   fs.writeFileSync('../mcp.config.json', JSON.stringify(mcpConfig, null, 2));
 
-  console.log('
-✅ Configuration complete!');
+  console.log('');
+  console.log('✅ Configuration complete!');
   console.log('📁 Created .env file');
   console.log('📁 Created mcp.config.json');
   
-  console.log('
-📦 Installing dependencies...');
+  console.log('');
+  console.log('📦 Installing dependencies...');
   try {
     execSync('npm install', { stdio: 'inherit' });
-    console.log('
-✅ Dependencies installed successfully!');
-    console.log('
-🎉 Setup complete! Next step:');
+    console.log('');
+    console.log('✅ Dependencies installed successfully!');
+    console.log('');
+    console.log('🎉 Setup complete! Next step:');
     console.log('   Run: make quick-docker-multi');
   } catch (error) {
-    console.error('
-❌ Error installing dependencies:', error.message);
-    console.log('Please run \'npm install\' manually, then:');
+    console.error('');
+    console.error('❌ Error installing dependencies:', error.message);
+    console.log('Please run npm install manually, then:');
     console.log('   Run: make quick-docker-multi');
   }
 
@@ -96,4 +96,3 @@ GITHUB_TOKEN=${githubToken}
 }
 
 setup().catch(console.error);
-

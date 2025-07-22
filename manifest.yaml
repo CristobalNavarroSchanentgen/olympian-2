@@ -121,6 +121,32 @@ domains:
         config: config/features/vision/image-processor/schema.ts
 
   artifacts:
+
+  ui:
+    features:
+      - name: dual-pane-layout
+        contract: features/ui/dual-pane-layout/contract.ts
+        adapters:
+          - layout-persistence-adapter
+          - theme-adapter
+        services:
+          - layout-service
+          - code-editor-service
+        events:
+          - layout-changed
+          - theme-switched
+        config: config/features/ui/dual-pane-layout/schema.ts
+
+      - name: reasoning-panel
+        contract: features/ui/reasoning-panel/contract.ts
+        adapters:
+          - reasoning-data-adapter
+        services:
+          - reasoning-service
+        events:
+          - reasoning-expanded
+          - reasoning-collapsed
+        config: config/features/ui/reasoning-panel/schema.ts
     features:
       - name: artifact-manager
         contract: features/artifacts/artifact-manager/contract.ts
@@ -269,6 +295,32 @@ models:
     - processing-result.ts
     
   artifacts:
+
+  ui:
+    features:
+      - name: dual-pane-layout
+        contract: features/ui/dual-pane-layout/contract.ts
+        adapters:
+          - layout-persistence-adapter
+          - theme-adapter
+        services:
+          - layout-service
+          - code-editor-service
+        events:
+          - layout-changed
+          - theme-switched
+        config: config/features/ui/dual-pane-layout/schema.ts
+
+      - name: reasoning-panel
+        contract: features/ui/reasoning-panel/contract.ts
+        adapters:
+          - reasoning-data-adapter
+        services:
+          - reasoning-service
+        events:
+          - reasoning-expanded
+          - reasoning-collapsed
+        config: config/features/ui/reasoning-panel/schema.ts
     - artifact.ts
     - version.ts
 

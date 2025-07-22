@@ -1,5 +1,5 @@
 import { Routes, Route } from 'react-router-dom';
-import { DualPaneLayout } from './components/ui/DualPaneLayout';
+import { ChatLayout } from './components/chat/ChatLayout';
 import { ConfigPage } from './components/config/ConfigPage';
 import { useAppStore } from './stores/app-store';
 import { useWebSocket } from './hooks/useWebSocket';
@@ -12,10 +12,10 @@ function App() {
     <div className={theme === 'dark' ? 'dark' : ''}>
       <div className="min-h-screen bg-background text-foreground">
         <Routes>
-          <Route path="/" element={<DualPaneLayout />} />
-          <Route path="/chat/:conversationId" element={<DualPaneLayout />} />
+          <Route path="/" element={<ChatLayout />} />
+          <Route path="/chat/:conversationId" element={<ChatLayout />} />
           <Route path="/config" element={<ConfigPage />} />
-          <Route path="*" element={<DualPaneLayout />} />
+          <Route path="*" element={<ChatLayout />} />
         </Routes>
       </div>
     </div>

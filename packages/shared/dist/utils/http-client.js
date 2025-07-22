@@ -73,7 +73,7 @@ ${prefix} RESPONSE [${requestId}] ${statusEmoji}`);
             : dataStr;
         console.log('📦 Response Data:', displayData);
     }
-    console.log('✨ Request completed, '););
+    console.log("✨ Request completed\n");
 }
 function logError(url, error, attempt, requestId) {
     if (!DEBUG_HTTP && !(DEBUG_OLLAMA && isOllamaRequest(url)))

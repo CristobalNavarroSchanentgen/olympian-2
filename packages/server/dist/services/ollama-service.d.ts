@@ -28,9 +28,26 @@ export declare class OllamaService {
     private client;
     private connected;
     private baseUrl;
+    private connectionAttempts;
+    private lastSuccessfulConnection?;
+    private reconnectInterval?;
     constructor();
+    private shouldLogVerbose;
+    private logConnectionDetails;
+    private recordConnectionAttempt;
     private testConnection;
+    private setupReconnectMonitoring;
     isConnected(): boolean;
+    getConnectionStats(): {
+        connected: boolean;
+        baseUrl: string;
+        lastSuccessfulConnection: Date | undefined;
+        totalAttempts: number;
+        recentAttempts: number;
+        recentSuccesses: number;
+        recentFailures: number;
+        averageResponseTime: number | null;
+    };
     getModels(): Promise<OllamaModel[]>;
     streamChat(request: ChatRequest): AsyncGenerator<ChatResponse>;
     chat(request: ChatRequest): Promise<ChatResponse>;
@@ -38,5 +55,6 @@ export declare class OllamaService {
     getModelInfo(modelName: string): Promise<any>;
     pullModel(modelName: string): Promise<boolean>;
     checkModel(modelName: string): Promise<boolean>;
+    destroy(): void;
 }
 export {};

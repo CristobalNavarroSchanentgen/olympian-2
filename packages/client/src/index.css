@@ -19,18 +19,18 @@
 }
 
 .dark {
-  --background: 222.2 84% 4.9%;
-  --foreground: 210 40% 98%;
-  --border: 217.2 32.6% 17.5%;
+  --background: 222 47% 11%;
+  --foreground: 213 31% 91%;
+  --border: 215 28% 17%;
   --input: 217.2 32.6% 17.5%;
   --ring: 212.7 26.8% 83.9%;
-  --primary: 210 40% 98%;
+  --primary: 217 91% 60%;
   --primary-foreground: 222.2 47.4% 11.2%;
-  --secondary: 217.2 32.6% 17.5%;
+  --secondary: 215 25% 27%;
   --secondary-foreground: 210 40% 98%;
   --muted: 217.2 32.6% 17.5%;
   --muted-foreground: 215 20.2% 65.1%;
-  --accent: 217.2 32.6% 17.5%;
+  --accent: 217 91% 60%;
   --accent-foreground: 210 40% 98%;
 }
 
@@ -61,3 +61,48 @@ body {
     51%, 100% { border-right-color: currentColor }
   }
 }
+
+/* Enhanced navy/blue theme utilities */
+.reasoning-panel {
+  background: linear-gradient(135deg, hsl(var(--background)) 0%, hsl(var(--muted)) 100%);
+}
+
+.code-editor-header {
+  background: linear-gradient(90deg, hsl(var(--muted)) 0%, hsl(var(--secondary)) 100%);
+}
+
+.conversation-header {
+  backdrop-filter: blur(8px);
+  background: hsla(var(--background), 0.8);
+}
+
+/* Custom scrollbar for dark theme */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: hsl(var(--muted));
+  border-radius: 3px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: hsl(var(--border));
+  border-radius: 3px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--accent));
+}
+
+/* Smooth transitions for layout changes */
+.layout-transition {
+  transition: all 0.2s ease-in-out;
+}
+
+/* Syntax highlighting for code */
+.syntax-comment { color: hsl(215, 20%, 65%); }
+.syntax-keyword { color: hsl(217, 91%, 70%); }
+.syntax-string { color: hsl(95, 38%, 62%); }
+.syntax-variable { color: hsl(29, 54%, 61%); }
+.syntax-number { color: hsl(5, 48%, 51%); }

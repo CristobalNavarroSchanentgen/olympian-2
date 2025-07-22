@@ -95,7 +95,7 @@ olympian-2/
 ### Quick Start (3 Commands)
 ```bash
 make setup              # Interactive configuration
-npm install            # Install all dependencies
+npm install            # Install dependencies (included in make setup)
 make quick-docker-multi # Deploy complete application
 ```
 

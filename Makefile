@@ -1,9 +1,10 @@
 .PHONY: setup install dev build docker-build docker-up docker-down quick-docker-multi clean
 
 setup:
-	@echo "🚀 Starting Olympian-2 Interactive Setup..."
+	@echo "🚀 Starting Olympian-2 Setup (includes dependency installation)..."
 	@node scripts/setup.js
 
+# Note: install is included in setup, use this target only for reinstalling dependencies
 install:
 	@echo "📦 Installing dependencies..."
 	@npm install

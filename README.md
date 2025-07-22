@@ -34,22 +34,19 @@ Built with an AI-native architecture that prioritizes context minimization:
    ```bash
    make setup
    ```
-   This will prompt you for:
-   - Ollama URL (default: http://localhost:11434)
-   - Model capability detection preference
-   - API tokens for MCP servers (NASA, GitHub)
+   This will:
+   - Install all dependencies
+   - Prompt you for:
+     - Ollama URL (default: http://localhost:11434)   - Model capability detection preference
+     - API tokens for MCP servers (NASA, GitHub)
 
-2. **Install Dependencies**
-   ```bash
-   npm install
-   ```
 
-3. **Deploy Everything**
+2. **Deploy Everything**
    ```bash
    make quick-docker-multi
    ```
 
-4. **Access the Application**
+3. **Access the Application**
    - Frontend: http://localhost:3000
    - Backend API: http://localhost:3001
    - MongoDB: mongodb://localhost:27017
@@ -61,7 +58,7 @@ Built with an AI-native architecture that prioritizes context minimization:
 ```bash
 # Setup and deployment
 make setup                 # Interactive configuration
-make install              # Install dependencies
+make install              # Install dependencies (included in setup)
 make dev                  # Start development servers
 make build                # Build all packages
 make quick-docker-multi   # Build and deploy containers

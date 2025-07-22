@@ -2,7 +2,6 @@
 
 const readline = require('readline');
 const fs = require('fs');
-const { execSync } = require('child_process');
 
 const rl = readline.createInterface({
   input: process.stdin,
@@ -72,28 +71,15 @@ GITHUB_TOKEN=${githubToken}
   fs.writeFileSync('../mcp.config.json', JSON.stringify(mcpConfig, null, 2));
 
   console.log('
-✅ Configuration complete!');
+✅ Setup complete!');
   console.log('📁 Created .env file');
   console.log('📁 Created mcp.config.json');
-  
   console.log('
-📦 Installing dependencies...');
-  try {
-    execSync('npm install', { stdio: 'inherit' });
-    console.log('
-✅ Dependencies installed successfully!');
-    console.log('
-🎉 Setup complete! Next step:');
-    console.log('   Run: make quick-docker-multi');
-  } catch (error) {
-    console.error('
-❌ Error installing dependencies:', error.message);
-    console.log('Please run \'npm install\' manually, then:');
-    console.log('   Run: make quick-docker-multi');
-  }
+🚀 Next steps:');
+  console.log('1. Run: npm install');
+  console.log('2. Run: make quick-docker-multi');
 
   rl.close();
 }
 
 setup().catch(console.error);
-

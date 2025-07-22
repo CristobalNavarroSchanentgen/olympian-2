@@ -130,3 +130,5 @@ export function createHttpClient(baseConfig: Partial<HttpRequestConfig> = {}) {
 }
 
 export const httpClient = createHttpClient();
+
+export const httpRequest = makeHttpRequest;

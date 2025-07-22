@@ -4,7 +4,7 @@
  * Pure functions for HTTP requests
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.httpClient = exports.HttpError = void 0;
+exports.httpRequest = exports.httpClient = exports.HttpError = void 0;
 exports.makeHttpRequest = makeHttpRequest;
 exports.createHttpClient = createHttpClient;
 class HttpError extends Error {
@@ -86,4 +86,5 @@ function createHttpClient(baseConfig = {}) {
     };
 }
 exports.httpClient = createHttpClient();
+exports.httpRequest = makeHttpRequest;
 //# sourceMappingURL=http-client.js.map

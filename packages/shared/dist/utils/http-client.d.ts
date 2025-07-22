@@ -34,4 +34,5 @@ export declare const httpClient: {
     get<T = unknown>(url: string, config?: Partial<HttpRequestConfig>): Promise<HttpResponse<T>>;
     post<T = unknown>(url: string, body: unknown, config?: Partial<HttpRequestConfig>): Promise<HttpResponse<T>>;
 };
+export declare const httpRequest: typeof makeHttpRequest;
 //# sourceMappingURL=http-client.d.ts.map

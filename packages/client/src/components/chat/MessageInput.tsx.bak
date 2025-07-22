@@ -90,14 +90,14 @@ export function MessageInput() {
 
   if (!currentConversationId) {
     return (
-      <div className="p-4 text-center text-secondary">
+      <div className="p-4 text-center text-muted-foreground">
         Select a conversation to start chatting
       </div>
     );
   }
 
   return (
-    <div className="input-area p-4">
+    <div className="p-4">
       {/* Selected Images Preview */}
       {selectedImages.length > 0 && (
         <div className="mb-4 flex flex-wrap gap-2">
@@ -106,7 +106,7 @@ export function MessageInput() {
               <img
                 src={image}
                 alt="Selected"
-                className="w-20 h-20 object-cover rounded border border-border"
+                className="w-20 h-20 object-cover rounded border"
               />
               <button
                 onClick={() => removeImage(index)}
@@ -124,7 +124,7 @@ export function MessageInput() {
         {/* Attach Button */}
         <button
           onClick={() => fileInputRef.current?.click()}
-          className="p-2 text-secondary hover:text-primary hover:bg-accent rounded-lg transition-colors"
+          className="p-2 text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg transition-colors"
         >
           <Paperclip className="h-5 w-5" />
         </button>
@@ -137,7 +137,7 @@ export function MessageInput() {
             onChange={(e) => setInputValue(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder="Type your message... (Shift+Enter for new line)"
-            className="w-full px-4 py-3 pr-12 rounded-lg bg-background-panel border border-border placeholder:text-muted resize-none min-h-[48px] max-h-32 focus:outline-none focus:ring-2 focus:ring-ring"
+            className="w-full px-4 py-3 pr-12 rounded-lg border border-input bg-background resize-none min-h-[48px] max-h-32 focus:outline-none focus:ring-2 focus:ring-ring"
             rows={1}
           />
           
@@ -145,7 +145,7 @@ export function MessageInput() {
           <button
             onClick={handleSubmit}
             disabled={!inputValue.trim() && selectedImages.length === 0}
-            className="absolute right-2 bottom-2 p-2 text-primary hover:opacity-90 disabled:text-secondary disabled:cursor-not-allowed transition-colors"
+            className="absolute right-2 bottom-2 p-2 text-primary hover:text-primary/80 disabled:text-muted-foreground disabled:cursor-not-allowed transition-colors"
           >
             <Send className="h-4 w-4" />
           </button>

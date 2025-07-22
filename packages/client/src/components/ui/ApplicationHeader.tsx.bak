@@ -123,11 +123,7 @@ export function ApplicationHeader({
           className="p-2 hover:bg-accent rounded-lg transition-colors"
           title="MCP Configuration"
         >
-          
-          <div className="flex items-center space-x-1">
-            <Settings className="w-5 h-5 text-secondary" />
-            <span className="text-sm text-secondary">MCP Config</span>
-          </div>
+          <Settings className="w-5 h-5 text-secondary" />
         </button>
       </div>
     </header>

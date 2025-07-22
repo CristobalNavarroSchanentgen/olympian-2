@@ -1,0 +1,388 @@
+# Olympian AI-Native Codebase Manifest
+# This file defines all feature boundaries and external touchpoints
+
+version: '1.0.0'
+name: 'olympian-ai-lightweight'
+description: 'AI-Native chat interface with integrated MCP support'
+
+# Core Domains and Features
+domains:
+  chat:
+    features:
+      - name: conversation-manager
+        contract: features/chat/conversation-manager/contract.ts
+        adapters:
+          - database-adapter
+          - websocket-adapter
+        services:
+          - conversation-service
+        events:
+          - conversation-created
+          - conversation-updated
+          - conversation-deleted
+        config: config/features/chat/conversation-manager/schema.ts
+        
+      - name: message-processor
+        contract: features/chat/message-processor/contract.ts
+        adapters:
+          - ollama-adapter
+          - token-counter-adapter
+        services:
+          - message-service
+          - streaming-service
+        events:
+          - message-sent
+          - message-received
+          - tokens-processed
+        config: config/features/chat/message-processor/schema.ts
+        
+      - name: memory-manager
+        contract: features/chat/memory-manager/contract.ts
+        adapters:
+          - context-adapter
+          - token-budget-adapter
+        services:
+          - memory-service
+        events:
+          - context-updated
+          - memory-cleaned
+        config: config/features/chat/memory-manager/schema.ts
+
+  mcp:
+    features:
+      - name: server-manager
+        contract: features/mcp/server-manager/contract.ts
+        adapters:
+          - process-adapter
+          - stdio-adapter
+          - config-adapter
+        services:
+          - mcp-service
+          - process-service
+        events:
+          - server-started
+          - server-stopped
+          - server-error
+        config: config/features/mcp/server-manager/schema.ts
+        
+      - name: tool-executor
+        contract: features/mcp/tool-executor/contract.ts
+        adapters:
+          - mcp-protocol-adapter
+          - result-transformer-adapter
+        services:
+          - tool-service
+        events:
+          - tool-invoked
+          - tool-completed
+          - tool-failed
+        config: config/features/mcp/tool-executor/schema.ts
+
+  connection:
+    features:
+      - name: ollama-connector
+        contract: features/connection/ollama-connector/contract.ts
+        adapters:
+          - http-adapter
+          - health-monitor-adapter
+        services:
+          - connection-service
+          - health-service
+        events:
+          - connection-established
+          - connection-lost
+          - health-checked
+        config: config/features/connection/ollama-connector/schema.ts
+        
+      - name: model-detector
+        contract: features/connection/model-detector/contract.ts
+        adapters:
+          - capability-scanner-adapter
+          - model-metadata-adapter
+        services:
+          - detection-service
+        events:
+          - models-detected
+          - capabilities-updated
+        config: config/features/connection/model-detector/schema.ts
+
+  vision:
+    features:
+      - name: image-processor
+        contract: features/vision/image-processor/contract.ts
+        adapters:
+          - image-upload-adapter
+          - format-converter-adapter
+        services:
+          - image-service
+        events:
+          - image-uploaded
+          - image-processed
+        config: config/features/vision/image-processor/schema.ts
+
+  artifacts:
+
+  ui:
+    features:
+      - name: dual-pane-layout
+        contract: features/ui/dual-pane-layout/contract.ts
+        adapters:
+          - layout-persistence-adapter
+          - theme-adapter
+        services:
+          - layout-service
+          - code-editor-service
+        events:
+          - layout-changed
+          - theme-switched
+        config: config/features/ui/dual-pane-layout/schema.ts
+
+      - name: reasoning-panel
+        contract: features/ui/reasoning-panel/contract.ts
+        adapters:
+          - reasoning-data-adapter
+        services:
+          - reasoning-service
+        events:
+          - reasoning-expanded
+          - reasoning-collapsed
+        config: config/features/ui/reasoning-panel/schema.ts
+    features:
+      - name: artifact-manager
+        contract: features/artifacts/artifact-manager/contract.ts
+        adapters:
+          - artifact-storage-adapter
+          - version-tracker-adapter
+        services:
+          - artifact-service
+        events:
+          - artifact-created
+          - artifact-updated
+          - artifact-deleted
+        config: config/features/artifacts/artifact-manager/schema.ts
+
+# External Dependencies (Services)
+services:
+  - name: conversation-service
+    interface: services/conversation-service.ts
+    
+  - name: message-service
+    interface: services/message-service.ts
+    
+  - name: streaming-service
+    interface: services/streaming-service.ts
+    
+  - name: memory-service
+    interface: services/memory-service.ts
+    
+  - name: mcp-service
+    interface: services/mcp-service.ts
+    
+  - name: process-service
+    interface: services/process-service.ts
+    
+  - name: tool-service
+    interface: services/tool-service.ts
+    
+  - name: connection-service
+    interface: services/connection-service.ts
+    
+  - name: health-service
+    interface: services/health-service.ts
+    
+  - name: detection-service
+    interface: services/detection-service.ts
+    
+  - name: image-service
+    interface: services/image-service.ts
+    
+  - name: artifact-service
+    interface: services/artifact-service.ts
+
+# Event Schema
+events:
+  - name: conversation-created
+    schema: events/conversation-created.ts
+    
+  - name: conversation-updated
+    schema: events/conversation-updated.ts
+    
+  - name: conversation-deleted
+    schema: events/conversation-deleted.ts
+    
+  - name: message-sent
+    schema: events/message-sent.ts
+    
+  - name: message-received
+    schema: events/message-received.ts
+    
+  - name: tokens-processed
+    schema: events/tokens-processed.ts
+    
+  - name: context-updated
+    schema: events/context-updated.ts
+    
+  - name: memory-cleaned
+    schema: events/memory-cleaned.ts
+    
+  - name: server-started
+    schema: events/server-started.ts
+    
+  - name: server-stopped
+    schema: events/server-stopped.ts
+    
+  - name: server-error
+    schema: events/server-error.ts
+    
+  - name: tool-invoked
+    schema: events/tool-invoked.ts
+    
+  - name: tool-completed
+    schema: events/tool-completed.ts
+    
+  - name: tool-failed
+    schema: events/tool-failed.ts
+    
+  - name: connection-established
+    schema: events/connection-established.ts
+    
+  - name: connection-lost
+    schema: events/connection-lost.ts
+    
+  - name: health-checked
+    schema: events/health-checked.ts
+    
+  - name: models-detected
+    schema: events/models-detected.ts
+    
+  - name: capabilities-updated
+    schema: events/capabilities-updated.ts
+    
+  - name: image-uploaded
+    schema: events/image-uploaded.ts
+    
+  - name: image-processed
+    schema: events/image-processed.ts
+    
+  - name: artifact-created
+    schema: events/artifact-created.ts
+    
+  - name: artifact-updated
+    schema: events/artifact-updated.ts
+    
+  - name: artifact-deleted
+    schema: events/artifact-deleted.ts
+
+# Models (Pure Types)
+models:
+  chat:
+    - conversation.ts
+    - message.ts
+    - memory-context.ts
+    
+  mcp:
+    - server-config.ts
+    - tool-definition.ts
+    - execution-result.ts
+    
+  connection:
+    - ollama-connection.ts
+    - model-capability.ts
+    - health-status.ts
+    
+  vision:
+    - image-data.ts
+    - processing-result.ts
+    
+  artifacts:
+
+  ui:
+    features:
+      - name: dual-pane-layout
+        contract: features/ui/dual-pane-layout/contract.ts
+        adapters:
+          - layout-persistence-adapter
+          - theme-adapter
+        services:
+          - layout-service
+          - code-editor-service
+        events:
+          - layout-changed
+          - theme-switched
+        config: config/features/ui/dual-pane-layout/schema.ts
+
+      - name: reasoning-panel
+        contract: features/ui/reasoning-panel/contract.ts
+        adapters:
+          - reasoning-data-adapter
+        services:
+          - reasoning-service
+        events:
+          - reasoning-expanded
+          - reasoning-collapsed
+        config: config/features/ui/reasoning-panel/schema.ts
+    - artifact.ts
+    - version.ts
+
+# Utilities (Pure Functions)
+utilities:
+  - name: token-counter
+    interface: utils/token-counter.ts
+    
+  - name: context-manager
+    interface: utils/context-manager.ts
+    
+  - name: config-parser
+    interface: utils/config-parser.ts
+    
+  - name: process-manager
+    interface: utils/process-manager.ts
+    
+  - name: protocol-handler
+    interface: utils/protocol-handler.ts
+    
+  - name: http-client
+    interface: utils/http-client.ts
+    
+  - name: health-checker
+    interface: utils/health-checker.ts
+    
+  - name: capability-detector
+    interface: utils/capability-detector.ts
+    
+  - name: image-processor
+    interface: utils/image-processor.ts
+    
+  - name: artifact-validator
+    interface: utils/artifact-validator.ts
+
+# Package Configuration
+packages:
+  client:
+    path: packages/client
+    framework: react-typescript
+    
+  server:
+    path: packages/server
+    framework: node-express-typescript
+    
+  shared:
+    path: packages/shared
+    framework: typescript
+
+# Infrastructure
+infrastructure:
+  containers:
+    - frontend
+    - backend
+    - mongodb
+    
+  external_services:
+    - ollama_host
+
+# Configuration Files
+configuration:
+  - .env
+  - mcp.config.json
+  - docker-compose.yml
+  - Makefile

@@ -7,12 +7,12 @@ interface SidebarProps {
 
 export const Sidebar: React.FC<SidebarProps> = ({ connected, onNewConversation }) => {
   return (
-    <div className="w-64 bg-gray-50 border-r p-4">
+    <div className="w-64 style="background-color: var(--background-panel); border-right: 1px solid var(--border);" p-4">
       <div className="mb-4">
         <span className="text-sm">
           {connected ? 'Connected' : 'Disconnected'}
         </span>
-        <button onClick={onNewConversation} className="w-full mt-2 bg-blue-500 text-white px-3 py-2 rounded">
+        <button onClick={onNewConversation} className="w-full mt-2 model-selector text-primary rounded-md flex items-center justify-center space-x-2">
           New Chat
         </button>
       </div>

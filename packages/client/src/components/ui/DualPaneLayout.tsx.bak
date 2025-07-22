@@ -8,12 +8,12 @@ export function DualPaneLayout() {
   const { sidebarOpen } = useChatStore();
 
   return (
-    <div className="h-screen flex flex-col style="background-color: var(--background-main)"">
+    <div className="h-screen flex flex-col bg-background">
       <ApplicationHeader title="Olympian AI" />
       
       <div className="flex-1 flex pt-14 overflow-hidden">
         {sidebarOpen && (
-          <div className="w-80 style="border-right: 1px solid var(--border)"">
+          <div className="w-80 border-r border-border">
             <Sidebar connected={true} onNewConversation={() => {}} />
           </div>
         )}

@@ -1,6 +1,6 @@
 /**
  * HTTP Client Utility
- * Pure functions for HTTP requests
+ * Pure functions for HTTP requests with verbose logging support
  */
 export interface HttpRequestConfig {
     method?: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
@@ -9,6 +9,7 @@ export interface HttpRequestConfig {
     timeout?: number;
     retries?: number;
     retryDelay?: number;
+    debug?: boolean;
 }
 export interface HttpResponse<T = unknown> {
     data: T;

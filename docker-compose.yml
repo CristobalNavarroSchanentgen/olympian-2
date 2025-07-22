@@ -6,6 +6,8 @@ services:
     container_name: olympian-mongodb
     restart: unless-stopped
     environment:
+      DEBUG_OLLAMA: true
+      DEBUG_HTTP: true
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: olympian123
       MONGO_INITDB_DATABASE: olympian
@@ -37,6 +39,8 @@ services:
     container_name: olympian-server
     restart: unless-stopped
     environment:
+      DEBUG_OLLAMA: true
+      DEBUG_HTTP: true
       NODE_ENV: production
       PORT: 3001
       MONGODB_URI: mongodb://root:olympian123@mongodb:27017/olympian?authSource=admin&replicaSet=rs0

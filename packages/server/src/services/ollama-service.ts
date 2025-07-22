@@ -105,8 +105,7 @@ export class OllamaService {
   }
 
   private logConnectionDetails(): void {
-    console.log('
-🦙 OLLAMA SERVICE INITIALIZATION');
+    console.log("\n🦙 OLLAMA SERVICE INITIALIZATION");
     console.log('📍 Base URL:', this.baseUrl);
     console.log('🌍 Environment:', process.env.NODE_ENV || 'development');
     console.log('🔍 Debug Mode:', this.shouldLogVerbose() ? 'ENABLED' : 'DISABLED');
@@ -142,8 +141,7 @@ export class OllamaService {
     const startTime = Date.now();
     const testUrl = `${this.baseUrl}/api/tags`;
     
-    console.log('
-🦙 OLLAMA CONNECTION TEST');
+    console.log("\n🦙 OLLAMA CONNECTION TEST");
     console.log('🔍 Testing connection to:', testUrl);
     console.log('⏱️  Timeout set to: 60000ms');
     
@@ -167,8 +165,7 @@ export class OllamaService {
         });
       }
       
-      console.log('🦙 Connected to Ollama successfully
-');
+      console.log("🦙 Connected to Ollama successfully\n");
       
     } catch (error: any) {
       const responseTime = Date.now() - startTime;
@@ -191,8 +188,7 @@ export class OllamaService {
         console.log('   - Request timeout or network error');
       }
       
-      console.log('
-🔧 TROUBLESHOOTING SUGGESTIONS:');
+      console.log("\n🔧 TROUBLESHOOTING SUGGESTIONS:");
       console.log('1. Ensure Ollama is running: `ollama serve`');
       console.log('2. Check if port 11434 is accessible');
       console.log('3. Verify OLLAMA_URL environment variable if using custom URL');
@@ -270,9 +266,8 @@ export class OllamaService {
       for await (const chunk of response.data) {
         buffer += chunk.toString();
         
-        const lines = buffer.split("
-");
-        buffer = lines.pop() || '';
+        
+        const lines = buffer.split("\n");        buffer = lines.pop() || '';
         
         for (const line of lines) {
           if (line.trim()) {

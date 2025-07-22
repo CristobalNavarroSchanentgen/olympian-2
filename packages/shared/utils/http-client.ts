@@ -101,8 +101,7 @@ ${prefix} RESPONSE [${requestId}] ${statusEmoji}`);
     console.log('📦 Response Data:', displayData);
   }
   
-  console.log('✨ Request completed
-');
+    console.log("✨ Request completed\n");
 }
 
 function logError(url: string, error: Error, attempt: number, requestId: string): void {

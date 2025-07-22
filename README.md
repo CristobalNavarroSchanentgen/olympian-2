@@ -189,3 +189,38 @@ MIT License - see LICENSE file for details.
 ---
 
 **Built with ❤️ using AI-native architecture principles**
+
+
+## 🐛 Debugging & Verbose Logging
+
+### Enhanced Ollama Connection Logging
+
+The `make logs` command now provides detailed Ollama connection diagnostics:
+
+**Debug Environment Variables** (pre-configured):
+- `DEBUG_OLLAMA=true` - Ollama-specific verbose logging  
+- `DEBUG_HTTP=true` - All HTTP request/response details
+
+**What You'll See:**
+- 🦙 Connection test results with URLs and timing
+- 📡 Full request/response headers and bodies  
+- ⏱️ Response times and performance metrics
+- 🔄 Retry attempts and reconnection logic
+- 📋 Available models and capabilities
+- ❌ Detailed error diagnostics with troubleshooting tips
+
+**Example Output:**
+```
+🦙 OLLAMA CONNECTION TEST
+🔍 Testing connection to: http://localhost:11434/api/tags
+✅ OLLAMA CONNECTION SUCCESS - Response Time: 45ms
+📋 Available Models: llama3.1:8b, codellama:7b
+```
+
+**Troubleshooting with Logs:**
+1. Run `make logs` and look for 🦙 OLLAMA messages
+2. Check connection URLs and error details  
+3. Verify Ollama service: `ollama serve`
+4. Test connectivity: `curl http://localhost:11434/api/tags`
+
+

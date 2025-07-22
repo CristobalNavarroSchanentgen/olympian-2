@@ -10,7 +10,6 @@ export function useWebSocket() {
     addMessage, 
     updateMessage, 
     setStreaming, 
-    appendStreamingContent,
     currentConversationId 
   } = useChatStore();
 
@@ -36,7 +35,7 @@ export function useWebSocket() {
     });
 
     socket.on('chat:token', (data) => {
-      const { messageId, token, fullContent } = data;
+      const { messageId, fullContent } = data;
       setStreaming(messageId, fullContent);
       updateMessage(messageId, { content: fullContent });
     });

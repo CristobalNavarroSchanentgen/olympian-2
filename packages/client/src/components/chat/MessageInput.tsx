@@ -1,5 +1,5 @@
-import { useState, useRef, useEffect } from 'react';
-import { Send, Paperclip, X, Image } from 'lucide-react';
+import { useRef, useEffect } from 'react';
+import { Send, Paperclip, X } from 'lucide-react';
 import { useChatStore } from '../../stores/chat-store';
 import { useWebSocket } from '../../hooks/useWebSocket';
 import { chatService } from '../../services/chat-service';

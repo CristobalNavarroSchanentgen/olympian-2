@@ -4,10 +4,9 @@ import { useChatStore } from '../../stores/chat-store';
 
 interface MessageBubbleProps {
   message: Message;
-  isLast: boolean;
 }
 
-export function MessageBubble({ message, isLast }: MessageBubbleProps) {
+export function MessageBubble({ message }: MessageBubbleProps) {
   const { streamingMessageId, streamingContent } = useChatStore();
   
   const isUser = message.role === 'user';

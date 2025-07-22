@@ -12,7 +12,6 @@ export function ChatLayout() {
     setCurrentConversation, 
     setConversations, 
     setMessages,
-    conversations 
   } = useChatStore();
 
   useEffect(() => {
@@ -37,7 +36,7 @@ export function ChatLayout() {
     <div className="flex h-screen bg-background">
       {sidebarOpen && (
         <div className="w-80 border-r border-border bg-muted/30">
-          <Sidebar conversations={conversations} connected={true} onNewConversation={() => {}} />
+          <Sidebar  connected={true} onNewConversation={() => {}} />
         </div>
       )}
       

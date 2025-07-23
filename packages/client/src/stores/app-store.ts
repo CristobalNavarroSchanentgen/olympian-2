@@ -2,8 +2,8 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
 interface AppState {
-  theme: 'dark' | 'dark';
-  setTheme: (theme: 'dark' | 'dark') => void;
+  theme: 'dark' | 'light';
+  setTheme: (theme: 'dark' | 'light') => void;
   
   // WebSocket connection status
   connected: boolean;

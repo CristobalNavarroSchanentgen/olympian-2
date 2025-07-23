@@ -7,7 +7,7 @@ interface SidebarProps {
 
 export const Sidebar: React.FC<SidebarProps> = ({ connected, onNewConversation }) => {
   return (
-    <div className="w-64 style="background-color: var(--background-panel); border-right: 1px solid var(--border);" p-4">
+    <div className="w-64 p-4" style={{backgroundColor: 'var(--background-panel)', borderRight: '1px solid var(--border)'}}>
       <div className="mb-4">
         <span className="text-sm">
           {connected ? 'Connected' : 'Disconnected'}

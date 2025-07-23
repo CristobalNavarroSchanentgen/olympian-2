@@ -1,6 +1,7 @@
 import { useRef, useEffect } from 'react';
 import { Send, Paperclip, X } from 'lucide-react';
 import { useChatStore } from '../../stores/chat-store';
+import { useAppStore } from '../../stores/app-store';
 import { useWebSocket } from '../../hooks/useWebSocket';
 import { chatService } from '../../services/chat-service';
 
@@ -19,6 +20,8 @@ export function MessageInput() {
     setSelectedImages,
     conversations
   } = useChatStore();
+
+  const { textModel } = useAppStore();
 
   const currentConversation = conversations.find(c => c.id === currentConversationId);
 
@@ -68,12 +71,12 @@ export function MessageInput() {
         metadata: {}
       });
 
-      // Send via WebSocket for AI response
+      // Send via WebSocket for AI response - use the selected model from app store
       socket.emit('chat:message', {
         conversationId: currentConversationId,
         content: messageContent,
         images: images.length > 0 ? images : undefined,
-        model: currentConversation?.model || 'llama3.2:latest'
+        model: textModel
       });
 
     } catch (error) {

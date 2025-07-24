@@ -17,13 +17,11 @@ export function MessageInput() {
     selectedImages,
     addImage,
     removeImage,
-    setSelectedImages,
-    conversations
+    setSelectedImages
   } = useChatStore();
 
   const { textModel } = useAppStore();
 
-  const currentConversation = conversations.find(c => c.id === currentConversationId);
 
   // Auto-resize textarea
   useEffect(() => {

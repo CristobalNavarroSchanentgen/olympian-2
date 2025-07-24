@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { ChevronDown, History, Zap, Settings } from 'lucide-react';
 
 interface ApplicationHeaderProps {
@@ -16,19 +16,15 @@ interface ApplicationHeaderProps {
   onMCPClick?: () => void;
 }
 
-export function ApplicationHeader({ 
-  title, 
-  modelSelector, 
-  onHistoryClick, 
-  onConnectionsClick, 
-  onMCPClick 
-}: ApplicationHeaderProps) {
+const TEXT_MODELS = ['llama3.2:latest', 'llama3.2:3b', 'codellama:latest', 'mistral:latest'];
+const VISION_MODELS = ['llava:latest', 'llava:13b', 'bakllava:latest'];
+
+export function ApplicationHeader({ title, modelSelector, onHistoryClick, onConnectionsClick, onMCPClick }: ApplicationHeaderProps) {
   const [textModelOpen, setTextModelOpen] = useState(false);
   const [visionModelOpen, setVisionModelOpen] = useState(false);
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 header-nav h-14 flex items-center px-4 shadow-sm">
-      {/* Application Branding */}
       <div className="flex items-center space-x-3">
         <div className="w-8 h-8 bg-primary-blue rounded flex items-center justify-center">
           <Zap className="w-5 h-5 text-white" />
@@ -36,9 +32,7 @@ export function ApplicationHeader({
         <h1 className="text-lg font-medium text-primary">{title}</h1>
       </div>
 
-      {/* Center Controls */}
       <div className="flex-1 flex items-center justify-center space-x-6">
-        {/* Text Model Selector */}
         {modelSelector && (
           <div className="flex items-center space-x-4">
             <div className="relative">
@@ -51,20 +45,22 @@ export function ApplicationHeader({
                 <ChevronDown className="w-4 h-4 text-secondary" />
               </button>
               {textModelOpen && (
-                <div className="absolute top-full mt-1 left-0 bg-background border border-border rounded-lg shadow-lg min-w-48">
+                <div className="absolute top-full mt-1 left-0 bg-background border border-border rounded-lg shadow-lg min-w-48 z-50">
                   <div className="p-1">
-                    <div className="px-3 py-2 hover:bg-accent rounded text-sm cursor-pointer">
-                      llama3.2:latest
-                    </div>
-                    <div className="px-3 py-2 hover:bg-accent rounded text-sm cursor-pointer">
-                      codellama:latest
-                    </div>
+                    {TEXT_MODELS.map((model) => (
+                      <div
+                        key={model}
+                        onClick={() => { modelSelector.onTextModelChange(model); setTextModelOpen(false); }}
+                        className="px-3 py-2 hover:bg-accent rounded text-sm cursor-pointer"
+                      >
+                        {model}
+                      </div>
+                    ))}
                   </div>
                 </div>
               )}
             </div>
-
-            {/* Vision Model Selector */}
+            
             <div className="relative">
               <button
                 onClick={() => setVisionModelOpen(!visionModelOpen)}
@@ -75,21 +71,23 @@ export function ApplicationHeader({
                 <ChevronDown className="w-4 h-4 text-secondary" />
               </button>
               {visionModelOpen && (
-                <div className="absolute top-full mt-1 left-0 bg-background border border-border rounded-lg shadow-lg min-w-48">
+                <div className="absolute top-full mt-1 left-0 bg-background border border-border rounded-lg shadow-lg min-w-48 z-50">
                   <div className="p-1">
-                    <div className="px-3 py-2 hover:bg-accent rounded text-sm cursor-pointer">
-                      llava:latest
-                    </div>
-                    <div className="px-3 py-2 hover:bg-accent rounded text-sm cursor-pointer">
-                      bakllava:latest
-                    </div>
+                    {VISION_MODELS.map((model) => (
+                      <div
+                        key={model}
+                        onClick={() => { modelSelector.onVisionModelChange(model); setVisionModelOpen(false); }}
+                        className="px-3 py-2 hover:bg-accent rounded text-sm cursor-pointer"
+                      >
+                        {model}
+                      </div>
+                    ))}
                   </div>
                 </div>
               )}
             </div>
 
-            {/* Auto-detect Toggle */}
-            <label className="flex items-center space-x-2 text-sm">
+            <label className="flex items-center space-x-2 text-sm cursor-pointer">
               <input
                 type="checkbox"
                 checked={modelSelector.autoDetect}
@@ -102,28 +100,14 @@ export function ApplicationHeader({
         )}
       </div>
 
-      {/* Navigation Controls */}
       <div className="flex items-center space-x-2">
-        <button
-          onClick={onHistoryClick}
-          className="p-2 hover:bg-accent rounded-lg transition-colors"
-          title="History"
-        >
+        <button onClick={onHistoryClick} className="p-2 hover:bg-accent rounded-lg transition-colors" title="Toggle Sidebar">
           <History className="w-5 h-5 text-secondary" />
         </button>
-        <button
-          onClick={onConnectionsClick}
-          className="p-2 hover:bg-accent rounded-lg transition-colors"
-          title="Connections"
-        >
+        <button onClick={onConnectionsClick} className="p-2 hover:bg-accent rounded-lg transition-colors" title="Connections">
           <Zap className="w-5 h-5 text-secondary" />
         </button>
-        <button
-          onClick={onMCPClick}
-          className="p-2 hover:bg-accent rounded-lg transition-colors"
-          title="MCP Configuration"
-        >
-          
+        <button onClick={onMCPClick} className="p-2 hover:bg-accent rounded-lg transition-colors" title="MCP Configuration">
           <div className="flex items-center space-x-1">
             <Settings className="w-5 h-5 text-secondary" />
             <span className="text-sm text-secondary">MCP Config</span>

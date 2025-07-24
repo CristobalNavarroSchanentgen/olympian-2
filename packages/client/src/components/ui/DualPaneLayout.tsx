@@ -11,7 +11,6 @@ export function DualPaneLayout() {
   const { 
     sidebarOpen, 
     setSidebarOpen, 
-    conversations, 
     setConversations, 
     currentConversationId, 
     setCurrentConversation,
@@ -54,7 +53,6 @@ export function DualPaneLayout() {
       const newConversation = await chatService.createConversation({
         title: 'New Chat',
         model: textModel,
-        metadata: {}
       });
       
       addConversation(newConversation);
@@ -67,9 +65,8 @@ export function DualPaneLayout() {
         id: Date.now().toString(),
         title: 'New Chat',
         model: textModel,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        metadata: {}
+        createdAt: new Date(),        updatedAt: new Date(),
+        messageCount: 0,        metadata: {}
       };
       
       addConversation(fallbackConversation);

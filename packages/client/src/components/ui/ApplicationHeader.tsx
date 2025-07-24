@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState } from 'react';
 import { ChevronDown, History, Zap, Settings } from 'lucide-react';
 
 interface ApplicationHeaderProps {

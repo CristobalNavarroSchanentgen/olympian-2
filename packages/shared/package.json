@@ -4,6 +4,24 @@
   "description": "Shared types, models, and business logic",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "require": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./utils/model-registry-helper": {
+      "require": "./dist/utils/model-registry-helper.js",
+      "types": "./dist/utils/model-registry-helper.d.ts"
+    },
+    "./features/connection/model-registry": {
+      "require": "./dist/features/connection/model-registry/index.js",
+      "types": "./dist/features/connection/model-registry/index.d.ts"
+    },
+    "./adapters/features/connection/model-registry/registry-loader-adapter": {
+      "require": "./dist/adapters/features/connection/model-registry/registry-loader-adapter.js",
+      "types": "./dist/adapters/features/connection/model-registry/registry-loader-adapter.d.ts"
+    }
+  },
   "scripts": {
     "build": "tsc",
     "watch": "tsc --watch",

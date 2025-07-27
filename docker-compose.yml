@@ -18,19 +18,18 @@ services:
       - ./scripts/init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
     networks:
       - olympian-network
-    command: mongod --replSet rs0 --bind_ip_all
 
-  mongodb-setup:
-    image: mongo:7
-    container_name: olympian-mongodb-setup
-    depends_on:
-      - mongodb
-    networks:
-      - olympian-network
-    volumes:
-      - ./scripts/setup-replica.sh:/setup-replica.sh:ro
-    command: ["sh", "/setup-replica.sh"]
-    restart: "no"
+#   mongodb-setup:
+#     image: mongo:7
+#     container_name: olympian-mongodb-setup
+#     depends_on:
+#       - mongodb
+#     networks:
+#       - olympian-network
+#     volumes:
+#       - ./scripts/setup-replica.sh:/setup-replica.sh:ro
+#     command: ["sh", "/setup-replica.sh"]
+#     restart: "no"
 
   server:
     build:
@@ -43,13 +42,13 @@ services:
       DEBUG_HTTP: true
       NODE_ENV: production
       PORT: 3001
-      MONGODB_URI: mongodb://root:olympian123@mongodb:27017/olympian?authSource=admin&replicaSet=rs0
+      MONGODB_URI: mongodb://root:olympian123@mongodb:27017/olympian?authSource=admin
       CLIENT_URL: http://localhost:3000
       OLLAMA_URL: https://ollama.prd.ihmn.fr
     ports:
       - "3001:3001"
     depends_on:
-      - mongodb-setup
+      - mongodb
     volumes:
       - ./mcp.config.json:/app/mcp.config.json:ro
       - /tmp:/tmp

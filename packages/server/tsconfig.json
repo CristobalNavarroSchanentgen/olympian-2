@@ -11,7 +11,11 @@
     "forceConsistentCasingInFileNames": true,
     "declaration": true,
     "sourceMap": true,
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "paths": {
+      "@olympian/shared/*": ["../shared/src/*", "../shared/dist/*"]
+    },
+    "baseUrl": "."
   },
   "include": [
     "src/**/*.ts"

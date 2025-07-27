@@ -15,7 +15,7 @@ function createOllamaAdapter(baseUrl) {
                     stop: options.stop || []
                 }
             };
-            const response = await (0, http_client_1.httpRequest)(`${baseUrl}/api/tags`, {
+            const response = await (0, http_client_1.httpRequest)(`${baseUrl}/api/chat`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload),
@@ -33,18 +33,18 @@ function createOllamaAdapter(baseUrl) {
                 messages: messages.map(transformMessage),
                 stream: true
             };
-            // Use fetch for streaming instead of httpRequest
-            const response = await fetch(`${baseUrl}/api/chat`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(payload)
+            const response = await (0, http_client_1.httpRequest)(`${baseUrl}/api/chat`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload),
+                timeout: 60000
             });
             if (response.status >= 400) {
                 throw new Error(`Ollama stream failed: ${response.status}`);
             }
             const reader = response.body?.getReader();
             if (!reader)
-                throw new Error("No response body");
+                throw new Error('No response body');
             const decoder = new TextDecoder();
             try {
                 while (true) {
@@ -52,7 +52,7 @@ function createOllamaAdapter(baseUrl) {
                     if (done)
                         break;
                     const chunk = decoder.decode(value);
-                    const lines = chunk.split("\n").filter(line => line.trim());
+                    const lines = chunk.split('\n').filter(line => line.trim());
                     for (const line of lines) {
                         try {
                             const data = JSON.parse(line);
@@ -71,7 +71,7 @@ function createOllamaAdapter(baseUrl) {
             }
         },
         async listModels() {
-            const response = await (0, http_client_1.httpRequest)(`${baseUrl}/api/tags`, {
+            const response = await (0, http_client_1.httpRequest)(`${baseUrl}/api/chat`, {
                 method: 'GET',
                 timeout: 10000
             });
@@ -82,7 +82,7 @@ function createOllamaAdapter(baseUrl) {
             return data.models.map(transformModelInfo);
         },
         async getModelInfo(name) {
-            const response = await (0, http_client_1.httpRequest)(`${baseUrl}/api/tags`, {
+            const response = await (0, http_client_1.httpRequest)(`${baseUrl}/api/chat`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ name }),
@@ -96,18 +96,18 @@ function createOllamaAdapter(baseUrl) {
         },
         async checkHealth() {
             try {
-                const response = await (0, http_client_1.httpRequest)(`${baseUrl}/api/tags`, {
+                const response = await (0, http_client_1.httpRequest)(`${baseUrl}/api/chat`, {
                     method: 'GET',
                     timeout: 5000
                 });
-                return response.status < 400;
+                return response.ok;
             }
             catch {
                 return false;
             }
         },
         async getVersion() {
-            const response = await (0, http_client_1.httpRequest)(`${baseUrl}/api/tags`, {
+            const response = await (0, http_client_1.httpRequest)(`${baseUrl}/api/chat`, {
                 method: 'GET',
                 timeout: 5000
             });
@@ -142,4 +142,4 @@ function extractCapabilities(model) {
         caps.push('text');
     return caps;
 }
-//# sourceMappingURL=ollama-adapter.js.map
+//# sourceMappingURL=ollama-adapter-fixed.js.map

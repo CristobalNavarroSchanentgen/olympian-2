@@ -71,3 +71,8 @@ export function calculateTokenBreakdown(messages: any[]): TokenBreakdown {
     total: messagesTokens + contextTokens + systemTokens + imagesTokens
   };
 }
+
+// Phase 1 stub - implement in Phase 2
+export function estimateTokens(text: string): number {
+  return countTokens(text);
+}

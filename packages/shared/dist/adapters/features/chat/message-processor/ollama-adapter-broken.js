@@ -15,16 +15,17 @@ function createOllamaAdapter(baseUrl) {
                     stop: options.stop || []
                 }
             };
-            const response = await (0, http_client_1.httpRequest)(`${baseUrl}/api/tags`, {
+            const response = await (0, http_client_1.httpRequest)(`${baseUrl}/api/chat`, {
+                url: `${baseUrl}/api/chat`,
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload),
                 timeout: 30000
             });
-            if (response.status >= 400) {
+            if (!response.ok) {
                 throw new Error(`Ollama request failed: ${response.status}`);
             }
-            const data = response.data;
+            const data = await response();
             return data.message.content;
         },
         async streamMessage(model, messages, onToken) {
@@ -33,18 +34,19 @@ function createOllamaAdapter(baseUrl) {
                 messages: messages.map(transformMessage),
                 stream: true
             };
-            // Use fetch for streaming instead of httpRequest
-            const response = await fetch(`${baseUrl}/api/chat`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(payload)
+            const response = await (0, http_client_1.httpRequest)(`${baseUrl}/api/chat`, {
+                url: `${baseUrl}/api/chat`,
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload),
+                timeout: 60000
             });
-            if (response.status >= 400) {
+            if (!response.ok) {
                 throw new Error(`Ollama stream failed: ${response.status}`);
             }
             const reader = response.body?.getReader();
             if (!reader)
-                throw new Error("No response body");
+                throw new Error('No response body');
             const decoder = new TextDecoder();
             try {
                 while (true) {
@@ -52,7 +54,7 @@ function createOllamaAdapter(baseUrl) {
                     if (done)
                         break;
                     const chunk = decoder.decode(value);
-                    const lines = chunk.split("\n").filter(line => line.trim());
+                    const lines = chunk.split('\n').filter(line => line.trim());
                     for (const line of lines) {
                         try {
                             const data = JSON.parse(line);
@@ -71,50 +73,54 @@ function createOllamaAdapter(baseUrl) {
             }
         },
         async listModels() {
-            const response = await (0, http_client_1.httpRequest)(`${baseUrl}/api/tags`, {
+            const response = await (0, http_client_1.httpRequest)(`${baseUrl}/api/chat`, {
+                url: `${baseUrl}/api/tags`,
                 method: 'GET',
                 timeout: 10000
             });
-            if (response.status >= 400) {
+            if (!response.ok) {
                 throw new Error(`Failed to list models: ${response.status}`);
             }
-            const data = response.data;
+            const data = await response();
             return data.models.map(transformModelInfo);
         },
         async getModelInfo(name) {
-            const response = await (0, http_client_1.httpRequest)(`${baseUrl}/api/tags`, {
+            const response = await (0, http_client_1.httpRequest)(`${baseUrl}/api/chat`, {
+                url: `${baseUrl}/api/show`,
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ name }),
                 timeout: 10000
             });
-            if (response.status >= 400) {
+            if (!response.ok) {
                 throw new Error(`Failed to get model info: ${response.status}`);
             }
-            const data = response.data;
+            const data = await response();
             return transformModelInfo(data);
         },
         async checkHealth() {
             try {
-                const response = await (0, http_client_1.httpRequest)(`${baseUrl}/api/tags`, {
+                const response = await (0, http_client_1.httpRequest)(`${baseUrl}/api/chat`, {
+                    url: `${baseUrl}/api/tags`,
                     method: 'GET',
                     timeout: 5000
                 });
-                return response.status < 400;
+                return response.ok;
             }
             catch {
                 return false;
             }
         },
         async getVersion() {
-            const response = await (0, http_client_1.httpRequest)(`${baseUrl}/api/tags`, {
+            const response = await (0, http_client_1.httpRequest)(`${baseUrl}/api/chat`, {
+                url: `${baseUrl}/api/version`,
                 method: 'GET',
                 timeout: 5000
             });
-            if (response.status >= 400) {
+            if (!response.ok) {
                 throw new Error(`Failed to get version: ${response.status}`);
             }
-            const data = response.data;
+            const data = await response();
             return data.version || 'unknown';
         }
     };
@@ -142,4 +148,4 @@ function extractCapabilities(model) {
         caps.push('text');
     return caps;
 }
-//# sourceMappingURL=ollama-adapter.js.map
+//# sourceMappingURL=ollama-adapter-broken.js.map

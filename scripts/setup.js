@@ -24,6 +24,19 @@ async function setup() {
   console.log('1. Auto-scan (recommended)');
   console.log('2. Custom configuration');
   const detectionChoice = await question('Choose detection method (1 or 2): ');
+
+  if (detectionChoice === '2') {
+    console.log('');
+    console.log('📋 Available models in registry:');
+    console.log('   • llama3.2-vision:11b (vision)');
+    console.log('   • granite3.2-vision:2b (vision)');
+    console.log('   • phi4:14b');
+    console.log('   • llama3.2:3b');
+    console.log('   • phi4-mini:3.8b (tools)');
+    console.log('   • deepseek-r1:14b (reasoning, tools)');
+    console.log('   • qwen3:4b (reasoning, tools)');
+    console.log('   • gemma3:4b');
+  }
   const autoScan = detectionChoice === '1' || detectionChoice === '';
 
   console.log('');
@@ -37,7 +50,7 @@ async function setup() {
     'MONGODB_URI=mongodb://root:olympian123@localhost:27017/olympian?authSource=admin&replicaSet=rs0',
     'CLIENT_URL=http://localhost:3000',
     'OLLAMA_URL=' + ollamaUrl,
-    'AUTO_SCAN_MODELS=' + autoScan,
+    'AUTO_SCAN_MODELS=' + (detectionChoice === "2" ? "false" : "true"),
     'NASA_API_KEY=' + nasaApiKey,
     'GITHUB_TOKEN=' + githubToken
   ];

@@ -386,3 +386,22 @@ configuration:
   - mcp.config.json
   - docker-compose.yml
   - Makefile
+
+model-registry:
+  path: packages/shared/features/connection/model-registry
+  dependencies:
+    adapters:
+      - registry-loader: packages/shared/adapters/features/connection/model-registry/registry-loader-adapter.ts
+    services:
+      - model-registry-service
+    models:
+      - connection/model-registry
+    events:
+      - models-detected
+    config:
+      mode: registry | auto-scan
+  exports:
+    - ModelRegistryContract
+    - ModelRegistryManager
+    - createModelRegistryManager
+

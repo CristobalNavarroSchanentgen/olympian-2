@@ -3,6 +3,7 @@
 
 version: '1.0.0'
 name: 'olympian-ai-lightweight'
+    - model-registry-service
 description: 'AI-Native chat interface with integrated MCP support'
 
 # Core Domains and Features

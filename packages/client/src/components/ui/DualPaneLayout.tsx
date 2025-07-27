@@ -6,8 +6,11 @@ import { Sidebar } from "../chat/Sidebar";
 import { useChatStore } from "../../stores/chat-store";
 import { useAppStore } from "../../stores/app-store";
 import { chatService } from "../../services/chat-service";
+import { ChatLayout } from "../chat/ChatLayout";
+import { useParams } from "react-router-dom";
 
 export function DualPaneLayout() {
+  const { conversationId } = useParams();
   const { 
     sidebarOpen, 
     setSidebarOpen, 

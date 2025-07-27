@@ -9,7 +9,7 @@ interface SidebarProps {
   onNewConversation: () => void;
 }
 
-export const Sidebar: React.FC<SidebarProps> = ({ connected }) => {
+export const Sidebar: React.FC<SidebarProps> = ({ connected, onNewConversation }) => {
   const navigate = useNavigate();
   const { conversations, currentConversationId, setConversations } = useChatStore();
 
@@ -22,8 +22,15 @@ export const Sidebar: React.FC<SidebarProps> = ({ connected }) => {
       
       await chatService.getConversations().then(setConversations);
       navigate(`/chat/${conversation.id}`);
+      
+      if (onNewConversation) {
+        onNewConversation();
+      }
     } catch (error) {
       console.error('Failed to create conversation:', error);
+      if (onNewConversation) {
+        onNewConversation();
+      }
     }
   };
 
@@ -42,7 +49,6 @@ export const Sidebar: React.FC<SidebarProps> = ({ connected }) => {
 
   return (
     <div className="h-full flex flex-col bg-panel/50 backdrop-blur-sm">
-      {/* Header */}
       <div className="p-4 border-b border-border/50">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-lg font-semibold gradient-text">Olympian AI</h2>
@@ -61,7 +67,6 @@ export const Sidebar: React.FC<SidebarProps> = ({ connected }) => {
         </button>
       </div>
 
-      {/* Conversations List */}
       <div className="flex-1 overflow-y-auto custom-scrollbar p-2">
         <div className="space-y-1">
           {conversations.map((conv) => (
@@ -94,7 +99,6 @@ export const Sidebar: React.FC<SidebarProps> = ({ connected }) => {
         </div>
       </div>
 
-      {/* Footer */}
       <div className="p-4 border-t border-border/50">
         <p className="text-xs text-muted text-center">
           Powered by Ollama

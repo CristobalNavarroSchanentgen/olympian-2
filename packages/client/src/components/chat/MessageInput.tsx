@@ -17,11 +17,11 @@ export function MessageInput() {
     selectedImages,
     addImage,
     removeImage,
-    setSelectedImages
+    setSelectedImages,
+    addMessage
   } = useChatStore();
 
   const { textModel } = useAppStore();
-
 
   // Auto-resize textarea
   useEffect(() => {
@@ -59,9 +59,9 @@ export function MessageInput() {
     setInputValue('');
     setSelectedImages([]);
 
-    // Create user message in database
     try {
-      await chatService.createMessage({
+      // Create user message in database
+      const userMessage = await chatService.createMessage({
         conversationId: currentConversationId,
         role: 'user',
         content: messageContent,
@@ -69,7 +69,10 @@ export function MessageInput() {
         metadata: {}
       });
 
-      // Send via WebSocket for AI response - use the selected model from app store
+      // Add user message to local store
+      addMessage(userMessage);
+
+      // Send via WebSocket for AI response
       socket.emit('chat:message', {
         conversationId: currentConversationId,
         content: messageContent,
@@ -79,6 +82,9 @@ export function MessageInput() {
 
     } catch (error) {
       console.error('Failed to send message:', error);
+      // Restore input on error
+      setInputValue(messageContent);
+      setSelectedImages(images);
     }
   };
 
@@ -146,9 +152,9 @@ export function MessageInput() {
           <button
             onClick={handleSubmit}
             disabled={!inputValue.trim() && selectedImages.length === 0}
-            className="absolute right-3 bottom-3 p-2.5 rounded-lg bg-primary/10 hover:bg-primary/20 text-primary hover:scale-110 transition-all duration-200 disabled:text-muted disabled:cursor-not-allowed disabled:hover:scale-100 disabled:bg-transparent transition-colors"
+            className="absolute right-3 bottom-3 p-2.5 rounded-lg bg-primary/10 hover:bg-primary/20 text-primary hover:scale-110 transition-all duration-200 disabled:text-muted disabled:cursor-not-allowed disabled:hover:scale-100 disabled:bg-transparent"
           >
-            <Send className="h-6 w-6" />
+            <Send className="h-5 w-5" />
           </button>
         </div>
 

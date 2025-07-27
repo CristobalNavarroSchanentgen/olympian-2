@@ -21,17 +21,17 @@ export function MessageBubble({ message }: MessageBubbleProps) {
     <div className={`flex gap-3 ${isUser ? 'flex-row-reverse' : 'flex-row'}`}>
       {/* Avatar */}
       <div className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center ${
-        isUser ? 'bg-primary text-primary-foreground' : 'bg-muted'
+        isUser ? 'user' : 'bg-accent'
       }`}>
         {isUser ? <User className="h-4 w-4" /> : <Bot className="h-4 w-4" />}
       </div>
 
       {/* Message Content */}
       <div className={`flex-1 max-w-3xl ${isUser ? 'text-right' : 'text-left'}`}>
-        <div className={`inline-block p-4 rounded-lg ${
+        <div className={`message-bubble ${
           isUser 
-            ? 'bg-primary text-primary-foreground' 
-            : 'bg-muted border border-border'
+            ? 'user' 
+            : 'assistant'
         }`}>
           {/* Images */}
           {message.images && message.images.length > 0 && (
@@ -64,14 +64,14 @@ export function MessageBubble({ message }: MessageBubbleProps) {
         </div>
 
         {/* Message metadata */}
-        <div className={`mt-1 flex items-center gap-2 text-xs text-muted-foreground ${
+        <div className={`mt-1 flex items-center gap-2 timestamp ${
           isUser ? 'justify-end' : 'justify-start'
         }`}>
           <span>{new Date(message.createdAt).toLocaleTimeString()}</span>
           {!isUser && (
             <button
               onClick={copyToClipboard}
-              className="p-1 hover:bg-muted rounded"
+              className="p-1 hover:bg-accent rounded"
               title="Copy message"
             >
               <Copy className="h-3 w-3" />

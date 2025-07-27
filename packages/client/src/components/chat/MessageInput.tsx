@@ -98,20 +98,20 @@ export function MessageInput() {
   }
 
   return (
-    <div className="input-area p-4">
+    <div className="input-area p-4 bg-gradient-to-t from-panel/50 to-transparent">
       {/* Selected Images Preview */}
       {selectedImages.length > 0 && (
-        <div className="mb-4 flex flex-wrap gap-2">
+        <div className="mb-4 flex flex-wrap gap-3 animate-slide-up">
           {selectedImages.map((image, index) => (
             <div key={index} className="relative">
               <img
                 src={image}
                 alt="Selected"
-                className="w-20 h-20 object-cover rounded border border-border"
+                className="w-24 h-24 object-cover rounded-lg border-2 border-border shadow-lg hover:scale-105 transition-transform"
               />
               <button
                 onClick={() => removeImage(index)}
-                className="absolute -top-2 -right-2 w-5 h-5 bg-red-500 text-white rounded-full flex items-center justify-center text-xs hover:bg-red-600"
+                className="absolute -top-3 -right-3 w-6 h-6 shadow-md bg-red-500 text-white rounded-full flex items-center justify-center text-xs hover:bg-red-600"
               >
                 <X className="w-3 h-3" />
               </button>
@@ -125,9 +125,9 @@ export function MessageInput() {
         {/* Attach Button */}
         <button
           onClick={() => fileInputRef.current?.click()}
-          className="p-2 text-secondary hover:text-primary hover:bg-accent rounded-lg transition-colors"
+          className="p-3 text-muted hover:text-primary hover:bg-accent/20 rounded-xl transition-all duration-200 hover:scale-110"
         >
-          <Paperclip className="h-5 w-5" />
+          <Paperclip className="h-6 w-6" />
         </button>
 
         {/* Text Input */}
@@ -138,7 +138,7 @@ export function MessageInput() {
             onChange={(e) => setInputValue(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder="Type your message... (Shift+Enter for new line)"
-            className="w-full px-4 py-3 pr-12 rounded-lg bg-background-panel border border-border placeholder:text-muted resize-none min-h-[48px] max-h-32 focus:outline-none focus:ring-2 focus:ring-ring"
+            className="w-full px-5 py-4 pr-14 rounded-xl bg-panel/80 backdrop-blur-sm border-2 border-border/50 placeholder:text-muted/70 text-primary resize-none min-h-[48px] max-h-32 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all duration-300"
             rows={1}
           />
           
@@ -146,9 +146,9 @@ export function MessageInput() {
           <button
             onClick={handleSubmit}
             disabled={!inputValue.trim() && selectedImages.length === 0}
-            className="absolute right-2 bottom-2 p-2 text-primary hover:opacity-90 disabled:text-secondary disabled:cursor-not-allowed transition-colors"
+            className="absolute right-3 bottom-3 p-2.5 rounded-lg bg-primary/10 hover:bg-primary/20 text-primary hover:scale-110 transition-all duration-200 disabled:text-muted disabled:cursor-not-allowed disabled:hover:scale-100 disabled:bg-transparent transition-colors"
           >
-            <Send className="h-4 w-4" />
+            <Send className="h-6 w-6" />
           </button>
         </div>
 

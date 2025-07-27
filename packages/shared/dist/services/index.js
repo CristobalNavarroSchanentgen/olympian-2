@@ -23,4 +23,5 @@ __exportStar(require("./memory-service"), exports);
 __exportStar(require("./message-service"), exports);
 __exportStar(require("./streaming-service"), exports);
 __exportStar(require("./vision-service"), exports);
+__exportStar(require("./model-registry-service"), exports);
 //# sourceMappingURL=index.js.map

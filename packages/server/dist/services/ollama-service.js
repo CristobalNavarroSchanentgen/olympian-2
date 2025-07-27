@@ -12,6 +12,7 @@ class OllamaService {
     connectionAttempts = [];
     lastSuccessfulConnection;
     reconnectInterval;
+    modelRegistry;
     constructor() {
         this.baseUrl = process.env.OLLAMA_URL || 'http://localhost:11434';
         this.logConnectionDetails();
@@ -223,6 +224,13 @@ class OllamaService {
     }
     async chat(request) {
         console.log(`🦙 Starting chat with model: ${request.model}`);
+        // Validate model access
+        if (this.modelRegistry) {
+            const validation = await this.modelRegistry.validateModelAccess(request.model);
+            if (!validation.allowed) {
+                throw new Error(`Model validation failed: ${validation.reason}. Suggested alternatives: ${validation.suggestedAlternatives?.join(", ") || "none"}`);
+            }
+        }
         try {
             const startTime = Date.now();
             const response = await this.client.post('/api/chat', {

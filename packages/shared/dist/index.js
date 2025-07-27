@@ -29,4 +29,6 @@ __exportStar(require("./utils/context-manager"), exports);
 __exportStar(require("./utils/process-manager"), exports);
 __exportStar(require("./utils/protocol-handler"), exports);
 __exportStar(require("./utils/image-processor"), exports);
+__exportStar(require("./features/connection/model-registry"), exports);
+__exportStar(require("./utils/model-registry-helper"), exports);
 //# sourceMappingURL=index.js.map

@@ -7,4 +7,5 @@ export * from './memory-service';
 export * from './message-service';
 export * from './streaming-service';
 export * from './vision-service';
+export * from "./model-registry-service";
 //# sourceMappingURL=index.d.ts.map

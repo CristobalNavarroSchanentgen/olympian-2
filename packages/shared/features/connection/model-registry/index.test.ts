@@ -2,7 +2,6 @@
  * Model Registry Manager Tests
  */
 
-import { describe, it, expect, beforeEach } from 'vitest';
 import { ModelRegistryManager } from './index';
 import { createRegistryLoaderAdapter } from '../../../adapters/features/connection/model-registry/registry-loader-adapter';
 

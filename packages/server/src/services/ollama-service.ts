@@ -1,14 +1,7 @@
 import axios, { AxiosInstance } from 'axios';
-import { ModelRegistryService } from "@olympian/shared/services";
-    // Validate model access
-    if (this.modelRegistry) {
-      const validation = await this.modelRegistry.validateModelAccess(request.model);
-      if (!validation.allowed) {
-        throw new Error(`Model validation failed: ${validation.reason}. Suggested alternatives: ${validation.suggestedAlternatives?.join(", ") || "none"}`);
-      }
-    }
-import { createModelRegistryManager } from "@olympian/shared/features/connection/model-registry";
-import { createRegistryLoaderAdapter } from "@olympian/shared/adapters/features/connection/model-registry/registry-loader-adapter";
+import { ModelRegistryService } from '@olympian/shared/services';
+import { createModelRegistryManager } from '@olympian/shared/features/connection/model-registry';
+import { createRegistryLoaderAdapter } from '@olympian/shared/adapters/features/connection/model-registry/registry-loader-adapter';
 
 interface OllamaModel {
   name: string;
@@ -55,6 +48,7 @@ export class OllamaService {
   private connectionAttempts: ConnectionAttempt[] = [];
   private lastSuccessfulConnection?: Date;
   private reconnectInterval?: NodeJS.Timeout;
+  private modelRegistry?: ModelRegistryService;
 
   constructor() {
     this.baseUrl = process.env.OLLAMA_URL || 'http://localhost:11434';
@@ -66,16 +60,7 @@ export class OllamaService {
     });
     
     // Add request interceptor for detailed logging
-    this.initializeModelRegistry();
     this.client.interceptors.request.use(
-
-  private modelRegistry?: ModelRegistryService;
-
-  private async initializeModelRegistry() {
-    const registryAdapter = createRegistryLoaderAdapter();
-    const config = { mode: (process.env.AUTO_SCAN_MODELS === "false" ? "registry" : "auto-scan") as "auto-scan" | "registry" };
-    this.modelRegistry = createModelRegistryManager({ registryAdapter, config });
-  }
       (config) => {
         if (this.shouldLogVerbose()) {
           console.log('🦙 OLLAMA REQUEST INTERCEPTOR');
@@ -312,7 +297,7 @@ export class OllamaService {
 
   async chat(request: ChatRequest): Promise<ChatResponse> {
     console.log(`🦙 Starting chat with model: ${request.model}`);
-    try {
+
     // Validate model access
     if (this.modelRegistry) {
       const validation = await this.modelRegistry.validateModelAccess(request.model);
@@ -320,6 +305,7 @@ export class OllamaService {
         throw new Error(`Model validation failed: ${validation.reason}. Suggested alternatives: ${validation.suggestedAlternatives?.join(", ") || "none"}`);
       }
     }
+    try {
       const startTime = Date.now();
       const response = await this.client.post('/api/chat', {
         ...request,

@@ -51,7 +51,7 @@ export function setupRoutes(app: any) {
     try {
       const { modelName } = req.params;
       const registryAdapter = createRegistryLoaderAdapter();
-      const config = { mode: isRegistryModeEnabled() ? 'registry' : 'auto-scan' as const };
+      const config = { mode: (isRegistryModeEnabled() ? "registry" : "auto-scan") as "auto-scan" | "registry" };
       const registry = createModelRegistryManager({ registryAdapter, config });
       
       const validation = await registry.validateModelAccess(modelName);
@@ -67,7 +67,7 @@ export function setupRoutes(app: any) {
     try {
       const { modelName } = req.params;
       const registryAdapter = createRegistryLoaderAdapter();
-      const config = { mode: isRegistryModeEnabled() ? 'registry' : 'auto-scan' as const };
+      const config = { mode: (isRegistryModeEnabled() ? "registry" : "auto-scan") as "auto-scan" | "registry" };
       const registry = createModelRegistryManager({ registryAdapter, config });
       
       const capability = await registry.getModelCapability(modelName);

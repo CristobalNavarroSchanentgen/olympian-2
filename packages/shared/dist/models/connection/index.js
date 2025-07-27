@@ -15,6 +15,9 @@ var __exportStar = (this && this.__exportStar) || function(m, exports) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 __exportStar(require("./health-status"), exports);
+__exportStar(require("./model-registry"), exports);
 __exportStar(require("./model-capability"), exports);
+__exportStar(require("./model-registry"), exports);
 __exportStar(require("./ollama-connection"), exports);
+__exportStar(require("./model-registry"), exports);
 //# sourceMappingURL=index.js.map

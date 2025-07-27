@@ -31,6 +31,7 @@ export declare class OllamaService {
     private connectionAttempts;
     private lastSuccessfulConnection?;
     private reconnectInterval?;
+    private modelRegistry?;
     constructor();
     private shouldLogVerbose;
     private logConnectionDetails;

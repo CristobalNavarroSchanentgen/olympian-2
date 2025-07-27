@@ -68,14 +68,6 @@ export class ModelDetector implements ModelDetectorContract {
     return capability;
   }
 
-  private getCapabilityList(registryDef: any): string[] {
-    const capabilities: string[] = ['chat', 'streaming'];
-    if (registryDef.hasVision) capabilities.push('vision');
-    if (registryDef.hasTools) capabilities.push('tools', 'code');
-    if (registryDef.hasReasoning) capabilities.push('reasoning');
-    return capabilities;
-  }
-
   async batchDetect(modelNames: string[]): Promise<ModelCapability[]> {
     const results = await Promise.allSettled(
       modelNames.map(name => this.detectCapabilities(name))
@@ -86,26 +78,20 @@ export class ModelDetector implements ModelDetectorContract {
       .map(result => (result as PromiseFulfilledResult<ModelCapability>).value);
   }
 
+  private getCapabilityList(registryDef: any): string[] {
+    const capabilities: string[] = ['chat', 'streaming'];
+    if (registryDef.hasVision) capabilities.push('vision');
+    if (registryDef.hasTools) capabilities.push('tools', 'code');
+    if (registryDef.hasReasoning) capabilities.push('reasoning');
+    return capabilities;
+  }
+
   async testVisionCapability(modelName: string): Promise<boolean> {
-    // Check registry first if available
-    if (this.modelRegistry) {
-      const isRegistryMode = await this.modelRegistry.isRegistryMode();
-      if (isRegistryMode) {
-        const registryCapability = await this.modelRegistry.getModelCapability(modelName);
-        return registryCapability?.hasVision || false;
-      }
-    }
-    
     return await this.deps.capabilityScanner.testVision(modelName);
   }
 
   async getCapability(modelName: string): Promise<ModelCapability | null> {
-    // Try to detect if not cached
-    try {
-      return await this.detectCapabilities(modelName);
-    } catch {
-      return null;
-    }
+    return this.detectionCache.get(modelName) || null;
   }
 
   async refreshCapability(modelName: string): Promise<ModelCapability> {
@@ -119,22 +105,6 @@ export class ModelDetector implements ModelDetectorContract {
   }
 
   async listDetectedModels(): Promise<ModelCapability[]> {
-    // In registry mode, return all registry models
-    if (this.modelRegistry) {
-      const isRegistryMode = await this.modelRegistry.isRegistryMode();
-      if (isRegistryMode) {
-        const registryModels = await this.modelRegistry.getAllRegisteredModels();
-        const capabilities: ModelCapability[] = [];
-        
-        for (const model of registryModels) {
-          const capability = await this.detectCapabilities(model.modelName);
-          capabilities.push(capability);
-        }
-        
-        return capabilities;
-      }
-    }
-    
     return Array.from(this.detectionCache.values());
   }
 
@@ -150,4 +120,3 @@ export class ModelDetector implements ModelDetectorContract {
     return { ...this.deps.config };
   }
 }
-

@@ -34,4 +34,6 @@ export type { ToolExecutorContract } from './features/mcp/tool-executor/contract
 export type { OllamaConnectorContract } from './features/connection/ollama-connector/contract';
 export type { ModelDetectorContract } from './features/connection/model-detector/contract';
 export type { ImageProcessorContract } from './features/vision/image-processor/contract';
+export * from "./features/connection/model-registry";
+export * from "./utils/model-registry-helper";
 //# sourceMappingURL=index.d.ts.map

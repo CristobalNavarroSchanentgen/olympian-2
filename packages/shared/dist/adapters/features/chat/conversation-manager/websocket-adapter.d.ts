@@ -1,4 +1,4 @@
-import { Conversation } from '../../../models/chat';
+import { Conversation } from '../../../../models/chat/index';
 /**
  * WebSocket adapter for real-time conversation updates
  * Transforms real-time communication for conversation-manager feature

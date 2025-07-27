@@ -1,28 +1,32 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.createArtifactStorageAdapter = createArtifactStorageAdapter;
-const artifact_validator_1 = require("../../../utils/artifact-validator");
+const artifact_validator_1 = require("../../../../utils/artifact-validator");
+// Helper function for generating IDs
+function generateArtifactId() {
+    return `artifact_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+}
 // In-memory storage for demo purposes
-// In production, this would connect to a database
 const artifactStore = new Map();
 function createArtifactStorageAdapter() {
     return {
         async storeArtifact(artifactData) {
             // Validate artifact before storing
-            const validation = (0, artifact_validator_1.validateArtifact)(artifactData.content, artifactData.type);
-            if (!validation.valid) {
+            const validation = (0, artifact_validator_1.validateArtifact)(artifactData);
+            if (!validation.isValid) {
                 throw new Error(`Artifact validation failed: ${validation.errors.join(', ')}`);
             }
             const now = new Date();
             const artifact = {
                 ...artifactData,
-                id: this.generateArtifactId(),
+                id: generateArtifactId(),
                 createdAt: now,
                 updatedAt: now,
                 metadata: {
                     ...artifactData.metadata,
-                    validationResult: validation,
-                    storageVersion: '1.0.0'
+                    size: artifactData.content?.length || 0,
+                    version: 1,
+                    tags: artifactData.metadata?.tags || []
                 }
             };
             artifactStore.set(artifact.id, artifact);
@@ -37,22 +41,22 @@ function createArtifactStorageAdapter() {
             if (!existing) {
                 throw new Error(`Artifact ${id} not found`);
             }
-            // Validate content if it's being updated
+            // Validate content if it\'s being updated
             if (updates.content) {
-                const validation = (0, artifact_validator_1.validateArtifact)(updates.content, updates.type || existing.type);
-                if (!validation.valid) {
+                const validation = (0, artifact_validator_1.validateArtifact)({ ...existing, ...updates });
+                if (!validation.isValid) {
                     throw new Error(`Artifact validation failed: ${validation.errors.join(', ')}`);
                 }
-                updates.metadata = {
-                    ...existing.metadata,
-                    ...updates.metadata,
-                    validationResult: validation
-                };
             }
             const updated = {
                 ...existing,
                 ...updates,
-                updatedAt: new Date()
+                updatedAt: new Date(),
+                metadata: {
+                    ...existing.metadata,
+                    ...updates.metadata,
+                    version: existing.metadata.version + 1
+                }
             };
             artifactStore.set(id, updated);
             return updated;
@@ -69,7 +73,6 @@ function createArtifactStorageAdapter() {
             const searchTerm = query.toLowerCase();
             for (const artifact of artifactStore.values()) {
                 if (artifact.title.toLowerCase().includes(searchTerm) ||
-                    artifact.description?.toLowerCase().includes(searchTerm) ||
                     artifact.content.toLowerCase().includes(searchTerm) ||
                     artifact.type.toLowerCase().includes(searchTerm)) {
                     results.push(artifact);
@@ -140,10 +143,6 @@ function createArtifactStorageAdapter() {
                 .filter(a => a.type === type)
                 .sort((a, b) => b.updatedAt.getTime() - a.updatedAt.getTime());
             return artifacts;
-        },
-        // Helper methods
-        generateArtifactId() {
-            return `artifact_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
         }
     };
 }

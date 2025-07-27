@@ -81,8 +81,9 @@ export function createVersionTrackerAdapter() {
         createdAt: new Date(),
         updatedAt: new Date(),
         metadata: {
-          
-          
+          size: version.content.length,
+          version: version.versionNumber,
+          tags: []
         }
       };
 

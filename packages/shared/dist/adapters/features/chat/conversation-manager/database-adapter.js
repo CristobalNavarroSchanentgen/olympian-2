@@ -81,7 +81,7 @@ function transformFromDb(doc) {
         model: doc.model,
         createdAt: doc.createdAt,
         updatedAt: doc.updatedAt,
-        metadata: doc.metadata || {}
+        messageCount: doc.messageCount || 0, metadata: doc.metadata || {}
     };
 }
 function generateId() {

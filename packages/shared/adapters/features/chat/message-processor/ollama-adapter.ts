@@ -1,5 +1,5 @@
-import { Message } from '../../../models/chat';
-import { httpRequest } from '../../../utils/http-client';
+import { Message } from '../../../../models/chat/index';
+import { httpRequest } from '../../../../utils/http-client';
 
 /**
  * Ollama adapter for message processing

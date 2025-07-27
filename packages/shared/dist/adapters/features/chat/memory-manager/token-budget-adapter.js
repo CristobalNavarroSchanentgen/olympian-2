@@ -1,265 +1,133 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.createTokenBudgetAdapter = createTokenBudgetAdapter;
-const token_counter_1 = require("../../../utils/token-counter");
+const token_counter_1 = require("../../../../utils/token-counter");
+// Helper functions (moved outside the adapter for scope clarity)
+function calculateBreakdown(messages) {
+    let systemMessages = 0;
+    let userMessages = 0;
+    let assistantMessages = 0;
+    let images = 0;
+    let metadata = 0;
+    messages.forEach(message => {
+        const tokens = (0, token_counter_1.countTokens)(message.content);
+        switch (message.role) {
+            case 'system':
+                systemMessages += tokens;
+                break;
+            case 'user':
+                userMessages += tokens;
+                break;
+            case 'assistant':
+                assistantMessages += tokens;
+                break;
+        }
+        if (message.images?.length) {
+            images += message.images.length * 765; // Standard image tokens
+        }
+        metadata += 10; // Approximate metadata overhead
+    });
+    return {
+        systemMessages,
+        userMessages,
+        assistantMessages,
+        images,
+        metadata,
+        total: systemMessages + userMessages + assistantMessages + images + metadata
+    };
+}
 function createTokenBudgetAdapter() {
     return {
-        calculateBudget(messages, maxTokens, reserveRatio = 0.1) {
-            const reserve = Math.floor(maxTokens * reserveRatio);
-            const available = maxTokens - reserve;
-            // Allocate 70% for context, 30% for response
-            const context = Math.floor(available * 0.7);
-            const response = available - context;
-            // Calculate system message allocation (usually small but important)
-            const systemMessages = messages.filter(m => m.role === 'system');
-            const systemTokens = systemMessages.reduce((sum, m) => sum + (0, token_counter_1.countTokens)(m.content), 0);
-            const system = Math.min(systemTokens + 100, Math.floor(context * 0.2)); // Cap at 20% of context
-            const breakdown = this.calculateBreakdown(messages);
+        allocateBudget(totalBudget, requirements) {
+            const allocation = {
+                total: totalBudget,
+                system: requirements.systemTokens,
+                user: requirements.userTokens,
+                assistant: requirements.assistantTokens,
+                context: requirements.contextTokens,
+                response: requirements.responseTokens,
+                reserve: Math.max(0, totalBudget - (requirements.systemTokens +
+                    requirements.userTokens +
+                    requirements.assistantTokens +
+                    requirements.contextTokens +
+                    requirements.responseTokens))
+            };
+            return allocation;
+        },
+        trackUsage(messages, budget) {
+            const breakdown = calculateBreakdown(messages);
             return {
-                total: maxTokens,
-                context: context - system,
-                response,
-                system,
-                reserve,
-                breakdown
+                total: breakdown.total,
+                byCategory: {
+                    system: breakdown.systemMessages,
+                    user: breakdown.userMessages,
+                    assistant: breakdown.assistantMessages,
+                    images: breakdown.images,
+                    metadata: breakdown.metadata
+                },
+                breakdown,
+                efficiency: breakdown.total / budget.total,
+                trends: []
             };
         },
-        checkBudgetCompliance(messages, budget) {
-            const usage = this.trackBudgetUsage(messages, budget);
+        validateUsage(usage, budget) {
             const overages = [];
-            // Check each category
-            if (usage.byCategory.system > budget.system) {
-                overages.push({
-                    category: 'system',
-                    allocated: budget.system,
-                    used: usage.byCategory.system,
-                    overage: usage.byCategory.system - budget.system
-                });
-            }
-            if (usage.byCategory.context > budget.context) {
-                overages.push({
-                    category: 'context',
-                    allocated: budget.context,
-                    used: usage.byCategory.context,
-                    overage: usage.byCategory.context - budget.context
-                });
-            }
-            const totalUsed = usage.total;
-            const totalAvailable = budget.total - budget.reserve;
-            if (totalUsed > totalAvailable) {
+            const warnings = [];
+            if (usage.total > budget.total) {
                 overages.push({
                     category: 'total',
-                    allocated: totalAvailable,
-                    used: totalUsed,
-                    overage: totalUsed - totalAvailable
+                    allocated: budget.total,
+                    used: usage.total,
+                    overage: usage.total - budget.total,
+                    percentage: (usage.total - budget.total) / budget.total * 100
                 });
             }
-            const compliant = overages.length === 0;
-            const severity = this.calculateSeverity(overages, budget);
-            const recommendations = this.generateRecommendations(overages, usage, budget);
+            const severity = overages.length > 0 ? 'high' : 'low';
+            const recommendations = overages.length > 0
+                ? ['Reduce context size', 'Optimize message content']
+                : [];
             return {
-                compliant,
+                isValid: overages.length === 0,
                 overages,
-                recommendations,
-                severity
+                warnings,
+                severity,
+                recommendations
             };
         },
-        optimizeBudgetAllocation(messages, totalBudget) {
-            const currentUsage = this.trackBudgetUsage(messages, this.calculateBudget(messages, totalBudget));
-            // Analyze message patterns
-            const systemRatio = currentUsage.byCategory.system / currentUsage.total;
-            const contextRatio = currentUsage.byCategory.context / currentUsage.total;
-            // Optimize based on actual usage patterns
-            const reserve = Math.floor(totalBudget * 0.1);
-            const available = totalBudget - reserve;
-            // Adjust allocations based on usage patterns
-            let systemAllocation = Math.max(currentUsage.byCategory.system, Math.floor(available * 0.1));
-            let contextAllocation = Math.floor((available - systemAllocation) * 0.75);
-            let responseAllocation = available - systemAllocation - contextAllocation;
-            // Ensure minimum response allocation
-            if (responseAllocation < Math.floor(totalBudget * 0.2)) {
-                responseAllocation = Math.floor(totalBudget * 0.2);
-                contextAllocation = available - systemAllocation - responseAllocation;
+        optimizeBudget(usage, budget) {
+            const recommendedAllocation = { ...budget };
+            // Simple optimization - redistribute based on actual usage
+            const totalUsed = usage.total;
+            const efficiency = totalUsed / budget.total;
+            if (efficiency > 0.9) {
+                recommendedAllocation.reserve = Math.floor(budget.total * 0.1);
             }
-            const efficiency = this.calculateAllocationEfficiency({ context: contextAllocation, response: responseAllocation, system: systemAllocation, reserve }, currentUsage);
             return {
-                context: contextAllocation,
-                response: responseAllocation,
-                system: systemAllocation,
-                reserve,
-                efficiency
+                recommendedAllocation,
+                projectedSavings: 0,
+                riskLevel: 'low',
+                recommendations: ['Monitor usage patterns']
             };
         },
-        suggestBudgetAdjustments(current, usage) {
-            const suggestions = [];
-            // Check for under-utilization
-            if (usage.utilizationRate < 0.7) {
-                suggestions.push({
-                    type: 'decrease',
-                    category: 'total',
-                    amount: Math.floor(current.total * 0.1),
-                    reason: 'Low utilization rate detected',
-                    impact: 'Reduces memory pressure while maintaining functionality'
-                });
-            }
-            // Check for over-utilization
-            if (usage.utilizationRate > 0.9) {
-                suggestions.push({
-                    type: 'increase',
-                    category: 'total',
-                    amount: Math.floor(current.total * 0.2),
-                    reason: 'High utilization rate may cause performance issues',
-                    impact: 'Provides more headroom for complex conversations'
-                });
-            }
-            // Check category imbalances
-            const contextUtilization = usage.byCategory.context / current.context;
-            const responseAllowance = current.response;
-            if (contextUtilization > 0.95 && responseAllowance > current.total * 0.4) {
-                suggestions.push({
-                    type: 'reallocate',
-                    category: 'context',
-                    amount: Math.floor(responseAllowance * 0.2),
-                    reason: 'Context frequently near capacity',
-                    impact: 'Improves conversation flow by providing more context space'
-                });
-            }
-            return suggestions;
-        },
-        trackBudgetUsage(messages, budget) {
-            const breakdown = this.calculateBreakdown(messages);
-            const byCategory = {
-                system: breakdown.systemMessages,
-                context: breakdown.userMessages + breakdown.assistantMessages,
-                images: breakdown.images,
-                metadata: breakdown.metadata
-            };
-            const total = Object.values(byCategory).reduce((sum, val) => sum + val, 0);
-            const utilizationRate = total / (budget.total - budget.reserve);
-            // Calculate efficiency (how well the budget is being used)
-            const efficiency = Math.min(1, utilizationRate) * (total > 0 ? 1 : 0);
-            const trends = this.calculateUsageTrends(messages);
+        getBudgetMetrics(usage, budget) {
             return {
-                total,
-                byCategory,
-                utilizationRate,
-                efficiency,
-                trends
+                utilization: usage.total / budget.total,
+                efficiency: usage.efficiency,
+                distribution: usage.byCategory,
+                trends: usage.trends
             };
         },
-        projectFutureUsage(currentUsage, projectedMessages) {
-            const avgTokensPerMessage = currentUsage.total / Math.max(1, projectedMessages);
-            const projectedTotal = currentUsage.total + (projectedMessages * avgTokensPerMessage);
-            const projectedByCategory = {};
-            Object.entries(currentUsage.byCategory).forEach(([category, current]) => {
-                const growthRate = this.getGrowthRateForCategory(category, currentUsage.trends);
-                projectedByCategory[category] = current + (projectedMessages * growthRate);
-            });
-            const riskLevel = this.assessRiskLevel(projectedTotal, projectedByCategory);
-            const recommendedActions = this.generateProjectionRecommendations(riskLevel, projectedByCategory);
+        projectUsage(messages, budget) {
+            const breakdown = calculateBreakdown(messages);
+            const projectedUsage = breakdown.total * 1.2; // 20% growth estimate
             return {
-                projectedTotal,
-                projectedByCategory,
-                riskLevel,
-                recommendedActions
+                timeframe: '1 hour',
+                projectedUsage,
+                riskLevel: projectedUsage > budget.total ? 'high' : 'low',
+                recommendations: projectedUsage > budget.total
+                    ? ['Consider budget increase', 'Optimize content']
+                    : ['Current usage is sustainable']
             };
-        },
-        // Helper methods
-        calculateBreakdown(messages) {
-            let systemMessages = 0;
-            let userMessages = 0;
-            let assistantMessages = 0;
-            let images = 0;
-            let metadata = 0;
-            messages.forEach(message => {
-                const tokens = (0, token_counter_1.countTokens)(message.content);
-                switch (message.role) {
-                    case 'system':
-                        systemMessages += tokens;
-                        break;
-                    case 'user':
-                        userMessages += tokens;
-                        break;
-                    case 'assistant':
-                        assistantMessages += tokens;
-                        break;
-                }
-                if (message.images && message.images.length > 0) {
-                    images += message.images.length * 750; // Estimated tokens per image
-                }
-                metadata += 10; // Estimated metadata overhead per message
-            });
-            return {
-                systemMessages,
-                userMessages,
-                assistantMessages,
-                images,
-                metadata
-            };
-        },
-        calculateSeverity(overages, budget) {
-            if (overages.length === 0)
-                return 'low';
-            const maxOverageRatio = Math.max(...overages.map(o => o.overage / o.allocated));
-            if (maxOverageRatio > 0.5)
-                return 'high';
-            if (maxOverageRatio > 0.2)
-                return 'medium';
-            return 'low';
-        },
-        generateRecommendations(overages, usage, budget) {
-            const recommendations = [];
-            if (overages.some(o => o.category === 'system')) {
-                recommendations.push('Consider simplifying system prompts or splitting them across multiple messages');
-            }
-            if (overages.some(o => o.category === 'context')) {
-                recommendations.push('Enable context compression or increase conversation memory limits');
-            }
-            if (overages.some(o => o.category === 'total')) {
-                recommendations.push('Increase total token budget or implement more aggressive memory management');
-            }
-            if (usage.efficiency < 0.5) {
-                recommendations.push('Budget allocation may be inefficient - consider rebalancing categories');
-            }
-            return recommendations;
-        },
-        calculateAllocationEfficiency(allocation, usage) {
-            // Calculate how well the allocation matches actual usage patterns
-            const contextEfficiency = Math.min(1, usage.byCategory.context / allocation.context);
-            const systemEfficiency = Math.min(1, usage.byCategory.system / allocation.system);
-            // Weight by importance
-            return (contextEfficiency * 0.6) + (systemEfficiency * 0.3) + (usage.efficiency * 0.1);
-        },
-        calculateUsageTrends(messages) {
-            // Simplified trend calculation - in real implementation, this would analyze historical data
-            return [
-                { category: 'context', direction: 'stable', rate: 0 },
-                { category: 'system', direction: 'stable', rate: 0 }
-            ];
-        },
-        getGrowthRateForCategory(category, trends) {
-            const trend = trends.find(t => t.category === category);
-            return trend ? trend.rate : 50; // Default 50 tokens per message
-        },
-        assessRiskLevel(projectedTotal, projectedByCategory) {
-            // Simplified risk assessment
-            if (projectedTotal > 8000)
-                return 'high';
-            if (projectedTotal > 6000)
-                return 'medium';
-            return 'low';
-        },
-        generateProjectionRecommendations(riskLevel, projectedByCategory) {
-            const recommendations = [];
-            if (riskLevel === 'high') {
-                recommendations.push('Consider implementing aggressive memory management');
-                recommendations.push('Enable context summarization');
-            }
-            if (riskLevel === 'medium') {
-                recommendations.push('Monitor token usage closely');
-                recommendations.push('Consider enabling context optimization');
-            }
-            return recommendations;
         }
     };
 }

@@ -1,4 +1,4 @@
-import { Conversation } from '../../../models/chat';
+import { Conversation } from '../../../../models/chat/index';
 
 /**
  * Database adapter for conversation operations
@@ -117,7 +117,7 @@ function transformFromDb(doc: any): Conversation {
     model: doc.model,
     createdAt: doc.createdAt,
     updatedAt: doc.updatedAt,
-    metadata: doc.metadata || {}
+    messageCount: doc.messageCount || 0,    metadata: doc.metadata || {}
   };
 }
 

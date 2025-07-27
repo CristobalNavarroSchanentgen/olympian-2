@@ -1,33 +1,25 @@
-import { Message } from '../../../models/chat';
-import { MemoryContext } from '../../../models/chat';
+import { Message } from '../../../../models/chat/index';
+import { MemoryContext } from '../../../../models/chat/index';
 /**
  * Context adapter for memory management
- * Transforms context optimization utilities for memory-manager feature
- *
- * AI-Native Rule: This adapter is owned exclusively by memory-manager
+ * Transforms context operations for memory-manager feature
  */
 export interface ContextAdapter {
     buildConversationContext(messages: Message[], maxTokens: number): MemoryContext;
     optimizeContext(context: MemoryContext, targetTokens: number): MemoryContext;
-    analyzeContextQuality(context: MemoryContext): ContextQuality;
-    getContextStatistics(context: MemoryContext): ContextStatistics;
-    applyCompressionStrategy(context: MemoryContext, ratio: number): MemoryContext;
-    applySummaryStrategy(context: MemoryContext): MemoryContext;
+    getContextStats(context: MemoryContext): ContextStats;
+    validateContext(context: MemoryContext): ContextValidation;
 }
-export interface ContextQuality {
-    score: number;
-    completeness: number;
-    relevance: number;
-    coherence: number;
-    suggestions: string[];
-}
-export interface ContextStatistics {
+export interface ContextStats {
     totalMessages: number;
-    includedMessages: number;
-    totalTokens: number;
-    averageMessageTokens: number;
-    contextCoverage: number;
+    tokenUsage: number;
     compressionRatio: number;
+    lastOptimizedAt: Date;
+}
+export interface ContextValidation {
+    isValid: boolean;
+    warnings: string[];
+    recommendations: string[];
 }
 export declare function createContextAdapter(): ContextAdapter;
 //# sourceMappingURL=context-adapter.d.ts.map

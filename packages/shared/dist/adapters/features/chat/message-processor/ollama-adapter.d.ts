@@ -1,4 +1,4 @@
-import { Message } from '../../../models/chat';
+import { Message } from '../../../../models/chat/index';
 /**
  * Ollama adapter for message processing
  * Transforms HTTP communication with Ollama for message-processor feature

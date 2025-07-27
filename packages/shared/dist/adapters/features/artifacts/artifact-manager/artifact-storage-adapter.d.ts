@@ -1,4 +1,4 @@
-import { Artifact } from '../../../models/artifacts';
+import { Artifact } from '../../../../models/artifacts/index';
 /**
  * Artifact storage adapter for artifact management
  * Transforms storage operations for artifact-manager feature

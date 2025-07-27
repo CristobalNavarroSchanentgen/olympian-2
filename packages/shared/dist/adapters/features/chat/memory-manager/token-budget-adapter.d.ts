@@ -1,25 +1,38 @@
-import { Message } from '../../../models/chat';
+import { Message } from '../../../../models/chat/index';
 /**
- * Token budget adapter for memory management
- * Transforms token budget utilities for memory-manager feature
- *
- * AI-Native Rule: This adapter is owned exclusively by memory-manager
+ * Token Budget Adapter
+ * Transforms token budget operations for memory-manager feature
  */
 export interface TokenBudgetAdapter {
-    calculateBudget(messages: Message[], maxTokens: number, reserveRatio?: number): BudgetInfo;
-    checkBudgetCompliance(messages: Message[], budget: BudgetInfo): ComplianceResult;
-    optimizeBudgetAllocation(messages: Message[], totalBudget: number): BudgetAllocation;
-    suggestBudgetAdjustments(current: BudgetInfo, usage: BudgetUsage): BudgetSuggestion[];
-    trackBudgetUsage(messages: Message[], budget: BudgetInfo): BudgetUsage;
-    projectFutureUsage(currentUsage: BudgetUsage, projectedMessages: number): BudgetProjection;
+    allocateBudget(totalBudget: number, requirements: BudgetRequirements): BudgetAllocation;
+    trackUsage(messages: Message[], budget: BudgetAllocation): BudgetUsage;
+    validateUsage(usage: BudgetUsage, budget: BudgetAllocation): BudgetValidation;
+    optimizeBudget(usage: BudgetUsage, budget: BudgetAllocation): BudgetOptimization;
+    getBudgetMetrics(usage: BudgetUsage, budget: BudgetAllocation): BudgetMetrics;
+    projectUsage(messages: Message[], budget: BudgetAllocation): UsageProjection;
 }
-export interface BudgetInfo {
+export interface BudgetRequirements {
+    systemTokens: number;
+    userTokens: number;
+    assistantTokens: number;
+    contextTokens: number;
+    responseTokens: number;
+}
+export interface BudgetAllocation {
     total: number;
+    system: number;
+    user: number;
+    assistant: number;
     context: number;
     response: number;
-    system: number;
     reserve: number;
+}
+export interface BudgetUsage {
+    total: number;
+    byCategory: Record<string, number>;
     breakdown: BudgetBreakdown;
+    efficiency: number;
+    trends: UsageTrend[];
 }
 export interface BudgetBreakdown {
     systemMessages: number;
@@ -27,50 +40,44 @@ export interface BudgetBreakdown {
     assistantMessages: number;
     images: number;
     metadata: number;
+    total: number;
 }
-export interface ComplianceResult {
-    compliant: boolean;
+export interface UsageTrend {
+    category: string;
+    growth: number;
+    prediction: number;
+}
+export interface BudgetValidation {
+    isValid: boolean;
     overages: BudgetOverage[];
-    recommendations: string[];
+    warnings: string[];
     severity: 'low' | 'medium' | 'high';
+    recommendations: string[];
 }
 export interface BudgetOverage {
     category: string;
     allocated: number;
     used: number;
     overage: number;
+    percentage: number;
 }
-export interface BudgetAllocation {
-    context: number;
-    response: number;
-    system: number;
-    reserve: number;
+export interface BudgetOptimization {
+    recommendedAllocation: BudgetAllocation;
+    projectedSavings: number;
+    riskLevel: 'low' | 'medium' | 'high';
+    recommendations: string[];
+}
+export interface BudgetMetrics {
+    utilization: number;
     efficiency: number;
-}
-export interface BudgetSuggestion {
-    type: 'increase' | 'decrease' | 'reallocate';
-    category: string;
-    amount: number;
-    reason: string;
-    impact: string;
-}
-export interface BudgetUsage {
-    total: number;
-    byCategory: Record<string, number>;
-    utilizationRate: number;
-    efficiency: number;
+    distribution: Record<string, number>;
     trends: UsageTrend[];
 }
-export interface UsageTrend {
-    category: string;
-    direction: 'increasing' | 'decreasing' | 'stable';
-    rate: number;
-}
-export interface BudgetProjection {
-    projectedTotal: number;
-    projectedByCategory: Record<string, number>;
+export interface UsageProjection {
+    timeframe: string;
+    projectedUsage: number;
     riskLevel: 'low' | 'medium' | 'high';
-    recommendedActions: string[];
+    recommendations: string[];
 }
 export declare function createTokenBudgetAdapter(): TokenBudgetAdapter;
 //# sourceMappingURL=token-budget-adapter.d.ts.map

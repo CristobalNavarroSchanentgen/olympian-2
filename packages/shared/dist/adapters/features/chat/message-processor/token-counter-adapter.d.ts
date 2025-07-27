@@ -1,4 +1,4 @@
-import { Message } from '../../../models/chat';
+import { Message } from '../../../../models/chat/index';
 /**
  * Token counter adapter for message processing
  * Transforms token counting utilities for message-processor feature

@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.createTokenCounterAdapter = createTokenCounterAdapter;
-const token_counter_1 = require("../../../utils/token-counter");
+const token_counter_1 = require("../../../../utils/token-counter");
 function createTokenCounterAdapter() {
     return {
         countMessageTokens(message) {

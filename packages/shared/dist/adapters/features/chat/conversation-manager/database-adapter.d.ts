@@ -1,4 +1,4 @@
-import { Conversation } from '../../../models/chat';
+import { Conversation } from '../../../../models/chat/index';
 /**
  * Database adapter for conversation operations
  * Transforms database operations for conversation-manager feature

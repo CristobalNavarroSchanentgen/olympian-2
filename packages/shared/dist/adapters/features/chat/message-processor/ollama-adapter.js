@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.createOllamaAdapter = createOllamaAdapter;
-const http_client_1 = require("../../../utils/http-client");
+const http_client_1 = require("../../../../utils/http-client");
 function createOllamaAdapter(baseUrl) {
     return {
         async processMessage(model, messages, options = {}) {

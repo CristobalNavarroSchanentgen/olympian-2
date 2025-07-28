@@ -7,14 +7,14 @@ function createModelMetadataAdapter() {
             const name = modelInfo.name?.toLowerCase() || '';
             const details = modelInfo.details || {};
             return {
-                family: this.detectFamily(name, details),
-                size: this.detectSize(name, details),
-                architecture: this.detectArchitecture(name, details),
-                trainingData: this.detectTrainingData(name),
-                languages: this.detectLanguages(name, details),
-                specializations: this.detectSpecializations(name),
-                limitations: this.detectLimitations(name, details),
-                recommendedUse: this.detectRecommendedUse(name, details)
+                family: detectFamily(name, details),
+                size: detectSize(name, details),
+                architecture: detectArchitecture(name, details),
+                trainingData: detectTrainingData(name),
+                languages: detectLanguages(name, details),
+                specializations: detectSpecializations(name),
+                limitations: detectLimitations(name, details),
+                recommendedUse: detectRecommendedUse(name, details)
             };
         },
         enrichCapabilities(capability, metadata) {
@@ -23,8 +23,8 @@ function createModelMetadataAdapter() {
                 metadata: {
                     ...capability.metadata,
                     ...metadata,
-                    category: this.categorizeModel(metadata),
-                    summary: this.generateModelSummary(capability)
+                    category: categorizeModel(metadata),
+                    summary: generateModelSummary(capability)
                 }
             };
             // Adjust capabilities based on metadata
@@ -95,16 +95,16 @@ function createModelMetadataAdapter() {
         },
         generateModelSummary(capability) {
             const metadata = capability.metadata;
-            const category = this.categorizeModel(metadata);
-            const title = this.generateTitle(capability.modelName, metadata, category);
-            const description = this.generateDescription(metadata, category);
+            const category = categorizeModel(metadata);
+            const title = generateTitle(capability.modelName, metadata, category);
+            const description = generateDescription(metadata, category);
             return {
                 title,
                 description,
-                strengths: this.generateStrengths(metadata, category),
+                strengths: generateStrengths(metadata, category),
                 limitations: metadata.limitations,
                 bestFor: metadata.recommendedUse,
-                notRecommendedFor: this.generateNotRecommended(metadata, category)
+                notRecommendedFor: generateNotRecommended(metadata, category)
             };
         },
         // Helper methods

@@ -46,14 +46,14 @@ export function createModelMetadataAdapter(): ModelMetadataAdapter {
       const details = modelInfo.details || {};
       
       return {
-        family: this.detectFamily(name, details),
-        size: this.detectSize(name, details),
-        architecture: this.detectArchitecture(name, details),
-        trainingData: this.detectTrainingData(name),
-        languages: this.detectLanguages(name, details),
-        specializations: this.detectSpecializations(name),
-        limitations: this.detectLimitations(name, details),
-        recommendedUse: this.detectRecommendedUse(name, details)
+        family: detectFamily(name, details),
+        size: detectSize(name, details),
+        architecture: detectArchitecture(name, details),
+        trainingData: detectTrainingData(name),
+        languages: detectLanguages(name, details),
+        specializations: detectSpecializations(name),
+        limitations: detectLimitations(name, details),
+        recommendedUse: detectRecommendedUse(name, details)
       };
     },
 
@@ -63,8 +63,8 @@ export function createModelMetadataAdapter(): ModelMetadataAdapter {
         metadata: {
           ...capability.metadata,
           ...metadata,
-          category: this.categorizeModel(metadata),
-          summary: this.generateModelSummary(capability)
+          category: categorizeModel(metadata),
+          summary: generateModelSummary(capability)
         }
       };
       
@@ -141,19 +141,19 @@ export function createModelMetadataAdapter(): ModelMetadataAdapter {
     },
 
     generateModelSummary(capability) {
-      const metadata = capability.metadata as ModelMetadata;
-      const category = this.categorizeModel(metadata);
+      const metadata = capability.metadata as any;
+      const category = categorizeModel(metadata);
       
-      const title = this.generateTitle(capability.modelName, metadata, category);
-      const description = this.generateDescription(metadata, category);
+      const title = generateTitle(capability.modelName, metadata, category);
+      const description = generateDescription(metadata, category);
       
       return {
         title,
         description,
-        strengths: this.generateStrengths(metadata, category),
+        strengths: generateStrengths(metadata, category),
         limitations: metadata.limitations,
         bestFor: metadata.recommendedUse,
-        notRecommendedFor: this.generateNotRecommended(metadata, category)
+        notRecommendedFor: generateNotRecommended(metadata, category)
       };
     },
 

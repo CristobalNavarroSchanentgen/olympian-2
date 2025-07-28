@@ -55,37 +55,33 @@ export function createConfigAdapter(): ConfigAdapter {
   return {
     async parseServerConfig(configPath) {
       try {
-        return await parseConfig(configPath, {
-          format: 'auto',
-          strict: true,
-          validateSchema: true
-        });
+        return await parseConfig(configPath);
       } catch (error) {
         return {
           success: false,
-          error: `Failed to parse config file ${configPath}: ${error.message}`,
-          configs: []
+          data: undefined,
+          errors: [{ message: `Failed to parse config file ${configPath}: ${(error instanceof Error ? error.message : String(error))}`, code: 'PARSE_ERROR' }],
+          warnings: []
         };
       }
     },
 
     parseInlineConfig(configData) {
       try {
-        const configs = this.extractServerConfigs(configData);
+        const configs = Array.isArray(configData) ? configData : [configData];
         
         return {
           success: true,
-          configs,
-          metadata: {
-            source: 'inline',
-            parsedAt: new Date()
-          }
+          data: { configs, metadata: { source: 'inline', parsedAt: new Date() } },
+          errors: [],
+          warnings: []
         };
       } catch (error) {
         return {
           success: false,
-          error: `Failed to parse inline config: ${error.message}`,
-          configs: []
+          data: undefined,
+          errors: [{ message: `Failed to parse inline config: ${(error instanceof Error ? error.message : String(error))}`, code: 'PARSE_ERROR' }],
+          warnings: []
         };
       }
     },

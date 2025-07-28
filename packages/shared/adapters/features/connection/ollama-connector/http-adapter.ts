@@ -13,8 +13,7 @@ export function createHttpAdapter(): HttpAdapter {
     async testConnection(connection) {
       const startTime = Date.now();
       try {
-        const response = await httpRequest({
-          url: connection.endpoint + '/api/tags',
+        const response = await httpRequest(connection.endpoint + '/api/tags', {
           method: 'GET',
           timeout: 5000
         });
@@ -27,7 +26,7 @@ export function createHttpAdapter(): HttpAdapter {
         return {
           success: false,
           latency: Date.now() - startTime,
-          error: error.message
+          error: (error instanceof Error ? error.message : String(error))
         };
       }
     },
@@ -35,10 +34,12 @@ export function createHttpAdapter(): HttpAdapter {
     async establishConnection(endpoint) {
       const connection: OllamaConnection = {
         id: 'ollama_' + Date.now(),
+        baseUrl: endpoint,
         endpoint: endpoint,
         status: 'connecting',
+        models: [],
         createdAt: new Date(),
-        lastHealthCheck: new Date(),
+        lastPing: new Date(),
         metadata: {}
       };
       
@@ -49,8 +50,7 @@ export function createHttpAdapter(): HttpAdapter {
     },
 
     async listModels(connection) {
-      const response = await httpRequest({
-        url: connection.endpoint + '/api/tags',
+      const response = await httpRequest(connection.endpoint + '/api/tags', {
         method: 'GET',
         timeout: 10000
       });
@@ -59,15 +59,14 @@ export function createHttpAdapter(): HttpAdapter {
         throw new Error('Failed to list models');
       }
       
-      const data = await response();
-      return data.models || [];
+      const data = response.data;
+      return (data as any).models || [];
     },
 
     async checkHealth(connection) {
       const startTime = Date.now();
       try {
-        const response = await httpRequest({
-          url: connection.endpoint + '/api/tags',
+        const response = await httpRequest(connection.endpoint + '/api/tags', {
           method: 'GET',
           timeout: 5000
         });
@@ -82,7 +81,7 @@ export function createHttpAdapter(): HttpAdapter {
           healthy: false,
           responseTime: Date.now() - startTime,
           timestamp: new Date(),
-          error: error.message
+          error: (error instanceof Error ? error.message : String(error))
         };
       }
     }

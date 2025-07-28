@@ -1,4 +1,4 @@
-import { HealthStatus } from '../../../../models/connection';
+import { HealthStatus } from '../../../../models/connection/health-status';
 import { checkHealth } from '../../../../utils/health-checker';
 
 /**
@@ -17,51 +17,57 @@ const monitors = new Map<string, NodeJS.Timeout>();
 const healthCallbacks = new Map<string, ((status: HealthStatus) => void)[]>();
 const lastHealthStatus = new Map<string, HealthStatus>();
 
-export function createHealthMonitorAdapter(): HealthMonitorAdapter {
-
 function triggerCallbacks(connectionId: string, status: HealthStatus): void {
   const callbacks = healthCallbacks.get(connectionId) || [];
-  callbacks.forEach(callback => callback(status));
-}  return {
-    startMonitoring(connectionId, endpoint) {
+  callbacks.forEach(callback => {
+    try {
+      callback(status);
+    } catch (error) {
+      console.error('Health callback error:', error);
+    }
+  });
+}
+
+export function createHealthMonitorAdapter(): HealthMonitorAdapter {
+  return {
+    startMonitoring(connectionId: string, endpoint: string): void {
       // Stop existing monitor if any
       this.stopMonitoring(connectionId);
       
       const monitor = setInterval(async () => {
         try {
-          const health = await checkHealth(endpoint, {
           const status = await checkHealth(endpoint, 5000);
-          
-          // Store status and notify callbacks
-          lastHealthStatus.set(connectionId, status);
-          triggerCallbacks(connectionId, status);            }
-          };
           
           // Store status and notify callbacks
           lastHealthStatus.set(connectionId, status);
           triggerCallbacks(connectionId, status);
           
         } catch (error) {
-          const status: HealthStatus = {
-            healthy: false,
-            lastCheck: new Date(),
-            responseTime: 0,
-            error: error.message,
-            details: {
+          const errorStatus: HealthStatus = {
+            status: 'unhealthy',
+            timestamp: new Date(),
+            services: {},
+            metadata: {
               endpoint: endpoint,
-              checks: []
-            }
+              error: error instanceof Error ? error.message : 'Unknown error'
+            },
+            // Compatibility properties
+            healthy: false,
+            responseTime: 0,
+            error: error instanceof Error ? error.message : 'Unknown error',
+            lastCheck: new Date(),
+            details: { endpoint }
           };
           
-          lastHealthStatus.set(connectionId, status);
-          triggerCallbacks(connectionId, status);
+          lastHealthStatus.set(connectionId, errorStatus);
+          triggerCallbacks(connectionId, errorStatus);
         }
       }, 30000); // Check every 30 seconds
       
       monitors.set(connectionId, monitor);
     },
 
-    stopMonitoring(connectionId) {
+    stopMonitoring(connectionId: string): void {
       const monitor = monitors.get(connectionId);
       if (monitor) {
         clearInterval(monitor);
@@ -73,7 +79,7 @@ function triggerCallbacks(connectionId: string, status: HealthStatus): void {
       lastHealthStatus.delete(connectionId);
     },
 
-    async getHealthStatus(connectionId) {
+    async getHealthStatus(connectionId: string): Promise<HealthStatus> {
       // Return cached status if available
       const cached = lastHealthStatus.get(connectionId);
       if (cached) {
@@ -82,32 +88,24 @@ function triggerCallbacks(connectionId: string, status: HealthStatus): void {
       
       // Return default unhealthy status
       return {
+        status: 'unhealthy',
+        timestamp: new Date(),
+        services: {},
+        metadata: { error: 'No health data available' },
+        // Compatibility properties
         healthy: false,
-        lastCheck: new Date(),
         responseTime: 0,
         error: 'No health data available',
-        details: {
-          endpoint: 'unknown',
-          checks: []
-        }
+        lastCheck: new Date(),
+        details: { endpoint: 'unknown' }
       };
     },
 
-    onHealthChange(connectionId, callback) {
+    onHealthChange(connectionId: string, callback: (status: HealthStatus) => void): void {
       const callbacks = healthCallbacks.get(connectionId) || [];
       callbacks.push(callback);
       healthCallbacks.set(connectionId, callbacks);
-    },
-
-    notifyHealthChange(connectionId: string, status: HealthStatus) {
-      const callbacks = healthCallbacks.get(connectionId) || [];
-      callbacks.forEach(callback => {
-        try {
-          callback(status);
-        } catch (error) {
-          console.error('Health callback error:', error);
-        }
-      });
     }
   };
 }
+

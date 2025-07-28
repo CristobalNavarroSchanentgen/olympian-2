@@ -1,5 +1,5 @@
-import { ServerConfig } from '../../../../models/mcp';
-import { parseConfig, validateConfig, ConfigParseResult } from '../../../../utils/config-parser';
+import { ServerConfig, McpConfigFile } from "../../../../models/mcp";
+import { parseConfig, validateConfig, ParseResult } from "../../../../utils/config-parser";
 
 /**
  * Config adapter for MCP server configuration
@@ -10,8 +10,8 @@ import { parseConfig, validateConfig, ConfigParseResult } from '../../../../util
 
 export interface ConfigAdapter {
   // Configuration parsing
-  parseServerConfig(configPath: string): Promise<ConfigParseResult>;
-  parseInlineConfig(configData: any): ConfigParseResult;
+  parseServerConfig(configPath: string): Promise<ParseResult<McpConfigFile>>;
+  parseInlineConfig(configData: any): ParseResult<McpConfigFile>;
   
   // Configuration validation
   validateServerConfig(config: ServerConfig): ValidationResult;
@@ -26,7 +26,7 @@ export interface ConfigAdapter {
   mergeConfigs(base: ServerConfig, override: Partial<ServerConfig>): ServerConfig;
   normalizeConfig(config: any): ServerConfig;
 
-
+}
 export interface ValidationResult {
   valid: boolean;
   errors: string[];
@@ -41,8 +41,8 @@ export interface RuntimeConfig {
   environment: Record<string, string>;
   workingDirectory?: string;
   timeout: number;
-  retryDelay: number;
-  endpoints: string[];
+  
+  
   retries: number;
   healthCheck: HealthCheckConfig;
 }
@@ -50,8 +50,8 @@ export interface RuntimeConfig {
 export interface HealthCheckConfig {
   timeout: number;
   retries: number;
-  retryDelay: number;
-  endpoints: string[];
+  
+  
 }
 
 export function createConfigAdapter(): ConfigAdapter {
@@ -177,8 +177,7 @@ export function createConfigAdapter(): ConfigAdapter {
         timeout: config.timeout || 30000,
         retries: config.retries || 3,
         healthCheck: {
-          timeout: config.healthCheck?.timeout ?? true,
-          retries: config.healthCheck?.retries || 30000,
+          retryDelay: config.healthCheck?.retryDelay || 1000,
           timeout: config.healthCheck?.timeout || 5000,
           retries: config.healthCheck?.retries || 2
         }
@@ -254,8 +253,7 @@ export function createConfigAdapter(): ConfigAdapter {
         timeout: config.timeout || 30000,
         retries: config.retries || 3,
         healthCheck: {
-          timeout: config.healthCheck?.timeout ?? true,
-          retries: config.healthCheck?.retries || 30000,
+          retryDelay: config.healthCheck?.retryDelay || 1000,
           timeout: config.healthCheck?.timeout || 5000,
           retries: config.healthCheck?.retries || 2
         }
@@ -287,16 +285,5 @@ export function createConfigAdapter(): ConfigAdapter {
       return configs;
     },
 
-    detectServerType(config: ServerConfig): string {
-      const packageName = config.args?.[0] || '';
-      
-      if (packageName.includes('github')) return 'github';
-      if (packageName.includes('nasa')) return 'nasa';
-      if (packageName.includes('context7')) return 'context7';
-      if (packageName.includes('metmuseum')) return 'met-museum';
-      if (config.command === 'uvx' && packageName === 'basic-memory') return 'basic-memory';
-      
-      return 'unknown';
-    }
   };
 }

@@ -109,8 +109,7 @@ function createConfigAdapter() {
                 timeout: config.timeout || 30000,
                 retries: config.retries || 3,
                 healthCheck: {
-                    timeout: config.healthCheck?.timeout ?? true,
-                    retries: config.healthCheck?.retries || 30000,
+                    retryDelay: config.healthCheck?.retryDelay || 1000,
                     timeout: config.healthCheck?.timeout || 5000,
                     retries: config.healthCheck?.retries || 2
                 }
@@ -179,8 +178,7 @@ function createConfigAdapter() {
                 timeout: config.timeout || 30000,
                 retries: config.retries || 3,
                 healthCheck: {
-                    timeout: config.healthCheck?.timeout ?? true,
-                    retries: config.healthCheck?.retries || 30000,
+                    retryDelay: config.healthCheck?.retryDelay || 1000,
                     timeout: config.healthCheck?.timeout || 5000,
                     retries: config.healthCheck?.retries || 2
                 }
@@ -209,20 +207,6 @@ function createConfigAdapter() {
             }
             return configs;
         },
-        detectServerType(config) {
-            const packageName = config.args?.[0] || '';
-            if (packageName.includes('github'))
-                return 'github';
-            if (packageName.includes('nasa'))
-                return 'nasa';
-            if (packageName.includes('context7'))
-                return 'context7';
-            if (packageName.includes('metmuseum'))
-                return 'met-museum';
-            if (config.command === 'uvx' && packageName === 'basic-memory')
-                return 'basic-memory';
-            return 'unknown';
-        }
     };
 }
 //# sourceMappingURL=config-adapter.js.map

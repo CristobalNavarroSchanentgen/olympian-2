@@ -1,5 +1,5 @@
-import { ServerConfig } from '../../../../models/mcp';
-import { ConfigParseResult } from '../../../../utils/config-parser';
+import { ServerConfig, McpConfigFile } from "../../../../models/mcp";
+import { ParseResult } from "../../../../utils/config-parser";
 /**
  * Config adapter for MCP server configuration
  * Transforms configuration utilities for server-manager feature
@@ -7,8 +7,8 @@ import { ConfigParseResult } from '../../../../utils/config-parser';
  * AI-Native Rule: This adapter is owned exclusively by server-manager
  */
 export interface ConfigAdapter {
-    parseServerConfig(configPath: string): Promise<ConfigParseResult>;
-    parseInlineConfig(configData: any): ConfigParseResult;
+    parseServerConfig(configPath: string): Promise<ParseResult<McpConfigFile>>;
+    parseInlineConfig(configData: any): ParseResult<McpConfigFile>;
     validateServerConfig(config: ServerConfig): ValidationResult;
     validateAllConfigs(configs: ServerConfig[]): ValidationResult[];
     transformToRuntimeConfig(config: ServerConfig): RuntimeConfig;
@@ -30,16 +30,12 @@ export interface RuntimeConfig {
     environment: Record<string, string>;
     workingDirectory?: string;
     timeout: number;
-    retryDelay: number;
-    endpoints: string[];
     retries: number;
     healthCheck: HealthCheckConfig;
 }
 export interface HealthCheckConfig {
     timeout: number;
     retries: number;
-    retryDelay: number;
-    endpoints: string[];
 }
 export declare function createConfigAdapter(): ConfigAdapter;
 //# sourceMappingURL=config-adapter.d.ts.map

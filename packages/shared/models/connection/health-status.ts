@@ -18,6 +18,13 @@ export interface HealthStatus {
     lastCheck: Date;
   }>;
   metadata: HealthMetadata;
+  // Additional properties for adapter compatibility
+  healthy?: boolean;
+  responseTime?: number;
+  error?: string;
+  lastCheck?: Date;
+  details?: Record<string, unknown>;
+  checks?: unknown[];
 }
 
 export interface HealthCheckConfig {

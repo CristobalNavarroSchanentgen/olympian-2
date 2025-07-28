@@ -18,7 +18,11 @@ const healthCallbacks = new Map<string, ((status: HealthStatus) => void)[]>();
 const lastHealthStatus = new Map<string, HealthStatus>();
 
 export function createHealthMonitorAdapter(): HealthMonitorAdapter {
-  return {
+
+function triggerCallbacks(connectionId: string, status: HealthStatus): void {
+  const callbacks = healthCallbacks.get(connectionId) || [];
+  callbacks.forEach(callback => callback(status));
+}  return {
     startMonitoring(connectionId, endpoint) {
       // Stop existing monitor if any
       this.stopMonitoring(connectionId);
@@ -26,24 +30,16 @@ export function createHealthMonitorAdapter(): HealthMonitorAdapter {
       const monitor = setInterval(async () => {
         try {
           const health = await checkHealth(endpoint, {
-            timeout: 5000,
-            checkEndpoints: ['/api/tags', '/api/version']
-          });
+          const status = await checkHealth(endpoint, 5000);
           
-          const status: HealthStatus = {
-            healthy: health.healthy,
-            lastCheck: new Date(),
-            responseTime: health.responseTime,
-            error: health.error,
-            details: {
-              endpoint: endpoint,
-              checks: health.checks || []
-            }
+          // Store status and notify callbacks
+          lastHealthStatus.set(connectionId, status);
+          triggerCallbacks(connectionId, status);            }
           };
           
           // Store status and notify callbacks
           lastHealthStatus.set(connectionId, status);
-          this.notifyHealthChange(connectionId, status);
+          triggerCallbacks(connectionId, status);
           
         } catch (error) {
           const status: HealthStatus = {
@@ -58,7 +54,7 @@ export function createHealthMonitorAdapter(): HealthMonitorAdapter {
           };
           
           lastHealthStatus.set(connectionId, status);
-          this.notifyHealthChange(connectionId, status);
+          triggerCallbacks(connectionId, status);
         }
       }, 30000); // Check every 30 seconds
       

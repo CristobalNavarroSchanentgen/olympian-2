@@ -18,7 +18,7 @@ export interface HttpResponse<T = unknown> {
   status: number;
   statusText: string;
   headers: Record<string, string>;
-  duration: number;
+  ok: boolean;  duration: number;
 }
 
 export class HttpError extends Error {
@@ -180,7 +180,8 @@ export async function makeHttpRequest<T = unknown>(
         statusText: response.statusText,
         headers: Object.fromEntries(response.headers.entries()),
         duration
-      };
+        ,
+        ok: response.ok      };
       
       logResponse(url, responseObj, duration, requestId);
       

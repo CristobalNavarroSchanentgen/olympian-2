@@ -1,14 +1,16 @@
 /**
  * Ollama Connection Models
  */
-export type ServiceStatus = 'connecting' | 'connected' | 'disconnected' | 'error';
+export type ServiceStatus = 'connecting' | 'connected' | 'disconnected' | 'error' | 'failed';
 export interface OllamaConnection {
     id: string;
     baseUrl: string;
+    endpoint: string;
     status: ServiceStatus;
     version?: string;
     models: string[];
     lastPing?: Date;
+    createdAt?: Date;
     metadata: Record<string, unknown>;
 }
 export interface ConnectionHealth {

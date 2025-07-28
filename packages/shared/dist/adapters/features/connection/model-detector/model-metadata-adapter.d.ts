@@ -1,8 +1,4 @@
 import { ModelCapability } from '../../../../models/connection';
-/**
- * Model metadata adapter for model detection
- * Transforms model metadata for model-detector feature
- */
 export interface ModelMetadataAdapter {
     extractMetadata(modelInfo: any): ModelMetadata;
     enrichCapabilities(capability: ModelCapability, metadata: ModelMetadata): ModelCapability;

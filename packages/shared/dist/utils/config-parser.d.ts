@@ -41,4 +41,6 @@ export declare function stringifyConfig(config: McpConfigFile, pretty?: boolean)
  * Merge multiple configuration files
  */
 export declare function mergeConfigs(configs: McpConfigFile[]): McpConfigFile;
+export declare const parseConfig: typeof parseMcpConfig;
+export type ConfigParseResult<T = McpConfigFile> = ParseResult<T>;
 //# sourceMappingURL=config-parser.d.ts.map

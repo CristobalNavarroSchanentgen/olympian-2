@@ -11,6 +11,7 @@ exports.checkMcpServerHealth = checkMcpServerHealth;
 exports.performHealthChecks = performHealthChecks;
 exports.aggregateHealthResults = aggregateHealthResults;
 exports.toHealthStatus = toHealthStatus;
+exports.checkHealth = checkHealth;
 /**
  * Check health of a single HTTP endpoint
  */
@@ -169,5 +170,19 @@ async function mockCheckProcess(processId) {
     // In real implementation, would use process.kill(processId, 0) or similar
     await new Promise(resolve => setTimeout(resolve, 50));
     return processId > 0;
+}
+// Generic health check wrapper for adapter compatibility
+async function checkHealth(endpoint, timeout) {
+    const result = await checkHttpEndpoint(endpoint, config);
+    return {
+        status: result.status === "healthy" ? 'healthy' : 'unhealthy',
+        timestamp: result.timestamp,
+        services: {},
+        metadata: {
+            endpoint,
+            responseTime: result.responseTime,
+            lastCheck: result.timestamp
+        }
+    };
 }
 //# sourceMappingURL=health-checker.js.map

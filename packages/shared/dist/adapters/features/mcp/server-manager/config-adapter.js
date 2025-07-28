@@ -6,37 +6,33 @@ function createConfigAdapter() {
     return {
         async parseServerConfig(configPath) {
             try {
-                return await (0, config_parser_1.parseConfig)(configPath, {
-                    format: 'auto',
-                    strict: true,
-                    validateSchema: true
-                });
+                return await (0, config_parser_1.parseConfig)(configPath);
             }
             catch (error) {
                 return {
                     success: false,
-                    error: `Failed to parse config file ${configPath}: ${error.message}`,
-                    configs: []
+                    data: undefined,
+                    errors: [{ field: "config", message: error instanceof Error ? error.message : String(error) }],
+                    warnings: []
                 };
             }
         },
         parseInlineConfig(configData) {
             try {
-                const configs = this.extractServerConfigs(configData);
+                const configs = Array.isArray(configData) ? configData : [configData];
                 return {
                     success: true,
-                    configs,
-                    metadata: {
-                        source: 'inline',
-                        parsedAt: new Date()
-                    }
+                    data: { configs, metadata: { source: 'inline', parsedAt: new Date() } },
+                    errors: [],
+                    warnings: []
                 };
             }
             catch (error) {
                 return {
                     success: false,
-                    error: `Failed to parse inline config: ${error.message}`,
-                    configs: []
+                    data: undefined,
+                    errors: [{ field: "config", message: error instanceof Error ? error.message : String(error) }],
+                    warnings: []
                 };
             }
         },
@@ -113,8 +109,8 @@ function createConfigAdapter() {
                 timeout: config.timeout || 30000,
                 retries: config.retries || 3,
                 healthCheck: {
-                    enabled: config.healthCheck?.enabled ?? true,
-                    interval: config.healthCheck?.interval || 30000,
+                    timeout: config.healthCheck?.timeout ?? true,
+                    retries: config.healthCheck?.retries || 30000,
                     timeout: config.healthCheck?.timeout || 5000,
                     retries: config.healthCheck?.retries || 2
                 }
@@ -164,6 +160,13 @@ function createConfigAdapter() {
                 }
             };
         },
+        detectServerType(config) {
+            if (config.command.includes("node"))
+                return "node";
+            if (config.command.includes("python"))
+                return "python";
+            return "unknown";
+        },
         normalizeConfig(config) {
             // Convert various config formats to standard ServerConfig
             const normalized = {
@@ -176,8 +179,8 @@ function createConfigAdapter() {
                 timeout: config.timeout || 30000,
                 retries: config.retries || 3,
                 healthCheck: {
-                    enabled: config.healthCheck?.enabled ?? true,
-                    interval: config.healthCheck?.interval || 30000,
+                    timeout: config.healthCheck?.timeout ?? true,
+                    retries: config.healthCheck?.retries || 30000,
                     timeout: config.healthCheck?.timeout || 5000,
                     retries: config.healthCheck?.retries || 2
                 }

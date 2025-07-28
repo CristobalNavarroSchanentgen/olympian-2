@@ -1,4 +1,4 @@
-import { HealthStatus } from '../../../../models/connection';
+import { HealthStatus } from '../../../../models/connection/health-status';
 /**
  * Health monitor adapter for Ollama connections
  * Transforms health checking utilities for ollama-connector feature

@@ -5,6 +5,7 @@
  * Follows AI-Native architecture - utility functions only
  */
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.parseConfig = void 0;
 exports.parseMcpConfig = parseMcpConfig;
 exports.parseServerConfig = parseServerConfig;
 exports.validateConfig = validateConfig;
@@ -155,4 +156,6 @@ function mergeConfigs(configs) {
     }
     return merged;
 }
+// Compatibility aliases for existing adapters
+exports.parseConfig = parseMcpConfig;
 //# sourceMappingURL=config-parser.js.map

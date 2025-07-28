@@ -61,4 +61,5 @@ export declare function aggregateHealthResults(checks: HealthCheckResult[]): Agg
  * Convert health results to status object
  */
 export declare function toHealthStatus(aggregated: AggregatedHealth): HealthStatus;
+export declare function checkHealth(endpoint: string, timeout?: number): Promise<HealthStatus>;
 //# sourceMappingURL=health-checker.d.ts.map

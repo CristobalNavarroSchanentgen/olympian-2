@@ -6,6 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.parseMessage = parseMessage;
 exports.formatMessage = formatMessage;
 exports.createRequest = createRequest;
+exports.createProtocolHandler = createProtocolHandler;
 function parseMessage(data) {
     try {
         const parsed = JSON.parse(data);
@@ -23,6 +24,21 @@ function createRequest(method, params) {
         id: Date.now().toString(),
         method,
         params
+    };
+}
+function createProtocolHandler() {
+    const messageCallbacks = [];
+    return {
+        async sendMessage(message) {
+            // Mock implementation
+            await new Promise(resolve => setTimeout(resolve, 10));
+        },
+        handleResponse(response) {
+            // Mock implementation
+        },
+        onMessage(callback) {
+            messageCallbacks.push(callback);
+        }
     };
 }
 //# sourceMappingURL=protocol-handler.js.map

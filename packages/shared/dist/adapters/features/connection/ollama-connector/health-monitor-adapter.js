@@ -5,6 +5,17 @@ const health_checker_1 = require("../../../../utils/health-checker");
 const monitors = new Map();
 const healthCallbacks = new Map();
 const lastHealthStatus = new Map();
+function triggerCallbacks(connectionId, status) {
+    const callbacks = healthCallbacks.get(connectionId) || [];
+    callbacks.forEach(callback => {
+        try {
+            callback(status);
+        }
+        catch (error) {
+            console.error('Health callback error:', error);
+        }
+    });
+}
 function createHealthMonitorAdapter() {
     return {
         startMonitoring(connectionId, endpoint) {
@@ -12,37 +23,29 @@ function createHealthMonitorAdapter() {
             this.stopMonitoring(connectionId);
             const monitor = setInterval(async () => {
                 try {
-                    const health = await (0, health_checker_1.checkHealth)(endpoint, {
-                        timeout: 5000,
-                        checkEndpoints: ['/api/tags', '/api/version']
-                    });
-                    const status = {
-                        healthy: health.healthy,
-                        lastCheck: new Date(),
-                        responseTime: health.responseTime,
-                        error: health.error,
-                        details: {
-                            endpoint: endpoint,
-                            checks: health.checks || []
-                        }
-                    };
+                    const status = await (0, health_checker_1.checkHealth)(endpoint, 5000);
                     // Store status and notify callbacks
                     lastHealthStatus.set(connectionId, status);
-                    this.notifyHealthChange(connectionId, status);
+                    triggerCallbacks(connectionId, status);
                 }
                 catch (error) {
-                    const status = {
-                        healthy: false,
-                        lastCheck: new Date(),
-                        responseTime: 0,
-                        error: error.message,
-                        details: {
+                    const errorStatus = {
+                        status: 'unhealthy',
+                        timestamp: new Date(),
+                        services: {},
+                        metadata: {
                             endpoint: endpoint,
-                            checks: []
-                        }
+                            error: error instanceof Error ? error.message : 'Unknown error'
+                        },
+                        // Compatibility properties
+                        healthy: false,
+                        responseTime: 0,
+                        error: error instanceof Error ? error.message : 'Unknown error',
+                        lastCheck: new Date(),
+                        details: { endpoint }
                     };
-                    lastHealthStatus.set(connectionId, status);
-                    this.notifyHealthChange(connectionId, status);
+                    lastHealthStatus.set(connectionId, errorStatus);
+                    triggerCallbacks(connectionId, errorStatus);
                 }
             }, 30000); // Check every 30 seconds
             monitors.set(connectionId, monitor);
@@ -65,31 +68,22 @@ function createHealthMonitorAdapter() {
             }
             // Return default unhealthy status
             return {
+                status: 'unhealthy',
+                timestamp: new Date(),
+                services: {},
+                metadata: { error: 'No health data available' },
+                // Compatibility properties
                 healthy: false,
-                lastCheck: new Date(),
                 responseTime: 0,
                 error: 'No health data available',
-                details: {
-                    endpoint: 'unknown',
-                    checks: []
-                }
+                lastCheck: new Date(),
+                details: { endpoint: 'unknown' }
             };
         },
         onHealthChange(connectionId, callback) {
             const callbacks = healthCallbacks.get(connectionId) || [];
             callbacks.push(callback);
             healthCallbacks.set(connectionId, callbacks);
-        },
-        notifyHealthChange(connectionId, status) {
-            const callbacks = healthCallbacks.get(connectionId) || [];
-            callbacks.forEach(callback => {
-                try {
-                    callback(status);
-                }
-                catch (error) {
-                    console.error('Health callback error:', error);
-                }
-            });
         }
     };
 }

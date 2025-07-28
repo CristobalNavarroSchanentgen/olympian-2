@@ -130,7 +130,8 @@ async function makeHttpRequest(url, config) {
                 status: response.status,
                 statusText: response.statusText,
                 headers: Object.fromEntries(response.headers.entries()),
-                duration
+                duration,
+                ok: response.ok
             };
             logResponse(url, responseObj, duration, requestId);
             if (!response.ok) {

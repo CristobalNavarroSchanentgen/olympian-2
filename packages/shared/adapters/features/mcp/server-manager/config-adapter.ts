@@ -22,9 +22,10 @@ export interface ConfigAdapter {
   injectEnvironmentVariables(config: ServerConfig, env: Record<string, string>): ServerConfig;
   
   // Configuration management
+  detectServerType(config: ServerConfig): string;
   mergeConfigs(base: ServerConfig, override: Partial<ServerConfig>): ServerConfig;
   normalizeConfig(config: any): ServerConfig;
-}
+
 
 export interface ValidationResult {
   valid: boolean;
@@ -40,15 +41,17 @@ export interface RuntimeConfig {
   environment: Record<string, string>;
   workingDirectory?: string;
   timeout: number;
+  retryDelay: number;
+  endpoints: string[];
   retries: number;
   healthCheck: HealthCheckConfig;
 }
 
 export interface HealthCheckConfig {
-  enabled: boolean;
-  interval: number;
   timeout: number;
   retries: number;
+  retryDelay: number;
+  endpoints: string[];
 }
 
 export function createConfigAdapter(): ConfigAdapter {
@@ -60,7 +63,7 @@ export function createConfigAdapter(): ConfigAdapter {
         return {
           success: false,
           data: undefined,
-          errors: [{ message: `Failed to parse config file ${configPath}: ${(error instanceof Error ? error.message : String(error))}`, code: 'PARSE_ERROR' }],
+          errors: [{ field: "config", message: error instanceof Error ? error.message : String(error) }],
           warnings: []
         };
       }
@@ -80,7 +83,7 @@ export function createConfigAdapter(): ConfigAdapter {
         return {
           success: false,
           data: undefined,
-          errors: [{ message: `Failed to parse inline config: ${(error instanceof Error ? error.message : String(error))}`, code: 'PARSE_ERROR' }],
+          errors: [{ field: "config", message: error instanceof Error ? error.message : String(error) }],
           warnings: []
         };
       }
@@ -174,8 +177,8 @@ export function createConfigAdapter(): ConfigAdapter {
         timeout: config.timeout || 30000,
         retries: config.retries || 3,
         healthCheck: {
-          enabled: config.healthCheck?.enabled ?? true,
-          interval: config.healthCheck?.interval || 30000,
+          timeout: config.healthCheck?.timeout ?? true,
+          retries: config.healthCheck?.retries || 30000,
           timeout: config.healthCheck?.timeout || 5000,
           retries: config.healthCheck?.retries || 2
         }
@@ -233,6 +236,12 @@ export function createConfigAdapter(): ConfigAdapter {
       };
     },
 
+
+    detectServerType(config) {
+      if (config.command.includes("node")) return "node";
+      if (config.command.includes("python")) return "python";
+      return "unknown";
+    },
     normalizeConfig(config) {
       // Convert various config formats to standard ServerConfig
       const normalized: ServerConfig = {
@@ -245,8 +254,8 @@ export function createConfigAdapter(): ConfigAdapter {
         timeout: config.timeout || 30000,
         retries: config.retries || 3,
         healthCheck: {
-          enabled: config.healthCheck?.enabled ?? true,
-          interval: config.healthCheck?.interval || 30000,
+          timeout: config.healthCheck?.timeout ?? true,
+          retries: config.healthCheck?.retries || 30000,
           timeout: config.healthCheck?.timeout || 5000,
           retries: config.healthCheck?.retries || 2
         }

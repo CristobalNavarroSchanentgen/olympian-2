@@ -16,6 +16,7 @@ export interface HttpResponse<T = unknown> {
     status: number;
     statusText: string;
     headers: Record<string, string>;
+    ok: boolean;
     duration: number;
 }
 export declare class HttpError extends Error {

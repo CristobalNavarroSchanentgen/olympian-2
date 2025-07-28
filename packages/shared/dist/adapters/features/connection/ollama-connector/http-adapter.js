@@ -7,8 +7,7 @@ function createHttpAdapter() {
         async testConnection(connection) {
             const startTime = Date.now();
             try {
-                const response = await (0, http_client_1.httpRequest)({
-                    url: connection.endpoint + '/api/tags',
+                const response = await (0, http_client_1.httpRequest)(connection.endpoint + '/api/tags', {
                     method: 'GET',
                     timeout: 5000
                 });
@@ -22,17 +21,19 @@ function createHttpAdapter() {
                 return {
                     success: false,
                     latency: Date.now() - startTime,
-                    error: error.message
+                    error: (error instanceof Error ? error.message : String(error))
                 };
             }
         },
         async establishConnection(endpoint) {
             const connection = {
                 id: 'ollama_' + Date.now(),
+                baseUrl: endpoint,
                 endpoint: endpoint,
                 status: 'connecting',
+                models: [],
                 createdAt: new Date(),
-                lastHealthCheck: new Date(),
+                lastPing: new Date(),
                 metadata: {}
             };
             const testResult = await this.testConnection(connection);
@@ -40,22 +41,20 @@ function createHttpAdapter() {
             return connection;
         },
         async listModels(connection) {
-            const response = await (0, http_client_1.httpRequest)({
-                url: connection.endpoint + '/api/tags',
+            const response = await (0, http_client_1.httpRequest)(connection.endpoint + '/api/tags', {
                 method: 'GET',
                 timeout: 10000
             });
             if (!response.ok) {
                 throw new Error('Failed to list models');
             }
-            const data = await response();
+            const data = response.data;
             return data.models || [];
         },
         async checkHealth(connection) {
             const startTime = Date.now();
             try {
-                const response = await (0, http_client_1.httpRequest)({
-                    url: connection.endpoint + '/api/tags',
+                const response = await (0, http_client_1.httpRequest)(connection.endpoint + '/api/tags', {
                     method: 'GET',
                     timeout: 5000
                 });
@@ -70,7 +69,7 @@ function createHttpAdapter() {
                     healthy: false,
                     responseTime: Date.now() - startTime,
                     timestamp: new Date(),
-                    error: error.message
+                    error: (error instanceof Error ? error.message : String(error))
                 };
             }
         }

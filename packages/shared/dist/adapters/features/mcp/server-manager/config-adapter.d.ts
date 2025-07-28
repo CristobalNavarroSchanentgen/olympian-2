@@ -13,6 +13,7 @@ export interface ConfigAdapter {
     validateAllConfigs(configs: ServerConfig[]): ValidationResult[];
     transformToRuntimeConfig(config: ServerConfig): RuntimeConfig;
     injectEnvironmentVariables(config: ServerConfig, env: Record<string, string>): ServerConfig;
+    detectServerType(config: ServerConfig): string;
     mergeConfigs(base: ServerConfig, override: Partial<ServerConfig>): ServerConfig;
     normalizeConfig(config: any): ServerConfig;
 }
@@ -29,14 +30,16 @@ export interface RuntimeConfig {
     environment: Record<string, string>;
     workingDirectory?: string;
     timeout: number;
+    retryDelay: number;
+    endpoints: string[];
     retries: number;
     healthCheck: HealthCheckConfig;
 }
 export interface HealthCheckConfig {
-    enabled: boolean;
-    interval: number;
     timeout: number;
     retries: number;
+    retryDelay: number;
+    endpoints: string[];
 }
 export declare function createConfigAdapter(): ConfigAdapter;
 //# sourceMappingURL=config-adapter.d.ts.map

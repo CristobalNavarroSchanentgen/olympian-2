@@ -1,6 +1,7 @@
 /**
  * MCP Server Configuration Models
  */
+import type { HealthCheckConfig } from '../connection/health-status';
 export interface McpServerConfig {
     command: string;
     args: string[];
@@ -16,6 +17,11 @@ export interface McpConfigFile {
 export interface ServerConfig extends McpServerConfig {
     name: string;
     id: string;
+    workingDirectory?: string;
+    environment?: Record<string, string>;
+    timeout?: number;
+    retries?: number;
+    healthCheck?: HealthCheckConfig;
 }
 export interface McpServerStatus {
     serverId: string;

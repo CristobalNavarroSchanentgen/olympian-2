@@ -19,3 +19,10 @@ export interface HealthStatus {
   }>;
   metadata: HealthMetadata;
 }
+
+export interface HealthCheckConfig {
+  timeout: number;
+  retries: number;
+  retryDelay: number;
+  endpoints: string[];
+}

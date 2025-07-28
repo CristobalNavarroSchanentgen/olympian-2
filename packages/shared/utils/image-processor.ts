@@ -52,11 +52,7 @@ export interface ImageMetadata {
   hasAlpha: boolean;
 }
 
-export function validateImageFormat(data: string | Buffer, allowedFormats: string[]): {
-  isValid: boolean;
-  detectedFormat?: string;
-  error?: string;
-} {
+{
   // Mock implementation
   return {
     isValid: true,
@@ -96,3 +92,4 @@ export function extractImageMetadata(data: string | Buffer): Promise<ImageMetada
     hasAlpha: false
   });
 }
+

@@ -6,13 +6,21 @@ export interface ProcessConfig {
   timeout?: number;
 }
 
+export interface ProcessOptions {
+  cwd?: string;
+  env?: Record<string, string>;
+  stdio?: string[];
+  timeout?: number;
+}
+
 export interface ProcessInfo {
   pid: number;
   command: string;
   startTime: Date;
-  status: 'running' | 'stopped' | 'error';
+  status: 'running' | 'stopped' | 'crashed' | 'error';
   memoryUsage?: number;
   cpuUsage?: number;
+  lastResponse?: Date;
 }
 
 export function validateProcessConfig(config: ProcessConfig): {
@@ -31,7 +39,12 @@ export function buildEnvironment(
   return { ...baseEnv, ...additionalEnv };
 }
 
-export function spawnProcess(config: ProcessConfig): Promise<ProcessInfo> {
+// Updated function signature to match adapter usage
+export function spawnProcess(
+  command: string,
+  args: string[],
+  options?: ProcessOptions
+): Promise<ProcessInfo> {
   return new Promise((resolve, reject) => {
     const startTime = new Date();
     
@@ -41,7 +54,7 @@ export function spawnProcess(config: ProcessConfig): Promise<ProcessInfo> {
       
       const processInfo: ProcessInfo = {
         pid: mockPid,
-        command: config.command,
+        command,
         startTime,
         status: 'running',
         memoryUsage: 0,
@@ -55,7 +68,16 @@ export function spawnProcess(config: ProcessConfig): Promise<ProcessInfo> {
   });
 }
 
-export function killProcess(pid: number): Promise<void> {
+// Backward compatibility: support old signature
+export function spawnProcessFromConfig(config: ProcessConfig): Promise<ProcessInfo> {
+  return spawnProcess(config.command, config.args, {
+    cwd: config.cwd,
+    env: config.env,
+    timeout: config.timeout
+  });
+}
+
+export function killProcess(pid: number, signal?: string): Promise<void> {
   return Promise.resolve();
 }
 

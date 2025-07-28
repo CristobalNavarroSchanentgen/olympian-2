@@ -1,10 +1,10 @@
-import { ToolDefinition } from '../../../models/mcp';
-import { ExecutionResult } from '../../../models/mcp';
+import { ToolDefinition } from '../../../../models/mcp';
+import { ExecutionResult } from '../../../../models/mcp';
 import { 
   createProtocolHandler,
   ProtocolMessage,
   ProtocolResponse
-} from '../../../utils/protocol-handler';
+} from '../../../../utils/protocol-handler';
 
 /**
  * MCP protocol adapter for tool execution

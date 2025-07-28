@@ -1,4 +1,4 @@
-import { ExecutionResult } from '../../../models/mcp';
+import { ExecutionResult } from '../../../../models/mcp';
 
 /**
  * Result transformer adapter for MCP tool execution

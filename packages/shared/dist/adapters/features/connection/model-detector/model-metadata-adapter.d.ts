@@ -1,4 +1,4 @@
-import { ModelCapability } from '../../../models/connection';
+import { ModelCapability } from '../../../../models/connection';
 /**
  * Model metadata adapter for model detection
  * Transforms model metadata for model-detector feature

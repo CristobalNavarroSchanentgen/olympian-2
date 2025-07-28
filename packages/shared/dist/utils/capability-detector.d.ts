@@ -39,4 +39,24 @@ export declare function getDefaultDetectionMethods(): DetectionMethod[];
  * Combine detection results into capability summary
  */
 export declare function summarizeCapabilities(results: CapabilityDetectionResult[]): ModelCapability;
+/**
+ * Main capability detection function - combines all detection methods
+ */
+export declare function detectCapabilities(modelName: string, options: {
+    endpoint: string;
+    timeout?: number;
+    methods?: string[];
+    testImage?: boolean;
+}): Promise<{
+    detected: string[];
+    vision?: boolean;
+    streaming?: boolean;
+    contextWindow?: number;
+    maxTokens?: number;
+    confidence: number;
+    methods: string[];
+    family?: string;
+    size?: string;
+    performance?: Record<string, unknown>;
+}>;
 //# sourceMappingURL=capability-detector.d.ts.map

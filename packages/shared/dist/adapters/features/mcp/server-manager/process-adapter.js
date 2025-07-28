@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.createProcessAdapter = createProcessAdapter;
-const process_manager_1 = require("../../../utils/process-manager");
+const process_manager_1 = require("../../../../utils/process-manager");
 const activeProcesses = new Map();
 function createProcessAdapter() {
     return {

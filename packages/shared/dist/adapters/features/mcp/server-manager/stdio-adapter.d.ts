@@ -1,4 +1,4 @@
-import { ProtocolMessage, ProtocolResponse } from '../../../utils/protocol-handler';
+import { ProtocolMessage, ProtocolResponse } from '../../../../utils/protocol-handler';
 /**
  * STDIO adapter for MCP server communication
  * Transforms stdio protocol handling for server-manager feature

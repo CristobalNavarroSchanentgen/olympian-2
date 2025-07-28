@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.createHttpAdapter = createHttpAdapter;
-const http_client_1 = require("../../../utils/http-client");
+const http_client_1 = require("../../../../utils/http-client");
 function createHttpAdapter() {
     return {
         async testConnection(connection) {

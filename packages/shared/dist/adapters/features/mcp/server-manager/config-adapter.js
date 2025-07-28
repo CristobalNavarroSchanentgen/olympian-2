@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.createConfigAdapter = createConfigAdapter;
-const config_parser_1 = require("../../../utils/config-parser");
+const config_parser_1 = require("../../../../utils/config-parser");
 function createConfigAdapter() {
     return {
         async parseServerConfig(configPath) {

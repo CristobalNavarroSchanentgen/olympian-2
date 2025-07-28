@@ -26,6 +26,11 @@ export interface ModelCapability {
     confidence: number;
     detectedAt: Date;
     metadata: Record<string, unknown>;
+    contextWindow?: number;
+    supportsVision?: boolean;
+    supportsStreaming?: boolean;
+    maxTokens?: number;
+    isCustom?: boolean;
 }
 export interface DetectionResult {
     modelName: string;

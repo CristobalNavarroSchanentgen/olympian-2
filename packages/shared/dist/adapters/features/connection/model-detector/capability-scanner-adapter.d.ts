@@ -1,4 +1,4 @@
-import { ModelCapability } from '../../../models/connection';
+import { ModelCapability } from '../../../../models/connection';
 /**
  * Capability scanner adapter for model detection
  * Transforms capability detection utilities for model-detector feature

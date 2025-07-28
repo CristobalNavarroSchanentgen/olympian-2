@@ -1,5 +1,5 @@
-import { httpRequest } from '../../../utils/http-client';
-import { OllamaConnection } from '../../../models/connection';
+import { httpRequest } from '../../../../utils/http-client';
+import { OllamaConnection } from '../../../../models/connection';
 
 export interface HttpAdapter {
   testConnection(connection: OllamaConnection): Promise<any>;

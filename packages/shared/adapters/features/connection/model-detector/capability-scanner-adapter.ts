@@ -1,5 +1,5 @@
-import { ModelCapability } from '../../../models/connection';
-import { detectCapabilities } from '../../../utils/capability-detector';
+import { ModelCapability } from '../../../../models/connection';
+import { detectCapabilities } from '../../../../utils/capability-detector';
 
 /**
  * Capability scanner adapter for model detection
@@ -23,9 +23,11 @@ export interface OptimalSettings {
 
 export function createCapabilityScannerAdapter(): CapabilityScannerAdapter {
   return {
-    async scanModelCapabilities(modelName, endpoint) {
+    async scanModelCapabilities(id: `capability_${modelName}_${Date.now()}`,
+          modelName, endpoint) {
       try {
-        const capabilities = await detectCapabilities(modelName, {
+        const capabilities = await detectCapabilities(id: `capability_${modelName}_${Date.now()}`,
+          modelName, {
           endpoint,
           timeout: 30000,
           methods: [
@@ -41,6 +43,7 @@ export function createCapabilityScannerAdapter(): CapabilityScannerAdapter {
         });
         
         return {
+          id: `capability_${modelName}_${Date.now()}`,
           modelName,
           capabilities: capabilities.detected,
           contextWindow: capabilities.contextWindow || 4096,
@@ -60,6 +63,7 @@ export function createCapabilityScannerAdapter(): CapabilityScannerAdapter {
         };
       } catch (error) {
         return {
+          id: `capability_${modelName}_${Date.now()}`,
           modelName,
           capabilities: ['text'], // Fallback to basic text capability
           contextWindow: 4096,
@@ -71,7 +75,7 @@ export function createCapabilityScannerAdapter(): CapabilityScannerAdapter {
           confidence: 0.1,
           metadata: {
             endpoint,
-            error: error.message,
+            error: (error instanceof Error ? error.message : String(error)),
             detectionMethods: [],
             family: 'unknown',
             size: 'unknown'
@@ -103,9 +107,11 @@ export function createCapabilityScannerAdapter(): CapabilityScannerAdapter {
       return results;
     },
 
-    async testVisionCapability(modelName, endpoint) {
+    async testVisionCapability(id: `capability_${modelName}_${Date.now()}`,
+          modelName, endpoint) {
       try {
-        const visionTest = await detectCapabilities(modelName, {
+        const visionTest = await detectCapabilities(id: `capability_${modelName}_${Date.now()}`,
+          modelName, {
           endpoint,
           timeout: 15000,
           methods: ['vision-test'],
@@ -124,11 +130,11 @@ export function createCapabilityScannerAdapter(): CapabilityScannerAdapter {
 
     detectOptimalSettings(capability) {
       const settings: OptimalSettings = {
-        contextWindow: capability.contextWindow,
+        contextWindow: capability.contextWindow || 4096,
         temperature: 0.7,
-        maxTokens: Math.min(capability.maxTokens, capability.contextWindow * 0.3),
+        maxTokens: Math.min(capability.maxTokens || 2048, (capability.contextWindow || 4096) * 0.3),
         stopSequences: [],
-        streaming: capability.supportsStreaming
+        streaming: capability.supportsStreaming || true
       };
       
       // Adjust settings based on model family

@@ -1,4 +1,4 @@
-import { OllamaConnection } from '../../../models/connection';
+import { OllamaConnection } from '../../../../models/connection';
 export interface HttpAdapter {
     testConnection(connection: OllamaConnection): Promise<any>;
     establishConnection(endpoint: string): Promise<OllamaConnection>;

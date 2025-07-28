@@ -1,5 +1,5 @@
-import { ServerConfig } from '../../../models/mcp';
-import { ConfigParseResult } from '../../../utils/config-parser';
+import { ServerConfig } from '../../../../models/mcp';
+import { ConfigParseResult } from '../../../../utils/config-parser';
 /**
  * Config adapter for MCP server configuration
  * Transforms configuration utilities for server-manager feature

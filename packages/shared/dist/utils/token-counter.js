@@ -7,6 +7,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.countTokens = countTokens;
 exports.countMessageTokens = countMessageTokens;
 exports.calculateTokenBreakdown = calculateTokenBreakdown;
+exports.estimateTokens = estimateTokens;
 function countTokens(text) {
     // Rough estimation: ~4 characters per token for English
     return Math.ceil(text.length / 4);
@@ -52,5 +53,9 @@ function calculateTokenBreakdown(messages) {
         images: imagesTokens,
         total: messagesTokens + contextTokens + systemTokens + imagesTokens
     };
+}
+// Phase 1 stub - implement in Phase 2
+function estimateTokens(text) {
+    return countTokens(text);
 }
 //# sourceMappingURL=token-counter.js.map

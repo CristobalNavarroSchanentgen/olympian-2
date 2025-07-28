@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.createMcpProtocolAdapter = createMcpProtocolAdapter;
-const protocol_handler_1 = require("../../../utils/protocol-handler");
+const protocol_handler_1 = require("../../../../utils/protocol-handler");
 function createMcpProtocolAdapter() {
     const protocolHandler = (0, protocol_handler_1.createProtocolHandler)({
         transport: 'stdio',

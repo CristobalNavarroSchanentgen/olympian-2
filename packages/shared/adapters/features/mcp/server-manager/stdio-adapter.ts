@@ -2,7 +2,7 @@ import {
   createProtocolHandler,
   ProtocolMessage,
   ProtocolResponse
-} from '../../../utils/protocol-handler';
+} from '../../../../utils/protocol-handler';
 
 /**
  * STDIO adapter for MCP server communication

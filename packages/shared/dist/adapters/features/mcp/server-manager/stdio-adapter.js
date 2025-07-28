@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.createStdioAdapter = createStdioAdapter;
-const protocol_handler_1 = require("../../../utils/protocol-handler");
+const protocol_handler_1 = require("../../../../utils/protocol-handler");
 const connections = new Map();
 const messageHandlers = new Map();
 const errorHandlers = new Map();

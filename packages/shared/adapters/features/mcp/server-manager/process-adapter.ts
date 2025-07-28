@@ -1,10 +1,10 @@
-import { ServerConfig } from '../../../models/mcp';
+import { ServerConfig } from '../../../../models/mcp';
 import { 
   spawnProcess, 
   killProcess, 
   getProcessInfo,
   ProcessInfo
-} from '../../../utils/process-manager';
+} from '../../../../utils/process-manager';
 
 /**
  * Process adapter for MCP server management

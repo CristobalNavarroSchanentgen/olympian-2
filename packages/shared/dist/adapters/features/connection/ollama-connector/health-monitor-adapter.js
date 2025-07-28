@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.createHealthMonitorAdapter = createHealthMonitorAdapter;
-const health_checker_1 = require("../../../utils/health-checker");
+const health_checker_1 = require("../../../../utils/health-checker");
 const monitors = new Map();
 const healthCallbacks = new Map();
 const lastHealthStatus = new Map();

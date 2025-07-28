@@ -1,5 +1,5 @@
-import { ServerConfig } from '../../../models/mcp';
-import { ProcessInfo } from '../../../utils/process-manager';
+import { ServerConfig } from '../../../../models/mcp';
+import { ProcessInfo } from '../../../../utils/process-manager';
 /**
  * Process adapter for MCP server management
  * Transforms process management utilities for server-manager feature

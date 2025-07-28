@@ -229,3 +229,21 @@ async function mockCheckProcess(processId: number): Promise<boolean> {
   await new Promise(resolve => setTimeout(resolve, 50));
   return processId > 0;
 }
+
+// Generic health check wrapper for adapter compatibility
+export async function checkHealth(
+  endpoint: string, 
+  config?: Partial<HealthCheckConfig>
+): Promise<HealthStatus> {
+  const result = await checkHttpEndpoint(endpoint, config);
+  return {
+    status: result.healthy ? 'healthy' : 'unhealthy',
+    timestamp: result.timestamp,
+    services: {},
+    metadata: {
+      endpoint,
+      responseTime: result.responseTime,
+      lastCheck: result.timestamp
+    }
+  };
+}

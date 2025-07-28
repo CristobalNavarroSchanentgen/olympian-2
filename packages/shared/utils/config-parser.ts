@@ -195,3 +195,7 @@ export function mergeConfigs(configs: McpConfigFile[]): McpConfigFile {
 
   return merged;
 }
+
+// Compatibility aliases for existing adapters
+export const parseConfig = parseMcpConfig;
+export type ConfigParseResult<T = McpConfigFile> = ParseResult<T>;

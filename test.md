@@ -22,9 +22,10 @@
 6. **version-tracker-adapter.ts** - Helper functions extracted, method references fixed
 7. **artifact-storage-adapter.ts** - Complex logic helpers extracted (validateArtifactHelper, searchArtifactsHelper, etc.)
 
-### Chat Feature - In Progress ✅ (2/6)
+### Chat Feature - In Progress ✅ (3/6)
 8. **database-adapter.ts** - MongoDB operations fixed, AI-native pattern applied
 9. **websocket-adapter.ts** - Real-time communication helpers extracted, room management logic separated
+10. **context-adapter.ts** - Helper functions extracted (buildConversationContextHelper, optimizeContextHelper, generateContextStatsHelper, validateContextHelper)
 
 ---
 

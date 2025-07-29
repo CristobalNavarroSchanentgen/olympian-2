@@ -1,4 +1,4 @@
-import { ToolDefinition } from '../../../../models/mcp';
+import { ToolDefinition, ToolParameter } from '../../../../models/mcp';
 import { ExecutionResult } from '../../../../models/mcp';
 /**
  * MCP protocol adapter for tool execution
@@ -12,19 +12,12 @@ export interface McpProtocolAdapter {
     executeToolCall(serverId: string, toolName: string, parameters: any): Promise<ExecutionResult>;
     sendInitialize(serverId: string): Promise<void>;
     sendListTools(serverId: string): Promise<ToolDefinition[]>;
-    sendCallTool(serverId: string, name: string, arguments: any): Promise<any>;
+    sendCallTool(serverId: string, name: string, args: any): Promise<any>;
 }
 export interface ToolSchema {
     name: string;
     description: string;
-    inputSchema: any;
-    outputSchema?: any;
-    examples?: ToolExample[];
-}
-export interface ToolExample {
-    description: string;
-    input: any;
-    output: any;
+    parameters: ToolParameter[];
 }
 export declare function createMcpProtocolAdapter(): McpProtocolAdapter;
 //# sourceMappingURL=mcp-protocol-adapter.d.ts.map

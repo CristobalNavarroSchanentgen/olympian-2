@@ -67,149 +67,347 @@ export interface ArtifactCandidate {
   metadata: any;
 }
 
+// AI-Native Pattern: Helper functions extracted outside returned object
+function processRawContent(rawResult: any): any {
+  if (rawResult === null || rawResult === undefined) {
+    return 'No result returned';
+  }
+
+  if (typeof rawResult === 'string') {
+    return rawResult;
+  }
+
+  if (typeof rawResult === 'object') {
+    // Handle MCP-style responses
+    if (rawResult.content && Array.isArray(rawResult.content)) {
+      return rawResult.content.map((item: any) => {
+        if (item.type === 'text') return item.text;
+        if (item.type === 'image') return processImageContentHelper(item);
+        return item;
+      }).join('\n');
+    }
+
+    if (rawResult.text) {
+      return rawResult.text;
+    }
+
+    if (rawResult.data) {
+      return rawResult.data;
+    }
+
+    return rawResult;
+  }
+
+  return String(rawResult);
+}
+
+function processImageContentHelper(content: any): ProcessedContent {
+  if (typeof content === 'string') {
+    // Base64 encoded image
+    const size = Buffer.byteLength(content, 'base64');
+    
+    return {
+      type: 'image',
+      content,
+      metadata: {
+        size,
+        encoding: 'base64',
+        mimeType: detectImageMimeType(content)
+      }
+    };
+  }
+  
+  if (content.url) {
+    // Image URL
+    return {
+      type: 'image',
+      content: content.url,
+      metadata: {
+        size: 0,
+        mimeType: detectImageMimeType(content.url)
+      }
+    };
+  }
+
+  return processTextContentHelper(JSON.stringify(content));
+}
+
+function processTextContentHelper(content: string): ProcessedContent {
+  const text = String(content);
+  const size = Buffer.byteLength(text, 'utf8');
+  
+  // Check if content should be truncated
+  const maxSize = 100000; // 100KB limit
+  const truncated = size > maxSize;
+  const processedText = truncated ? text.substring(0, maxSize) + '...[truncated]' : text;
+
+  return {
+    type: 'text',
+    content: processedText,
+    metadata: {
+      size,
+      encoding: 'utf8',
+      truncated
+    }
+  };
+}
+
+function detectResultType(result: any): string {
+  if (typeof result === 'string') return 'text';
+  if (Array.isArray(result)) return 'array';
+  if (result && typeof result === 'object') return 'object';
+  return 'primitive';
+}
+
+function calculateContentSize(content: any): number {
+  if (typeof content === 'string') {
+    return Buffer.byteLength(content, 'utf8');
+  }
+  return Buffer.byteLength(JSON.stringify(content), 'utf8');
+}
+
+function hasImageContent(result: any): boolean {
+  const str = JSON.stringify(result).toLowerCase();
+  return str.includes('image') || str.includes('base64') || str.includes('png') || str.includes('jpg');
+}
+
+function hasFileContent(result: any): boolean {
+  const str = JSON.stringify(result).toLowerCase();
+  return str.includes('file') || str.includes('path') || str.includes('content');
+}
+
+function detectImageMimeType(content: string): string {
+  if (content.startsWith('data:image/')) {
+    return content.substring(5, content.indexOf(';'));
+  }
+  
+  const ext = content.split('.').pop()?.toLowerCase();
+  switch (ext) {
+    case 'png': return 'image/png';
+    case 'jpg': case 'jpeg': return 'image/jpeg';
+    case 'gif': return 'image/gif';
+    case 'webp': return 'image/webp';
+    default: return 'image/unknown';
+  }
+}
+
+function detectFileMimeType(path: string): string {
+  const ext = path.split('.').pop()?.toLowerCase();
+  switch (ext) {
+    case 'txt': return 'text/plain';
+    case 'json': return 'application/json';
+    case 'html': return 'text/html';
+    case 'css': return 'text/css';
+    case 'js': return 'application/javascript';
+    case 'pdf': return 'application/pdf';
+    default: return 'application/octet-stream';
+  }
+}
+
+function generateSummary(result: ExecutionResult): string {
+  if (result.status === 'failed') {
+    return `${result.toolName} failed: ${result.error?.message || 'Unknown error'}`;
+  }
+
+  const executionTime = result.duration < 1000 ? 
+    `${result.duration}ms` : 
+    `${(result.duration / 1000).toFixed(1)}s`;
+
+  return `${result.toolName} completed successfully in ${executionTime}`;
+}
+
+function generateActions(result: ExecutionResult): ResultAction[] {
+  const actions: ResultAction[] = [];
+
+  if (result.status === 'completed' && result.result) {
+    actions.push({
+      type: 'copy',
+      label: 'Copy Result',
+      data: typeof result.result === 'string' ? result.result : JSON.stringify(result.result)
+    });
+
+    if (looksLikeCode(result.result) || looksLikeStructuredData(result.result)) {
+      actions.push({
+        type: 'save',
+        label: 'Save as Artifact',
+        data: result
+      });
+    }
+  }
+
+  return actions;
+}
+
+function looksLikeCode(content: any): boolean {
+  if (typeof content !== 'string') return false;
+  
+  const codeIndicators = [
+    'function ', 'class ', 'import ', 'export ',
+    'const ', 'let ', 'var ', '=> {',
+    'def ', 'class ', 'import ', 'from ',
+    '#include', 'using namespace',
+    '<?php', '#!/'
+  ];
+
+  return codeIndicators.some(indicator => content.includes(indicator));
+}
+
+function looksLikeStructuredData(content: any): boolean {
+  if (typeof content !== 'string') {
+    return typeof content === 'object' && content !== null;
+  }
+
+  try {
+    JSON.parse(content);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+function looksLikeMarkdown(content: any): boolean {
+  if (typeof content !== 'string') return false;
+  
+  const markdownIndicators = ['# ', '## ', '### ', '- ', '* ', '1. ', '```', '**', '*', '[', ']('];
+  return markdownIndicators.some(indicator => content.includes(indicator));
+}
+
+function generateId(): string {
+  return Date.now() + '-' + Math.random().toString(36).substr(2, 9);
+}
+
 export function createResultTransformerAdapter(): ResultTransformerAdapter {
   return {
     transformToolResult(rawResult, context) {
       const endTime = Date.now();
-      const executionTime = endTime - context.startTime;
+      const duration = endTime - context.startTime;
+      const startedAt = new Date(context.startTime);
+      const completedAt = new Date(endTime);
 
       try {
         // Process the result based on its structure
-        const processedContent = this.processRawContent(rawResult);
+        const processedContent = processRawContent(rawResult);
         
         return {
-          success: true,
-          result: processedContent,
-          executionTime,
-          serverId: context.serverId,
+          id: generateId(),
           toolName: context.toolName,
-          parameters: context.parameters,
-          timestamp: new Date(),
+          serverId: context.serverId,
+          status: 'completed' as const,
+          result: processedContent,
+          duration,
+          startedAt,
+          completedAt,
           metadata: {
-            resultType: this.detectResultType(rawResult),
-            contentSize: this.calculateContentSize(rawResult),
-            hasImages: this.hasImageContent(rawResult),
-            hasFiles: this.hasFileContent(rawResult),
+            parameters: context.parameters,
+            resultType: detectResultType(rawResult),
+            contentSize: calculateContentSize(rawResult),
+            hasImages: hasImageContent(rawResult),
+            hasFiles: hasFileContent(rawResult),
             processingVersion: '1.0.0'
           }
         };
       } catch (error) {
-        return this.transformError(error, context);
+        return {
+          id: generateId(),
+          toolName: context.toolName,
+          serverId: context.serverId,
+          status: 'failed' as const,
+          error: {
+            code: 'TRANSFORM_ERROR',
+            message: (error as Error).message || 'Unknown error occurred',
+            details: {
+              stack: (error as Error).stack
+            }
+          },
+          duration,
+          startedAt,
+          completedAt,
+          metadata: {
+            parameters: context.parameters,
+            processingVersion: '1.0.0'
+          }
+        };
       }
     },
 
     transformError(error, context) {
       const endTime = Date.now();
-      const executionTime = endTime - context.startTime;
+      const duration = endTime - context.startTime;
+      const startedAt = new Date(context.startTime);
+      const completedAt = new Date(endTime);
 
       return {
-        success: false,
-        error: error.message || 'Unknown error occurred',
-        executionTime,
-        serverId: context.serverId,
+        id: generateId(),
         toolName: context.toolName,
-        parameters: context.parameters,
-        timestamp: new Date(),
+        serverId: context.serverId,
+        status: 'failed' as const,
+        error: {
+          code: (error as any).code || 'EXECUTION_ERROR',
+          message: (error as Error).message || 'Unknown error occurred',
+          details: {
+            stack: (error as Error).stack
+          }
+        },
+        duration,
+        startedAt,
+        completedAt,
         metadata: {
-          errorType: error.name || 'Error',
-          stack: error.stack,
+          parameters: context.parameters,
+          errorType: (error as Error).name || 'Error',
           processingVersion: '1.0.0'
         }
       };
     },
 
     processTextContent(content) {
-      const text = String(content);
-      const size = Buffer.byteLength(text, 'utf8');
-      
-      // Check if content should be truncated
-      const maxSize = 100000; // 100KB limit
-      const truncated = size > maxSize;
-      const processedText = truncated ? text.substring(0, maxSize) + '...[truncated]' : text;
-
-      return {
-        type: 'text',
-        content: processedText,
-        metadata: {
-          size,
-          encoding: 'utf8',
-          truncated
-        }
-      };
+      return processTextContentHelper(content);
     },
 
     processImageContent(content) {
-      if (typeof content === 'string') {
-        // Base64 encoded image
-        const size = Buffer.byteLength(content, 'base64');
-        
-        return {
-          type: 'image',
-          content,
-          metadata: {
-            size,
-            encoding: 'base64',
-            mimeType: this.detectImageMimeType(content)
-          }
-        };
-      }
-      
-      if (content.url) {
-        // Image URL
-        return {
-          type: 'image',
-          content: content.url,
-          metadata: {
-            size: 0,
-            mimeType: this.detectImageMimeType(content.url)
-          }
-        };
-      }
-
-      return this.processTextContent(JSON.stringify(content));
+      return processImageContentHelper(content);
     },
 
     processFileContent(content) {
       if (content.path) {
         return {
-          type: 'file',
+          type: 'file' as const,
           content: content.content || content.path,
           metadata: {
             size: content.size || 0,
-            mimeType: this.detectFileMimeType(content.path),
+            mimeType: detectFileMimeType(content.path),
             encoding: content.encoding || 'utf8'
           }
         };
       }
 
-      return this.processTextContent(JSON.stringify(content));
+      return processTextContentHelper(JSON.stringify(content));
     },
 
     formatForDisplay(result) {
       const content: ProcessedContent[] = [];
       
-      if (result.success && result.result) {
+      if (result.status === 'completed' && result.result) {
         if (typeof result.result === 'string') {
-          content.push(this.processTextContent(result.result));
+          content.push(processTextContentHelper(result.result));
         } else if (Array.isArray(result.result)) {
           result.result.forEach((item, index) => {
-            content.push(this.processTextContent(`Item ${index + 1}: ${JSON.stringify(item, null, 2)}`));
+            content.push(processTextContentHelper(`Item ${index + 1}: ${JSON.stringify(item, null, 2)}`));
           });
         } else {
-          content.push(this.processTextContent(JSON.stringify(result.result, null, 2)));
+          content.push(processTextContentHelper(JSON.stringify(result.result, null, 2)));
         }
       }
 
-      const summary = this.generateSummary(result);
-      const actions = this.generateActions(result);
+      const summary = generateSummary(result);
+      const actions = generateActions(result);
 
       return {
         summary,
         content,
         actions,
         metadata: {
-          executionTime: result.executionTime,
-          success: result.success,
+          executionTime: result.duration,
+          success: result.status === 'completed',
           serverId: result.serverId,
           toolName: result.toolName
         }
@@ -217,12 +415,12 @@ export function createResultTransformerAdapter(): ResultTransformerAdapter {
     },
 
     formatForLLM(result) {
-      if (!result.success) {
-        return `Tool execution failed: ${result.error}`;
+      if (result.status === 'failed') {
+        return `Tool execution failed: ${result.error?.message || 'Unknown error'}`;
       }
 
       const header = `Tool: ${result.toolName} (${result.serverId})`;
-      const timing = `Execution time: ${result.executionTime}ms`;
+      const timing = `Execution time: ${result.duration}ms`;
       
       let content = '';
       if (typeof result.result === 'string') {
@@ -242,27 +440,27 @@ export function createResultTransformerAdapter(): ResultTransformerAdapter {
     extractArtifacts(result) {
       const artifacts: ArtifactCandidate[] = [];
 
-      if (!result.success || !result.result) {
+      if (result.status !== 'completed' || !result.result) {
         return artifacts;
       }
 
       // Check for code content
-      if (this.looksLikeCode(result.result)) {
+      if (looksLikeCode(result.result)) {
         artifacts.push({
           type: 'code',
           title: `Code from ${result.toolName}`,
           content: String(result.result),
-          language: this.detectCodeLanguage(result.result),
+          language: detectCodeLanguage(result.result),
           metadata: {
             toolName: result.toolName,
             serverId: result.serverId,
-            timestamp: result.timestamp
+            timestamp: result.completedAt
           }
         });
       }
 
       // Check for structured data
-      if (this.looksLikeStructuredData(result.result)) {
+      if (looksLikeStructuredData(result.result)) {
         artifacts.push({
           type: 'data',
           title: `Data from ${result.toolName}`,
@@ -270,13 +468,13 @@ export function createResultTransformerAdapter(): ResultTransformerAdapter {
           metadata: {
             toolName: result.toolName,
             serverId: result.serverId,
-            timestamp: result.timestamp
+            timestamp: result.completedAt
           }
         });
       }
 
       // Check for markdown content
-      if (this.looksLikeMarkdown(result.result)) {
+      if (looksLikeMarkdown(result.result)) {
         artifacts.push({
           type: 'document',
           title: `Document from ${result.toolName}`,
@@ -284,166 +482,36 @@ export function createResultTransformerAdapter(): ResultTransformerAdapter {
           metadata: {
             toolName: result.toolName,
             serverId: result.serverId,
-            timestamp: result.timestamp
+            timestamp: result.completedAt
           }
         });
       }
 
       return artifacts;
-    },
-
-    // Helper methods
-    processRawContent(rawResult: any): any {
-      if (rawResult === null || rawResult === undefined) {
-        return 'No result returned';
-      }
-
-      if (typeof rawResult === 'string') {
-        return rawResult;
-      }
-
-      if (typeof rawResult === 'object') {
-        // Handle MCP-style responses
-        if (rawResult.content && Array.isArray(rawResult.content)) {
-          return rawResult.content.map((item: any) => {
-            if (item.type === 'text') return item.text;
-            if (item.type === 'image') return this.processImageContent(item);
-            return item;
-          }).join('\n');
-        }
-
-        if (rawResult.text) {
-          return rawResult.text;
-        }
-
-        if (rawResult.data) {
-          return rawResult.data;
-        }
-
-        return rawResult;
-      }
-
-      return String(rawResult);
-    },
-
-    detectResultType(result: any): string {
-      if (typeof result === 'string') return 'text';
-      if (Array.isArray(result)) return 'array';
-      if (result && typeof result === 'object') return 'object';
-      return 'primitive';
-    },
-
-    calculateContentSize(content: any): number {
-      if (typeof content === 'string') {
-        return Buffer.byteLength(content, 'utf8');
-      }
-      return Buffer.byteLength(JSON.stringify(content), 'utf8');
-    },
-
-    hasImageContent(result: any): boolean {
-      const str = JSON.stringify(result).toLowerCase();
-      return str.includes('image') || str.includes('base64') || str.includes('png') || str.includes('jpg');
-    },
-
-    hasFileContent(result: any): boolean {
-      const str = JSON.stringify(result).toLowerCase();
-      return str.includes('file') || str.includes('path') || str.includes('content');
-    },
-
-    detectImageMimeType(content: string): string {
-      if (content.startsWith('data:image/')) {
-        return content.substring(5, content.indexOf(';'));
-      }
-      
-      const ext = content.split('.').pop()?.toLowerCase();
-      switch (ext) {
-        case 'png': return 'image/png';
-        case 'jpg': case 'jpeg': return 'image/jpeg';
-        case 'gif': return 'image/gif';
-        case 'webp': return 'image/webp';
-        default: return 'image/unknown';
-      }
-    },
-
-    detectFileMimeType(path: string): string {
-      const ext = path.split('.').pop()?.toLowerCase();
-      switch (ext) {
-        case 'txt': return 'text/plain';
-        case 'json': return 'application/json';
-        case 'html': return 'text/html';
-        case 'css': return 'text/css';
-        case 'js': return 'application/javascript';
-        case 'pdf': return 'application/pdf';
-        default: return 'application/octet-stream';
-      }
-    },
-
-    generateSummary(result: ExecutionResult): string {
-      if (!result.success) {
-        return `${result.toolName} failed: ${result.error}`;
-      }
-
-      const executionTime = result.executionTime < 1000 ? 
-        `${result.executionTime}ms` : 
-        `${(result.executionTime / 1000).toFixed(1)}s`;
-
-      return `${result.toolName} completed successfully in ${executionTime}`;
-    },
-
-    generateActions(result: ExecutionResult): ResultAction[] {
-      const actions: ResultAction[] = [];
-
-      if (result.success && result.result) {
-        actions.push({
-          type: 'copy',
-          label: 'Copy Result',
-          data: typeof result.result === 'string' ? result.result : JSON.stringify(result.result)
-        });
-
-        if (this.looksLikeCode(result.result) || this.looksLikeStructuredData(result.result)) {
-          actions.push({
-            type: 'save',
-            label: 'Save as Artifact',
-            data: result
-          });
-        }
-      }
-
-      return actions;
-    },
-
-    looksLikeCode(content: any): boolean {
-      if (typeof content !== 'string') return false;
-      
-      const codeIndicators = [
-        'function ', 'class ', 'import ', 'export ',
-        'const ', 'let ', 'var ', '=> {',
-        'def ', 'class ', 'import ', 'from ',
-        '#include', 'using namespace',
-        '<?php', '#!/'
-      ];
-
-      return codeIndicators.some(indicator => content.includes(indicator));
-    },
-
-    looksLikeStructuredData(content: any): boolean {
-      if (typeof content !== 'string') {
-        return typeof content === 'object' && content !== null;
-      }
-
-      try {
-        JSON.parse(content);
-        return true;
-      } catch {
-        return false;
-      }
-    },
-
-    looksLikeMarkdown(content: any): boolean {
-      if (typeof content !== 'string') return false;
-      
-      const markdownIndicators = ['# ', '## ', '### ', '- ', '* ', '1. ', '```', '**', '*', '[', ']('];
-      return markdownIndicators.some(indicator => content.includes(indicator));
     }
   };
+}
+
+function detectCodeLanguage(content: any): string {
+  if (typeof content !== 'string') return 'text';
+  
+  const lowerContent = content.toLowerCase();
+  
+  if (lowerContent.includes('function ') || lowerContent.includes('const ') || lowerContent.includes('let ')) {
+    return 'javascript';
+  }
+  if (lowerContent.includes('def ') || lowerContent.includes('import ')) {
+    return 'python';
+  }
+  if (lowerContent.includes('class ') || lowerContent.includes('public ')) {
+    return 'java';
+  }
+  if (lowerContent.includes('#include') || lowerContent.includes('using namespace')) {
+    return 'cpp';
+  }
+  if (lowerContent.includes('<?php')) {
+    return 'php';
+  }
+  
+  return 'text';
 }

@@ -57,7 +57,7 @@ export function createProcessAdapter(): ProcessAdapter {
         const args = buildCommandArgs(config);
         const processInfo = await spawnProcess(config.command, args, {
           cwd: config.workingDirectory,
-          env: { ...process.env, ...config.environment },
+          env: Object.fromEntries(Object.entries({ ...process.env, ...config.environment }).filter(([_, v]) => v !== undefined)) as Record<string, string>,
           timeout: config.timeout
         });
         activeProcesses.set(config.name, processInfo);

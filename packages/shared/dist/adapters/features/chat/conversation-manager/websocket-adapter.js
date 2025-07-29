@@ -1,49 +1,91 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.createWebSocketAdapter = createWebSocketAdapter;
+// Helper Functions - Extracted from adapter implementation
+function buildConversationRoomId(conversationId) {
+    return `conversation:${conversationId}`;
+}
+function buildUserRoomId(userId) {
+    return `user:${userId}`;
+}
+function getSocketById(io, socketId) {
+    return io.sockets.sockets.get(socketId) || null;
+}
+function transformConversationForCreated(conversation) {
+    return {
+        id: conversation.id,
+        title: conversation.title,
+        model: conversation.model,
+        createdAt: conversation.createdAt,
+        metadata: conversation.metadata
+    };
+}
+function buildListUpdateEvent(action, conversationOrId) {
+    if (action === 'delete') {
+        return { action, id: conversationOrId };
+    }
+    return { action, conversation: conversationOrId };
+}
+function emitConversationCreatedHelper(io, conversation) {
+    const transformedData = transformConversationForCreated(conversation);
+    io.emit('conversation:created', transformedData);
+}
+function emitConversationUpdatedHelper(io, conversation) {
+    const roomId = buildConversationRoomId(conversation.id);
+    const listUpdateEvent = buildListUpdateEvent('update', conversation);
+    io.to(roomId).emit('conversation:updated', conversation);
+    io.emit('conversation:list_updated', listUpdateEvent);
+}
+function emitConversationDeletedHelper(io, id) {
+    const roomId = buildConversationRoomId(id);
+    const listUpdateEvent = buildListUpdateEvent('delete', id);
+    io.to(roomId).emit('conversation:deleted', { id });
+    io.emit('conversation:list_updated', listUpdateEvent);
+}
+function joinConversationRoomHelper(io, conversationId, socketId) {
+    const socket = getSocketById(io, socketId);
+    if (socket) {
+        const roomId = buildConversationRoomId(conversationId);
+        socket.join(roomId);
+    }
+}
+function leaveConversationRoomHelper(io, conversationId, socketId) {
+    const socket = getSocketById(io, socketId);
+    if (socket) {
+        const roomId = buildConversationRoomId(conversationId);
+        socket.leave(roomId);
+    }
+}
+function broadcastToConversationHelper(io, conversationId, event, data) {
+    const roomId = buildConversationRoomId(conversationId);
+    io.to(roomId).emit(event, data);
+}
+function broadcastToUserHelper(io, userId, event, data) {
+    const roomId = buildUserRoomId(userId);
+    io.to(roomId).emit(event, data);
+}
 function createWebSocketAdapter(io) {
     return {
         emitConversationCreated(conversation) {
-            io.emit('conversation:created', {
-                id: conversation.id,
-                title: conversation.title,
-                model: conversation.model,
-                createdAt: conversation.createdAt,
-                metadata: conversation.metadata
-            });
+            emitConversationCreatedHelper(io, conversation);
         },
         emitConversationUpdated(conversation) {
-            // Emit to conversation room and general updates
-            io.to(`conversation:${conversation.id}`).emit('conversation:updated', conversation);
-            io.emit('conversation:list_updated', {
-                action: 'update',
-                conversation
-            });
+            emitConversationUpdatedHelper(io, conversation);
         },
         emitConversationDeleted(id) {
-            io.to(`conversation:${id}`).emit('conversation:deleted', { id });
-            io.emit('conversation:list_updated', {
-                action: 'delete',
-                id
-            });
+            emitConversationDeletedHelper(io, id);
         },
         joinConversationRoom(conversationId, socketId) {
-            const socket = io.sockets.sockets.get(socketId);
-            if (socket) {
-                socket.join(`conversation:${conversationId}`);
-            }
+            joinConversationRoomHelper(io, conversationId, socketId);
         },
         leaveConversationRoom(conversationId, socketId) {
-            const socket = io.sockets.sockets.get(socketId);
-            if (socket) {
-                socket.leave(`conversation:${conversationId}`);
-            }
+            leaveConversationRoomHelper(io, conversationId, socketId);
         },
         broadcastToConversation(conversationId, event, data) {
-            io.to(`conversation:${conversationId}`).emit(event, data);
+            broadcastToConversationHelper(io, conversationId, event, data);
         },
         broadcastToUser(userId, event, data) {
-            io.to(`user:${userId}`).emit(event, data);
+            broadcastToUserHelper(io, userId, event, data);
         }
     };
 }

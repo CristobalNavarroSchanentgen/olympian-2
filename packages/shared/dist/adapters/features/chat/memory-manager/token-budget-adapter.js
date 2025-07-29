@@ -3,6 +3,60 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.createTokenBudgetAdapter = createTokenBudgetAdapter;
 const token_counter_1 = require("../../../../utils/token-counter");
 // Helper functions (moved outside the adapter for scope clarity)
+// Helper functions (extracted for AI-native architecture clarity)
+function allocateBudgetHelper(totalBudget, requirements) {
+    return {
+        total: totalBudget,
+        system: requirements.systemTokens,
+        user: requirements.userTokens,
+        assistant: requirements.assistantTokens,
+        context: requirements.contextTokens,
+        response: requirements.responseTokens,
+        reserve: Math.max(0, totalBudget - (requirements.systemTokens +
+            requirements.userTokens +
+            requirements.assistantTokens +
+            requirements.contextTokens +
+            requirements.responseTokens))
+    };
+}
+function validateUsageHelper(usage, budget) {
+    const overages = [];
+    const warnings = [];
+    if (usage.total > budget.total) {
+        overages.push({
+            category: "total",
+            allocated: budget.total,
+            used: usage.total,
+            overage: usage.total - budget.total,
+            percentage: (usage.total - budget.total) / budget.total * 100
+        });
+    }
+    const severity = overages.length > 0 ? "high" : "low";
+    const recommendations = overages.length > 0
+        ? ["Reduce context size", "Optimize message content"]
+        : [];
+    return {
+        isValid: overages.length === 0,
+        overages,
+        warnings,
+        severity,
+        recommendations
+    };
+}
+function optimizeBudgetHelper(usage, budget) {
+    const recommendedAllocation = { ...budget };
+    const totalUsed = usage.total;
+    const efficiency = totalUsed / budget.total;
+    if (efficiency > 0.9) {
+        recommendedAllocation.reserve = Math.floor(budget.total * 0.1);
+    }
+    return {
+        recommendedAllocation,
+        projectedSavings: 0,
+        riskLevel: "low",
+        recommendations: ["Monitor usage patterns"]
+    };
+}
 function calculateBreakdown(messages) {
     let systemMessages = 0;
     let userMessages = 0;
@@ -39,20 +93,7 @@ function calculateBreakdown(messages) {
 function createTokenBudgetAdapter() {
     return {
         allocateBudget(totalBudget, requirements) {
-            const allocation = {
-                total: totalBudget,
-                system: requirements.systemTokens,
-                user: requirements.userTokens,
-                assistant: requirements.assistantTokens,
-                context: requirements.contextTokens,
-                response: requirements.responseTokens,
-                reserve: Math.max(0, totalBudget - (requirements.systemTokens +
-                    requirements.userTokens +
-                    requirements.assistantTokens +
-                    requirements.contextTokens +
-                    requirements.responseTokens))
-            };
-            return allocation;
+            return allocateBudgetHelper(totalBudget, requirements);
         },
         trackUsage(messages, budget) {
             const breakdown = calculateBreakdown(messages);
@@ -71,43 +112,10 @@ function createTokenBudgetAdapter() {
             };
         },
         validateUsage(usage, budget) {
-            const overages = [];
-            const warnings = [];
-            if (usage.total > budget.total) {
-                overages.push({
-                    category: 'total',
-                    allocated: budget.total,
-                    used: usage.total,
-                    overage: usage.total - budget.total,
-                    percentage: (usage.total - budget.total) / budget.total * 100
-                });
-            }
-            const severity = overages.length > 0 ? 'high' : 'low';
-            const recommendations = overages.length > 0
-                ? ['Reduce context size', 'Optimize message content']
-                : [];
-            return {
-                isValid: overages.length === 0,
-                overages,
-                warnings,
-                severity,
-                recommendations
-            };
+            return validateUsageHelper(usage, budget);
         },
         optimizeBudget(usage, budget) {
-            const recommendedAllocation = { ...budget };
-            // Simple optimization - redistribute based on actual usage
-            const totalUsed = usage.total;
-            const efficiency = totalUsed / budget.total;
-            if (efficiency > 0.9) {
-                recommendedAllocation.reserve = Math.floor(budget.total * 0.1);
-            }
-            return {
-                recommendedAllocation,
-                projectedSavings: 0,
-                riskLevel: 'low',
-                recommendations: ['Monitor usage patterns']
-            };
+            return optimizeBudgetHelper(usage, budget);
         },
         getBudgetMetrics(usage, budget) {
             return {

@@ -6,6 +6,21 @@
  */
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.createVersionTrackerAdapter = createVersionTrackerAdapter;
+// Helper functions extracted outside returned object (AI-native pattern)
+function getNextVersionNumberHelper(versions, artifactId) {
+    const artifactVersions = versions.get(artifactId) || [];
+    return artifactVersions.length + 1;
+}
+function generateContentHashHelper(content) {
+    // Simple hash function for demo purposes
+    let hash = 0;
+    for (let i = 0; i < content.length; i++) {
+        const char = content.charCodeAt(i);
+        hash = ((hash << 5) - hash) + char;
+        hash = hash & hash;
+    }
+    return hash.toString(36);
+}
 /**
  * Adapter for version tracking operations
  * Transforms utility functions into feature-specific interface
@@ -15,8 +30,8 @@ function createVersionTrackerAdapter() {
     const versions = new Map();
     return {
         async createVersion(artifactId, content, description) {
-            const versionNumber = this.getNextVersionNumber(artifactId);
-            const hash = this.generateContentHash(content);
+            const versionNumber = getNextVersionNumberHelper(versions, artifactId);
+            const hash = generateContentHashHelper(content);
             const version = {
                 id: `${artifactId}_v${versionNumber}`,
                 artifactId,
@@ -52,19 +67,37 @@ function createVersionTrackerAdapter() {
             return true;
         },
         async restoreVersion(artifactId, versionNumber) {
-            const version = await this.getVersion(artifactId, versionNumber);
+            const artifactVersions = versions.get(artifactId) || [];
+            const version = artifactVersions.find(v => v.versionNumber === versionNumber) || null;
             if (!version) {
                 throw new Error(`Version ${versionNumber} not found for artifact ${artifactId}`);
             }
             // Create rollback version before restoring
-            await this.createVersion(artifactId, version.content, 'rollback');
+            const rollbackVersionNumber = getNextVersionNumberHelper(versions, artifactId);
+            const rollbackHash = generateContentHashHelper(version.content);
+            const rollbackVersion = {
+                id: `${artifactId}_v${rollbackVersionNumber}`,
+                artifactId,
+                versionNumber: rollbackVersionNumber,
+                content: version.content,
+                contentHash: rollbackHash,
+                description: "rollback",
+                createdAt: new Date(),
+                metadata: {
+                    size: version.content.length,
+                    hash: rollbackHash
+                }
+            };
+            const artifactVersionsForRollback = versions.get(artifactId) || [];
+            artifactVersionsForRollback.push(rollbackVersion);
+            versions.set(artifactId, artifactVersionsForRollback);
             const restoredArtifact = {
                 id: artifactId,
-                title: 'Restored Artifact',
-                type: 'code',
+                title: "Restored Artifact",
+                type: "code",
                 content: version.content,
-                conversationId: '',
-                messageId: '',
+                conversationId: "",
+                messageId: "",
                 createdAt: new Date(),
                 updatedAt: new Date(),
                 metadata: {
@@ -74,20 +107,6 @@ function createVersionTrackerAdapter() {
                 }
             };
             return restoredArtifact;
-        },
-        getNextVersionNumber(artifactId) {
-            const artifactVersions = versions.get(artifactId) || [];
-            return artifactVersions.length + 1;
-        },
-        generateContentHash(content) {
-            // Simple hash function for demo purposes
-            let hash = 0;
-            for (let i = 0; i < content.length; i++) {
-                const char = content.charCodeAt(i);
-                hash = ((hash << 5) - hash) + char;
-                hash = hash & hash;
-            }
-            return hash.toString(36);
         }
     };
 }

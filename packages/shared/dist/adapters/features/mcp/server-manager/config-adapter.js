@@ -2,6 +2,20 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.createConfigAdapter = createConfigAdapter;
 const config_parser_1 = require("../../../../utils/config-parser");
+// Helper functions extracted outside (AI-Native pattern)
+function detectServerTypeHelper(config) {
+    if (config.command.includes("github"))
+        return "github";
+    if (config.command.includes("nasa"))
+        return "nasa";
+    if (config.command.includes("context7"))
+        return "context7";
+    if (config.command.includes("node"))
+        return "node";
+    if (config.command.includes("python"))
+        return "python";
+    return "unknown";
+}
 function createConfigAdapter() {
     return {
         async parseServerConfig(configPath) {
@@ -145,7 +159,7 @@ function createConfigAdapter() {
         injectEnvironmentVariables(config, env) {
             const newEnvironment = { ...config.environment };
             // Inject environment variables based on server type
-            const serverType = this.detectServerType(config);
+            const serverType = detectServerTypeHelper(config);
             switch (serverType) {
                 case 'github':
                     if (env.GITHUB_PERSONAL_ACCESS_TOKEN) {
@@ -197,11 +211,7 @@ function createConfigAdapter() {
             };
             return merged;
         }, detectServerType(config) {
-            if (config.command.includes("node"))
-                return "node";
-            if (config.command.includes("python"))
-                return "python";
-            return "unknown";
+            return detectServerTypeHelper(config);
         },
         normalizeConfig(config) {
             // Ensure all required McpServerConfig properties are present

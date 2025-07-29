@@ -30,7 +30,7 @@ function createDatabaseAdapter(connection) {
         async update(id, updates) {
             const updateDoc = { ...updates, updatedAt: new Date() };
             const result = await connection.collection('conversations')
-                .findOneAndUpdate({ _id: id }, { set: updateDoc }, { returnDocument: 'after' });
+                .findOneAndUpdate({ _id: id }, { $set: updateDoc }, { returnDocument: 'after' });
             if (!result.value)
                 throw new Error('Conversation not found');
             return transformFromDb(result.value);
@@ -42,7 +42,7 @@ function createDatabaseAdapter(connection) {
         },
         async search(query) {
             const docs = await connection.collection('conversations')
-                .find({ title: { regex: query, options: 'i' } })
+                .find({ title: { $regex: query, $options: 'i' } })
                 .sort({ updatedAt: -1 })
                 .toArray();
             return docs.map(transformFromDb);
@@ -67,8 +67,8 @@ function createDatabaseAdapter(connection) {
         },
         async countByModel() {
             const pipeline = [
-                { group: { _id: 'model', count: { sum: 1 } } },
-                { project: { model: '_id', count: 1, _id: 0 } }
+                { $group: { _id: '$model', count: { $sum: 1 } } },
+                { $project: { model: '_id', count: 1, _id: 0 } }
             ];
             return await connection.collection('conversations').aggregate(pipeline).toArray();
         }

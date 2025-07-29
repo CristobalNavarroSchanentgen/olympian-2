@@ -16,6 +16,7 @@ export interface ConfigAdapter {
     detectServerType(config: ServerConfig): string;
     mergeConfigs(base: ServerConfig, override: Partial<ServerConfig>): ServerConfig;
     normalizeConfig(config: any): ServerConfig;
+    extractServerConfigs(configData: any): ServerConfig[];
 }
 export interface ValidationResult {
     valid: boolean;

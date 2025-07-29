@@ -6,16 +6,50 @@ const connections = new Map();
 const messageHandlers = new Map();
 const errorHandlers = new Map();
 const closeHandlers = new Map();
+// Helper functions moved outside - AI-Native pattern
+function handleIncomingMessage(serverId, message) {
+    const handler = messageHandlers.get(serverId);
+    if (handler) {
+        try {
+            handler(message);
+        }
+        catch (error) {
+            handleError(serverId, new Error(`Message handler error: ${error.message}`));
+        }
+    }
+}
+function handleError(serverId, error) {
+    const handler = errorHandlers.get(serverId);
+    if (handler) {
+        try {
+            handler(error);
+        }
+        catch {
+            // Prevent recursive errors
+        }
+    }
+}
+function handleClose(serverId) {
+    const handler = closeHandlers.get(serverId);
+    if (handler) {
+        try {
+            handler();
+        }
+        catch {
+            // Prevent errors during cleanup
+        }
+    }
+    // Clean up connection
+    connections.delete(serverId);
+}
 function createStdioAdapter() {
     return {
         createConnection(serverId, process) {
             if (connections.has(serverId)) {
                 throw new Error(`Connection ${serverId} already exists`);
             }
-            const handler = (0, protocol_handler_1.createProtocolHandler)({
-                transport: 'stdio',
-                timeout: 30000
-            });
+            // Fix: createProtocolHandler expects 0 arguments
+            const handler = (0, protocol_handler_1.createProtocolHandler)();
             const connection = {
                 serverId,
                 process,
@@ -33,7 +67,7 @@ function createStdioAdapter() {
                     for (const line of lines) {
                         try {
                             const message = JSON.parse(line);
-                            this.handleIncomingMessage(serverId, message);
+                            handleIncomingMessage(serverId, message);
                         }
                         catch (e) {
                             // Ignore non-JSON lines (debug output, etc.)
@@ -41,22 +75,22 @@ function createStdioAdapter() {
                     }
                 }
                 catch (error) {
-                    this.handleError(serverId, new Error(`Failed to parse stdout: ${error.message}`));
+                    handleError(serverId, new Error(`Failed to parse stdout: ${error.message}`));
                 }
             });
             // Set up stderr handling
             process.stderr.on('data', (data) => {
                 const error = new Error(`Server stderr: ${data.toString('utf8')}`);
-                this.handleError(serverId, error);
+                handleError(serverId, error);
             });
             // Set up process exit handling
             process.on('exit', (code) => {
                 connection.isActive = false;
-                this.handleClose(serverId);
+                handleClose(serverId);
             });
             process.on('error', (error) => {
                 connection.isActive = false;
-                this.handleError(serverId, error);
+                handleError(serverId, error);
             });
             connections.set(serverId, connection);
             return connection;
@@ -129,42 +163,6 @@ function createStdioAdapter() {
         },
         onClose(serverId, handler) {
             closeHandlers.set(serverId, handler);
-        },
-        // Private helper methods
-        handleIncomingMessage(serverId, message) {
-            const handler = messageHandlers.get(serverId);
-            if (handler) {
-                try {
-                    handler(message);
-                }
-                catch (error) {
-                    this.handleError(serverId, new Error(`Message handler error: ${error.message}`));
-                }
-            }
-        },
-        handleError(serverId, error) {
-            const handler = errorHandlers.get(serverId);
-            if (handler) {
-                try {
-                    handler(error);
-                }
-                catch {
-                    // Prevent recursive errors
-                }
-            }
-        },
-        handleClose(serverId) {
-            const handler = closeHandlers.get(serverId);
-            if (handler) {
-                try {
-                    handler();
-                }
-                catch {
-                    // Prevent errors during cleanup
-                }
-            }
-            // Clean up connection
-            connections.delete(serverId);
         }
     };
 }

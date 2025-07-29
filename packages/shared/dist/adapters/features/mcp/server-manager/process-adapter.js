@@ -3,22 +3,23 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.createProcessAdapter = createProcessAdapter;
 const process_manager_1 = require("../../../../utils/process-manager");
 const activeProcesses = new Map();
+function buildCommandArgs(config) {
+    const args = [...(config.args || [])];
+    if (config.command === 'npx') {
+        args.unshift('-y');
+    }
+    return args;
+}
 function createProcessAdapter() {
-    return {
+    const adapter = {
         async startServer(config) {
             try {
-                // Build command arguments from config
-                const args = this.buildCommandArgs(config);
-                // Spawn the process
+                const args = buildCommandArgs(config);
                 const processInfo = await (0, process_manager_1.spawnProcess)(config.command, args, {
                     cwd: config.workingDirectory,
-                    env: {
-                        ...process.env,
-                        ...config.environment
-                    },
-                    stdio: ['pipe', 'pipe', 'pipe']
+                    env: { ...process.env, ...config.environment },
+                    timeout: config.timeout
                 });
-                // Store process info
                 activeProcesses.set(config.name, processInfo);
                 return processInfo;
             }
@@ -33,14 +34,12 @@ function createProcessAdapter() {
             }
             try {
                 await (0, process_manager_1.killProcess)(processInfo.pid, 'SIGTERM');
-                // Wait for graceful shutdown
                 await new Promise(resolve => setTimeout(resolve, 2000));
-                // Force kill if still running
                 try {
                     await (0, process_manager_1.killProcess)(processInfo.pid, 'SIGKILL');
                 }
                 catch {
-                    // Process already dead, ignore
+                    // Process already dead
                 }
                 activeProcesses.delete(serverId);
             }
@@ -49,14 +48,11 @@ function createProcessAdapter() {
             }
         },
         async restartServer(serverId, config) {
-            // Stop existing server if running
             if (activeProcesses.has(serverId)) {
-                await this.stopServer(serverId);
+                await adapter.stopServer(serverId);
             }
-            // Wait a moment before restarting
             await new Promise(resolve => setTimeout(resolve, 1000));
-            // Start server with new config
-            return await this.startServer(config);
+            return await adapter.startServer(config);
         },
         async getServerStatus(serverId) {
             const processInfo = activeProcesses.get(serverId);
@@ -71,19 +67,30 @@ function createProcessAdapter() {
             }
             try {
                 const currentInfo = await (0, process_manager_1.getProcessInfo)(processInfo.pid);
-                const uptime = Date.now() - processInfo.startTime.getTime();
-                return {
-                    serverId,
-                    pid: processInfo.pid,
-                    status: currentInfo.status,
-                    uptime,
-                    memoryUsage: currentInfo.memoryUsage || 0,
-                    cpuUsage: currentInfo.cpuUsage || 0,
-                    lastResponse: processInfo.lastResponse
-                };
+                if (currentInfo !== null) {
+                    const uptime = Date.now() - processInfo.startTime.getTime();
+                    return {
+                        serverId,
+                        pid: processInfo.pid,
+                        status: currentInfo.status,
+                        uptime,
+                        memoryUsage: currentInfo.memoryUsage || 0,
+                        cpuUsage: currentInfo.cpuUsage || 0,
+                        lastResponse: processInfo.lastResponse
+                    };
+                }
+                else {
+                    activeProcesses.delete(serverId);
+                    return {
+                        serverId,
+                        status: 'crashed',
+                        uptime: 0,
+                        memoryUsage: 0,
+                        cpuUsage: 0
+                    };
+                }
             }
             catch (error) {
-                // Process not found, mark as crashed
                 activeProcesses.delete(serverId);
                 return {
                     serverId,
@@ -96,19 +103,17 @@ function createProcessAdapter() {
         },
         async listActiveServers() {
             const activeServers = [];
-            for (const [serverId, processInfo] of activeProcesses.entries()) {
+            for (const [serverId, processInfo] of Array.from(activeProcesses.entries())) {
                 try {
                     const currentInfo = await (0, process_manager_1.getProcessInfo)(processInfo.pid);
-                    if (currentInfo.status === 'running') {
+                    if (currentInfo !== null && currentInfo.status === 'running') {
                         activeServers.push(processInfo);
                     }
                     else {
-                        // Clean up dead processes
                         activeProcesses.delete(serverId);
                     }
                 }
                 catch {
-                    // Process dead, clean up
                     activeProcesses.delete(serverId);
                 }
             }
@@ -127,8 +132,7 @@ function createProcessAdapter() {
                 const startTime = Date.now();
                 const currentInfo = await (0, process_manager_1.getProcessInfo)(processInfo.pid);
                 const responseTime = Date.now() - startTime;
-                if (currentInfo.status === 'running') {
-                    // Update last response time
+                if (currentInfo !== null && currentInfo.status === 'running') {
                     processInfo.lastResponse = new Date();
                     return {
                         healthy: true,
@@ -139,7 +143,7 @@ function createProcessAdapter() {
                 else {
                     return {
                         healthy: false,
-                        error: `Process status: ${currentInfo.status}`,
+                        error: `Process status: ${currentInfo?.status || 'not found'}`,
                         lastCheck: new Date()
                     };
                 }
@@ -155,29 +159,17 @@ function createProcessAdapter() {
         async killUnresponsiveServer(serverId) {
             const processInfo = activeProcesses.get(serverId);
             if (!processInfo) {
-                return; // Already gone
+                return;
             }
             try {
                 await (0, process_manager_1.killProcess)(processInfo.pid, 'SIGKILL');
                 activeProcesses.delete(serverId);
             }
             catch (error) {
-                // Process might already be dead
                 activeProcesses.delete(serverId);
             }
-        },
-        // Helper method to build command arguments
-        buildCommandArgs(config) {
-            const args = [...(config.args || [])];
-            // Add environment-specific arguments
-            if (config.command === 'npx') {
-                args.unshift('-y'); // Auto-confirm package installation
-            }
-            if (config.command === 'uvx' || config.command === 'uv') {
-                // UV-specific arguments can be added here
-            }
-            return args;
         }
     };
+    return adapter;
 }
 //# sourceMappingURL=process-adapter.js.map

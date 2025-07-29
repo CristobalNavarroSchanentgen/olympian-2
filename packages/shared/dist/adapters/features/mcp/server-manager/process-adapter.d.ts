@@ -18,7 +18,7 @@ export interface ProcessAdapter {
 export interface ProcessStatus {
     serverId: string;
     pid?: number;
-    status: 'running' | 'stopped' | 'crashed' | 'starting' | 'stopping';
+    status: 'running' | 'stopped' | 'crashed' | 'error';
     uptime: number;
     memoryUsage: number;
     cpuUsage: number;

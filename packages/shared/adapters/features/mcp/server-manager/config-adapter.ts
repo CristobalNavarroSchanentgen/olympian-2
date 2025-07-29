@@ -25,8 +25,8 @@ export interface ConfigAdapter {
   detectServerType(config: ServerConfig): string;
   mergeConfigs(base: ServerConfig, override: Partial<ServerConfig>): ServerConfig;
   normalizeConfig(config: any): ServerConfig;
-
 }
+
 export interface ValidationResult {
   valid: boolean;
   errors: string[];
@@ -41,8 +41,6 @@ export interface RuntimeConfig {
   environment: Record<string, string>;
   workingDirectory?: string;
   timeout: number;
-  
-  
   retries: number;
   healthCheck: HealthCheckConfig;
 }
@@ -50,8 +48,8 @@ export interface RuntimeConfig {
 export interface HealthCheckConfig {
   timeout: number;
   retries: number;
-  
-  
+  retryDelay: number;
+  endpoints: string[];
 }
 
 export function createConfigAdapter(): ConfigAdapter {
@@ -71,11 +69,38 @@ export function createConfigAdapter(): ConfigAdapter {
 
     parseInlineConfig(configData) {
       try {
-        const configs = Array.isArray(configData) ? configData : [configData];
+        // Handle single server or array of servers
+        const servers: Record<string, any> = {};
+        
+        if (Array.isArray(configData)) {
+          configData.forEach((config, i) => {
+            servers[config.name || `server_${i}`] = {
+              command: config.command || "npx",
+              args: config.args || [],
+              env: config.env || config.environment || {},
+              disabled: config.disabled || false,
+              metadata: config.metadata || {}
+            };
+          });
+        } else if (configData && typeof configData === "object") {
+          servers[configData.name || "server_0"] = {
+            command: configData.command || "npx",
+            args: configData.args || [],
+            env: configData.env || configData.environment || {},
+            disabled: configData.disabled || false,
+            metadata: configData.metadata || {}
+          };
+        }
+        
+        const mcpConfigFile = {
+          servers,
+          version: "1.0.0",
+          metadata: { source: "inline", parsedAt: new Date().toISOString() }
+        };
         
         return {
           success: true,
-          data: { servers: Array.isArray(configData) ? configData.reduce((acc, config, i) => ({ ...acc, [`server_${i}`]: config }), {}) : { server_0: configData }, version: "1.0", metadata: { source: "inline", parsedAt: new Date() } },
+          data: mcpConfigFile,
           errors: [],
           warnings: []
         };
@@ -170,19 +195,16 @@ export function createConfigAdapter(): ConfigAdapter {
     transformToRuntimeConfig(config) {
       return {
         name: config.name,
-        id: config.id || config.name || "unnamed-server",
-        env: config.env || config.environment || {},
-        disabled: config.disabled || false,
-        metadata: config.metadata || {},        command: config.command,
+        command: config.command,
         args: config.args || [],
         environment: config.environment || {},
         workingDirectory: config.workingDirectory,
         timeout: config.timeout || 30000,
         retries: config.retries || 3,
         healthCheck: {
-          retryDelay: config.healthCheck?.retryDelay || 1000,
           timeout: config.healthCheck?.timeout || 5000,
           retries: config.healthCheck?.retries || 2,
+          retryDelay: config.healthCheck?.retryDelay || 1000,
           endpoints: config.healthCheck?.endpoints || []
         }
       };
@@ -224,50 +246,83 @@ export function createConfigAdapter(): ConfigAdapter {
     },
 
     mergeConfigs(base, override) {
+      const merged: ServerConfig = {
+        // Core ServerConfig properties
+        name: override.name || base.name,
         id: override.id || base.id,
-        env: override.env || base.env,
+        
+        // McpServerConfig properties
+        command: override.command || base.command,
+        args: override.args || base.args || [],
+        env: { ...base.env, ...override.env },
         disabled: override.disabled !== undefined ? override.disabled : base.disabled,
-        metadata: { ...base.metadata, ...override.metadata },      return {
-        ...base,
-        id: override.id || base.id,
-        env: override.env || base.env,
-        disabled: override.disabled !== undefined ? override.disabled : base.disabled,
-        metadata: { ...base.metadata, ...override.metadata },        ...override,
-        args: override.args || base.args,
+        metadata: { ...base.metadata, ...override.metadata },
+        
+        // Optional ServerConfig properties
         environment: {
           ...base.environment,
           ...override.environment
         },
+        workingDirectory: override.workingDirectory || base.workingDirectory,
+        timeout: override.timeout || base.timeout,
+        retries: override.retries || base.retries,
+        healthCheck: override.healthCheck ? {
+          ...base.healthCheck,
+          ...override.healthCheck
+        } : base.healthCheck
+      };
+      
+      return merged;
+    },        disabled: override.disabled !== undefined ? override.disabled : base.disabled,
+        metadata: { ...base.metadata, ...override.metadata },
+        
+        // Additional ServerConfig properties
+        environment: {
+          ...base.environment,
+          ...override.environment
+        },
+        workingDirectory: override.workingDirectory || base.workingDirectory,
+        timeout: override.timeout || base.timeout,
+        retries: override.retries || base.retries,
         healthCheck: {
           ...base.healthCheck,
           ...override.healthCheck
-        }        }
+        }
+      };
     },
-
 
     detectServerType(config) {
       if (config.command.includes("node")) return "node";
       if (config.command.includes("python")) return "python";
       return "unknown";
     },
+
     normalizeConfig(config) {
-      // Convert various config formats to standard ServerConfig
+      // Ensure all required McpServerConfig properties are present
+      const serverName = config.name || config.id || "unnamed-server";
+      
       const normalized: ServerConfig = {
-        name: config.name || config.id || 'unnamed-server',
-        id: config.id || config.name || "unnamed-server",
+        // Required ServerConfig properties
+        name: serverName,
+        id: config.id || serverName,
+        
+        // Required McpServerConfig properties
+        command: config.command || config.cmd || "npx",
+        args: Array.isArray(config.args) ? config.args : 
+              typeof config.args === "string" ? config.args.split(" ") : [],
         env: config.env || config.environment || {},
         disabled: config.disabled || false,
-        metadata: config.metadata || {},        command: config.command || config.cmd || 'npx',
-        args: Array.isArray(config.args) ? config.args : 
-              typeof config.args === 'string' ? config.args.split(' ') : [],
+        metadata: config.metadata || {},
+        
+        // Optional ServerConfig properties
         environment: config.environment || config.env || {},
         workingDirectory: config.workingDirectory || config.cwd,
         timeout: config.timeout || 30000,
         retries: config.retries || 3,
         healthCheck: {
-          retryDelay: config.healthCheck?.retryDelay || 1000,
           timeout: config.healthCheck?.timeout || 5000,
           retries: config.healthCheck?.retries || 2,
+          retryDelay: config.healthCheck?.retryDelay || 1000,
           endpoints: config.healthCheck?.endpoints || []
         }
       };
@@ -296,7 +351,6 @@ export function createConfigAdapter(): ConfigAdapter {
       }
 
       return configs;
-    },
-
+    }
   };
 }

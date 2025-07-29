@@ -19,10 +19,36 @@ function createConfigAdapter() {
         },
         parseInlineConfig(configData) {
             try {
-                const configs = Array.isArray(configData) ? configData : [configData];
+                // Handle single server or array of servers
+                const servers = {};
+                if (Array.isArray(configData)) {
+                    configData.forEach((config, i) => {
+                        servers[config.name || `server_${i}`] = {
+                            command: config.command || "npx",
+                            args: config.args || [],
+                            env: config.env || config.environment || {},
+                            disabled: config.disabled || false,
+                            metadata: config.metadata || {}
+                        };
+                    });
+                }
+                else if (configData && typeof configData === "object") {
+                    servers[configData.name || "server_0"] = {
+                        command: configData.command || "npx",
+                        args: configData.args || [],
+                        env: configData.env || configData.environment || {},
+                        disabled: configData.disabled || false,
+                        metadata: configData.metadata || {}
+                    };
+                }
+                const mcpConfigFile = {
+                    servers,
+                    version: "1.0.0",
+                    metadata: { source: "inline", parsedAt: new Date().toISOString() }
+                };
                 return {
                     success: true,
-                    data: { configs, metadata: { source: 'inline', parsedAt: new Date() } },
+                    data: mcpConfigFile,
                     errors: [],
                     warnings: []
                 };
@@ -109,9 +135,10 @@ function createConfigAdapter() {
                 timeout: config.timeout || 30000,
                 retries: config.retries || 3,
                 healthCheck: {
-                    retryDelay: config.healthCheck?.retryDelay || 1000,
                     timeout: config.healthCheck?.timeout || 5000,
-                    retries: config.healthCheck?.retries || 2
+                    retries: config.healthCheck?.retries || 2,
+                    retryDelay: config.healthCheck?.retryDelay || 1000,
+                    endpoints: config.healthCheck?.endpoints || []
                 }
             };
         },
@@ -145,68 +172,106 @@ function createConfigAdapter() {
             };
         },
         mergeConfigs(base, override) {
-            return {
-                ...base,
-                ...override,
-                args: override.args || base.args,
+            const merged = {
+                // Core ServerConfig properties
+                name: override.name || base.name,
+                id: override.id || base.id,
+                // McpServerConfig properties
+                command: override.command || base.command,
+                args: override.args || base.args || [],
+                env: { ...base.env, ...override.env },
+                disabled: override.disabled !== undefined ? override.disabled : base.disabled,
+                metadata: { ...base.metadata, ...override.metadata },
+                // Optional ServerConfig properties
                 environment: {
                     ...base.environment,
                     ...override.environment
                 },
-                healthCheck: {
+                workingDirectory: override.workingDirectory || base.workingDirectory,
+                timeout: override.timeout || base.timeout,
+                retries: override.retries || base.retries,
+                healthCheck: override.healthCheck ? {
                     ...base.healthCheck,
                     ...override.healthCheck
-                }
+                } : base.healthCheck
             };
+            return merged;
+        }, disabled: override.disabled !== undefined ? override.disabled : base.disabled,
+        metadata: { ...base.metadata, ...override.metadata },
+        // Additional ServerConfig properties
+        environment: {
+            ...base.environment,
+            ...override.environment
         },
-        detectServerType(config) {
-            if (config.command.includes("node"))
-                return "node";
-            if (config.command.includes("python"))
-                return "python";
-            return "unknown";
-        },
-        normalizeConfig(config) {
-            // Convert various config formats to standard ServerConfig
-            const normalized = {
-                name: config.name || config.id || 'unnamed-server',
-                command: config.command || config.cmd || 'npx',
-                args: Array.isArray(config.args) ? config.args :
-                    typeof config.args === 'string' ? config.args.split(' ') : [],
-                environment: config.environment || config.env || {},
-                workingDirectory: config.workingDirectory || config.cwd,
-                timeout: config.timeout || 30000,
-                retries: config.retries || 3,
-                healthCheck: {
-                    retryDelay: config.healthCheck?.retryDelay || 1000,
-                    timeout: config.healthCheck?.timeout || 5000,
-                    retries: config.healthCheck?.retries || 2
-                }
-            };
-            return normalized;
-        },
-        // Helper methods
-        extractServerConfigs(configData) {
-            const configs = [];
-            if (configData.mcpServers) {
-                // Standard MCP config format
-                Object.entries(configData.mcpServers).forEach(([name, serverConfig]) => {
-                    configs.push(this.normalizeConfig({
-                        name,
-                        ...serverConfig
-                    }));
-                });
-            }
-            else if (Array.isArray(configData)) {
-                // Array of server configs
-                configs.push(...configData.map(this.normalizeConfig));
-            }
-            else if (configData.name || configData.command) {
-                // Single server config
-                configs.push(this.normalizeConfig(configData));
-            }
-            return configs;
-        },
+        workingDirectory: override.workingDirectory || base.workingDirectory,
+        timeout: override.timeout || base.timeout,
+        retries: override.retries || base.retries,
+        healthCheck: {
+            ...base.healthCheck,
+            ...override.healthCheck
+        }
     };
 }
+detectServerType(config);
+{
+    if (config.command.includes("node"))
+        return "node";
+    if (config.command.includes("python"))
+        return "python";
+    return "unknown";
+}
+normalizeConfig(config);
+{
+    // Ensure all required McpServerConfig properties are present
+    const serverName = config.name || config.id || "unnamed-server";
+    const normalized = {
+        // Required ServerConfig properties
+        name: serverName,
+        id: config.id || serverName,
+        // Required McpServerConfig properties
+        command: config.command || config.cmd || "npx",
+        args: Array.isArray(config.args) ? config.args :
+            typeof config.args === "string" ? config.args.split(" ") : [],
+        env: config.env || config.environment || {},
+        disabled: config.disabled || false,
+        metadata: config.metadata || {},
+        // Optional ServerConfig properties
+        environment: config.environment || config.env || {},
+        workingDirectory: config.workingDirectory || config.cwd,
+        timeout: config.timeout || 30000,
+        retries: config.retries || 3,
+        healthCheck: {
+            timeout: config.healthCheck?.timeout || 5000,
+            retries: config.healthCheck?.retries || 2,
+            retryDelay: config.healthCheck?.retryDelay || 1000,
+            endpoints: config.healthCheck?.endpoints || []
+        }
+    };
+    return normalized;
+}
+// Helper methods
+extractServerConfigs(configData, any);
+mcp_1.ServerConfig[];
+{
+    const configs = [];
+    if (configData.mcpServers) {
+        // Standard MCP config format
+        Object.entries(configData.mcpServers).forEach(([name, serverConfig]) => {
+            configs.push(this.normalizeConfig({
+                name,
+                ...serverConfig
+            }));
+        });
+    }
+    else if (Array.isArray(configData)) {
+        // Array of server configs
+        configs.push(...configData.map(this.normalizeConfig));
+    }
+    else if (configData.name || configData.command) {
+        // Single server config
+        configs.push(this.normalizeConfig(configData));
+    }
+    return configs;
+}
+;
 //# sourceMappingURL=config-adapter.js.map

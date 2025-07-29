@@ -36,6 +36,8 @@ export interface RuntimeConfig {
 export interface HealthCheckConfig {
     timeout: number;
     retries: number;
+    retryDelay: number;
+    endpoints: string[];
 }
 export declare function createConfigAdapter(): ConfigAdapter;
 //# sourceMappingURL=config-adapter.d.ts.map

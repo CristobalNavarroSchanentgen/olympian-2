@@ -75,7 +75,7 @@ export function createConfigAdapter(): ConfigAdapter {
         
         return {
           success: true,
-          data: { configs, metadata: { source: 'inline', parsedAt: new Date() } },
+          data: { servers: Array.isArray(configData) ? configData.reduce((acc, config, i) => ({ ...acc, [`server_${i}`]: config }), {}) : { server_0: configData }, version: "1.0", metadata: { source: "inline", parsedAt: new Date() } },
           errors: [],
           warnings: []
         };
@@ -170,7 +170,10 @@ export function createConfigAdapter(): ConfigAdapter {
     transformToRuntimeConfig(config) {
       return {
         name: config.name,
-        command: config.command,
+        id: config.id || config.name || "unnamed-server",
+        env: config.env || config.environment || {},
+        disabled: config.disabled || false,
+        metadata: config.metadata || {},        command: config.command,
         args: config.args || [],
         environment: config.environment || {},
         workingDirectory: config.workingDirectory,
@@ -179,7 +182,8 @@ export function createConfigAdapter(): ConfigAdapter {
         healthCheck: {
           retryDelay: config.healthCheck?.retryDelay || 1000,
           timeout: config.healthCheck?.timeout || 5000,
-          retries: config.healthCheck?.retries || 2
+          retries: config.healthCheck?.retries || 2,
+          endpoints: config.healthCheck?.endpoints || []
         }
       };
     },
@@ -220,9 +224,15 @@ export function createConfigAdapter(): ConfigAdapter {
     },
 
     mergeConfigs(base, override) {
-      return {
+        id: override.id || base.id,
+        env: override.env || base.env,
+        disabled: override.disabled !== undefined ? override.disabled : base.disabled,
+        metadata: { ...base.metadata, ...override.metadata },      return {
         ...base,
-        ...override,
+        id: override.id || base.id,
+        env: override.env || base.env,
+        disabled: override.disabled !== undefined ? override.disabled : base.disabled,
+        metadata: { ...base.metadata, ...override.metadata },        ...override,
         args: override.args || base.args,
         environment: {
           ...base.environment,
@@ -231,8 +241,7 @@ export function createConfigAdapter(): ConfigAdapter {
         healthCheck: {
           ...base.healthCheck,
           ...override.healthCheck
-        }
-      };
+        }        }
     },
 
 
@@ -245,7 +254,10 @@ export function createConfigAdapter(): ConfigAdapter {
       // Convert various config formats to standard ServerConfig
       const normalized: ServerConfig = {
         name: config.name || config.id || 'unnamed-server',
-        command: config.command || config.cmd || 'npx',
+        id: config.id || config.name || "unnamed-server",
+        env: config.env || config.environment || {},
+        disabled: config.disabled || false,
+        metadata: config.metadata || {},        command: config.command || config.cmd || 'npx',
         args: Array.isArray(config.args) ? config.args : 
               typeof config.args === 'string' ? config.args.split(' ') : [],
         environment: config.environment || config.env || {},
@@ -255,7 +267,8 @@ export function createConfigAdapter(): ConfigAdapter {
         healthCheck: {
           retryDelay: config.healthCheck?.retryDelay || 1000,
           timeout: config.healthCheck?.timeout || 5000,
-          retries: config.healthCheck?.retries || 2
+          retries: config.healthCheck?.retries || 2,
+          endpoints: config.healthCheck?.endpoints || []
         }
       };
 

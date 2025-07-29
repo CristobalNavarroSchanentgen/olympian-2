@@ -54,6 +54,16 @@ export interface HealthCheckConfig {
   endpoints: string[];
 }
 
+
+// Helper functions extracted outside (AI-Native pattern)
+function detectServerTypeHelper(config: ServerConfig): string {
+  if (config.command.includes("github")) return "github";
+  if (config.command.includes("nasa")) return "nasa";
+  if (config.command.includes("context7")) return "context7";
+  if (config.command.includes("node")) return "node";
+  if (config.command.includes("python")) return "python";
+  return "unknown";
+}
 export function createConfigAdapter(): ConfigAdapter {
   return {
     async parseServerConfig(configPath) {
@@ -216,7 +226,7 @@ export function createConfigAdapter(): ConfigAdapter {
       const newEnvironment = { ...config.environment };
       
       // Inject environment variables based on server type
-      const serverType = this.detectServerType(config);
+      const serverType = detectServerTypeHelper(config);
       
       switch (serverType) {
         case 'github':
@@ -276,11 +286,8 @@ export function createConfigAdapter(): ConfigAdapter {
       
       return merged;
 
-    },    detectServerType(config: any) {
-      if (config.command.includes("node")) return "node";
-      if (config.command.includes("python")) return "python";
-      return "unknown";
-    },
+    },    detectServerType(config) {
+      return detectServerTypeHelper(config);    },
     normalizeConfig(config: any) {
       // Ensure all required McpServerConfig properties are present
       const serverName = config.name || config.id || "unnamed-server";

@@ -25,7 +25,9 @@ export interface ConfigAdapter {
   detectServerType(config: ServerConfig): string;
   mergeConfigs(base: ServerConfig, override: Partial<ServerConfig>): ServerConfig;
   normalizeConfig(config: any): ServerConfig;
-}
+  
+  // Helper methods
+  extractServerConfigs(configData: any): ServerConfig[];}
 
 export interface ValidationResult {
   valid: boolean;
@@ -273,31 +275,13 @@ export function createConfigAdapter(): ConfigAdapter {
       };
       
       return merged;
-    },        disabled: override.disabled !== undefined ? override.disabled : base.disabled,
-        metadata: { ...base.metadata, ...override.metadata },
-        
-        // Additional ServerConfig properties
-        environment: {
-          ...base.environment,
-          ...override.environment
-        },
-        workingDirectory: override.workingDirectory || base.workingDirectory,
-        timeout: override.timeout || base.timeout,
-        retries: override.retries || base.retries,
-        healthCheck: {
-          ...base.healthCheck,
-          ...override.healthCheck
-        }
-      };
-    },
 
-    detectServerType(config) {
+    },    detectServerType(config: any) {
       if (config.command.includes("node")) return "node";
       if (config.command.includes("python")) return "python";
       return "unknown";
     },
-
-    normalizeConfig(config) {
+    normalizeConfig(config: any) {
       // Ensure all required McpServerConfig properties are present
       const serverName = config.name || config.id || "unnamed-server";
       
@@ -344,7 +328,7 @@ export function createConfigAdapter(): ConfigAdapter {
         });
       } else if (Array.isArray(configData)) {
         // Array of server configs
-        configs.push(...configData.map(this.normalizeConfig));
+        configs.push(...configData.map((config: any) => this.normalizeConfig(config)));
       } else if (configData.name || configData.command) {
         // Single server config
         configs.push(this.normalizeConfig(configData));

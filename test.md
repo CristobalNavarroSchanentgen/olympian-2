@@ -9,7 +9,7 @@
 
 ---
 
-## ✅ COMPLETED ADAPTERS (11/20)
+## ✅ COMPLETED ADAPTERS (12/20)
 
 ### MCP Feature - Complete ✅ (5/5)
 1. **stdio-adapter.ts** - Helper functions extracted, clean architecture

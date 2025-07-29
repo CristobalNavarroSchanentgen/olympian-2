@@ -4,9 +4,26 @@
  * Follows AI-Native architecture - stays under 100 lines
  */
 
-import type { Artifact } from '../../../../models/artifacts/artifact';
-import type { Version } from '../../../../models/artifacts/version';
-import * as artifactValidator from '../../../../utils/artifact-validator';
+import type { Artifact } from "../../../../models/artifacts/artifact";
+import type { Version } from "../../../../models/artifacts/version";
+import * as artifactValidator from "../../../../utils/artifact-validator";
+
+// Helper functions extracted outside returned object (AI-native pattern)
+function getNextVersionNumberHelper(versions: Map<string, Version[]>, artifactId: string): number {
+  const artifactVersions = versions.get(artifactId) || [];
+  return artifactVersions.length + 1;
+}
+
+function generateContentHashHelper(content: string): string {
+  // Simple hash function for demo purposes
+  let hash = 0;
+  for (let i = 0; i < content.length; i++) {
+    const char = content.charCodeAt(i);
+    hash = ((hash << 5) - hash) + char;
+    hash = hash & hash;
+  }
+  return hash.toString(36);
+}
 
 /**
  * Adapter for version tracking operations
@@ -18,8 +35,8 @@ export function createVersionTrackerAdapter() {
 
   return {
     async createVersion(artifactId: string, content: string, description?: string): Promise<Version> {
-      const versionNumber = this.getNextVersionNumber(artifactId);
-      const hash = this.generateContentHash(content);
+      const versionNumber = getNextVersionNumberHelper(versions, artifactId);
+      const hash = generateContentHashHelper(content);
       
       const version: Version = {
         id: `${artifactId}_v${versionNumber}`,
@@ -63,21 +80,42 @@ export function createVersionTrackerAdapter() {
     },
 
     async restoreVersion(artifactId: string, versionNumber: number): Promise<Artifact> {
-      const version = await this.getVersion(artifactId, versionNumber);
+      const artifactVersions = versions.get(artifactId) || [];
+      const version = artifactVersions.find(v => v.versionNumber === versionNumber) || null;
+      
       if (!version) {
         throw new Error(`Version ${versionNumber} not found for artifact ${artifactId}`);
       }
       
       // Create rollback version before restoring
-      await this.createVersion(artifactId, version.content, 'rollback');
+      const rollbackVersionNumber = getNextVersionNumberHelper(versions, artifactId);
+      const rollbackHash = generateContentHashHelper(version.content);
+      
+      const rollbackVersion: Version = {
+        id: `${artifactId}_v${rollbackVersionNumber}`,
+        artifactId,
+        versionNumber: rollbackVersionNumber,
+        content: version.content,
+        contentHash: rollbackHash,
+        description: "rollback",
+        createdAt: new Date(),
+        metadata: {
+          size: version.content.length,
+          hash: rollbackHash
+        }
+      };
+      
+      const artifactVersionsForRollback = versions.get(artifactId) || [];
+      artifactVersionsForRollback.push(rollbackVersion);
+      versions.set(artifactId, artifactVersionsForRollback);
       
       const restoredArtifact: Artifact = {
         id: artifactId,
-        title: 'Restored Artifact',
-        type: 'code',
+        title: "Restored Artifact",
+        type: "code",
         content: version.content,
-        conversationId: '',
-        messageId: '',
+        conversationId: "",
+        messageId: "",
         createdAt: new Date(),
         updatedAt: new Date(),
         metadata: {
@@ -88,22 +126,6 @@ export function createVersionTrackerAdapter() {
       };
 
       return restoredArtifact;
-    },
-
-    getNextVersionNumber(artifactId: string): number {
-      const artifactVersions = versions.get(artifactId) || [];
-      return artifactVersions.length + 1;
-    },
-
-    generateContentHash(content: string): string {
-      // Simple hash function for demo purposes
-      let hash = 0;
-      for (let i = 0; i < content.length; i++) {
-        const char = content.charCodeAt(i);
-        hash = ((hash << 5) - hash) + char;
-        hash = hash & hash;
-      }
-      return hash.toString(36);
     }
   };
 }

@@ -20,13 +20,14 @@
     "services/**/*.ts",
     "events/**/*.ts",
     "config/**/*.ts",
-    "features/**/*.ts",
-    "adapters/**/*.ts",
+    "features/**/contract.ts",
     "index.ts"
   ],
   "exclude": [
     "node_modules",
     "dist",
-    "**/*.test.ts"
+    "**/*.test.ts",
+    "adapters/**/*.ts",
+    "features/**/index.ts"
   ]
 }

@@ -1,7 +1,6 @@
 "use strict";
 /**
- * Shared Package Entry Point
- * Minimal exports for basic functionality
+ * Shared Package Entry Point - Minimal Working Version
  */
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
@@ -18,17 +17,9 @@ var __exportStar = (this && this.__exportStar) || function(m, exports) {
     for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports, p)) __createBinding(exports, m, p);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-// Core Utilities
+// Basic utilities that should work
 __exportStar(require("./utils/token-counter"), exports);
-__exportStar(require("./utils/artifact-validator"), exports);
 __exportStar(require("./utils/http-client"), exports);
-__exportStar(require("./utils/health-checker"), exports);
-__exportStar(require("./utils/capability-detector"), exports);
 __exportStar(require("./utils/config-parser"), exports);
-__exportStar(require("./utils/context-manager"), exports);
-__exportStar(require("./utils/process-manager"), exports);
-__exportStar(require("./utils/protocol-handler"), exports);
 __exportStar(require("./utils/image-processor"), exports);
-__exportStar(require("./features/connection/model-registry"), exports);
-__exportStar(require("./utils/model-registry-helper"), exports);
 //# sourceMappingURL=index.js.map

@@ -1,16 +1,17 @@
 /**
- * Image Data Models
+ * Vision domain models
  */
 
 export interface ImageData {
   id: string;
   filename: string;
-  mimetype: string;
+  mimeType: string;
   size: number;
-  width: number;
-  height: number;
-  url?: string;
-  base64?: string;
+  base64Data: string;
+  dimensions: {
+    width: number;
+    height: number;
+  };
   uploadedAt: Date;
-  metadata: Record<string, unknown>;
+  metadata?: Record<string, unknown>;
 }

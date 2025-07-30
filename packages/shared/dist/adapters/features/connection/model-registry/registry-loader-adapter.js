@@ -1,32 +1,27 @@
 "use strict";
 /**
  * Registry Loader Adapter
- * Loads the predefined model registry
+ * Transforms registry loading utilities for model-registry feature
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.RegistryLoaderAdapter = void 0;
 exports.createRegistryLoaderAdapter = createRegistryLoaderAdapter;
 const connection_1 = require("../../../../models/connection");
-class RegistryLoaderAdapter {
-    configMode;
-    constructor(configMode = 'auto-scan') {
-        this.configMode = configMode;
-    }
-    loadRegistry() {
-        return [...connection_1.PREDEFINED_MODEL_REGISTRY];
-    }
-    getConfigurationMode() {
-        return this.configMode;
-    }
-    setConfigurationMode(mode) {
-        this.configMode = mode;
-    }
+// Helper functions extracted from business logic
+function loadModelRegistry() {
+    return [...connection_1.PREDEFINED_MODEL_REGISTRY];
 }
-exports.RegistryLoaderAdapter = RegistryLoaderAdapter;
-// Factory function
+function getEnvironmentConfigMode() {
+    return process.env.AUTO_SCAN_MODELS === 'false' ? 'registry' : 'auto-scan';
+}
 function createRegistryLoaderAdapter(mode) {
-    // Check environment variable for configuration mode
-    const envMode = process.env.AUTO_SCAN_MODELS === 'false' ? 'registry' : 'auto-scan';
-    return new RegistryLoaderAdapter(mode || envMode);
+    const configMode = mode || getEnvironmentConfigMode();
+    return {
+        loadRegistry() {
+            return loadModelRegistry();
+        },
+        getConfigurationMode() {
+            return configMode;
+        }
+    };
 }
 //# sourceMappingURL=registry-loader-adapter.js.map

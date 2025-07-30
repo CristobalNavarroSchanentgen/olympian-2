@@ -173,7 +173,7 @@ async function mockCheckProcess(processId) {
 }
 // Generic health check wrapper for adapter compatibility
 async function checkHealth(endpoint, timeout) {
-    const result = await checkHttpEndpoint(endpoint, config);
+    const result = await checkHttpEndpoint(endpoint, timeout || 5000);
     return {
         status: result.status === "healthy" ? 'healthy' : 'unhealthy',
         timestamp: result.timestamp,

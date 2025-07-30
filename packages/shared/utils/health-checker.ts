@@ -235,7 +235,7 @@ export async function checkHealth(
   endpoint: string, 
   timeout?: number
 ): Promise<HealthStatus> {
-  const result = await checkHttpEndpoint(endpoint, config);
+  const result = await checkHttpEndpoint(endpoint, timeout || 5000);
   return {
     status: result.status === "healthy" ? 'healthy' : 'unhealthy',
     timestamp: result.timestamp,

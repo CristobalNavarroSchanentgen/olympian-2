@@ -1,4 +1,8 @@
 import { OllamaConnection } from '../../../../models/connection';
+/**
+ * HTTP adapter for Ollama connector
+ * Transforms HTTP utilities for ollama-connector feature
+ */
 export interface HttpAdapter {
     testConnection(connection: OllamaConnection): Promise<any>;
     establishConnection(endpoint: string): Promise<OllamaConnection>;

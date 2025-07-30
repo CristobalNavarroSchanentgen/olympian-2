@@ -2,18 +2,65 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.createFormatConverterAdapter = createFormatConverterAdapter;
 const image_processor_1 = require("../../../utils/image-processor");
+// Helper functions extracted from adapter
+function getOptimalQuality(format) {
+    switch (format) {
+        case 'jpeg': return 0.9;
+        case 'webp': return 0.85;
+        case 'png': return 1.0; // PNG is lossless
+        case 'gif': return 1.0; // GIF is lossless
+        default: return 0.9;
+    }
+}
+function getThumbnailDimensions(size) {
+    switch (size) {
+        case 'small': return { width: 150, height: 150 };
+        case 'medium': return { width: 300, height: 300 };
+        case 'large': return { width: 600, height: 600 };
+        case 'custom': return { width: 400, height: 400 }; // Default for custom
+        default: return { width: 300, height: 300 };
+    }
+}
+function meetsRequirements(imageData, requirements) {
+    const { dimensions, size, mimeType } = imageData;
+    // Check format
+    if (mimeType !== `image/${requirements.format}`) {
+        return false;
+    }
+    // Check dimensions
+    if (dimensions.width > requirements.maxWidth || dimensions.height > requirements.maxHeight) {
+        return false;
+    }
+    // Check size if specified
+    if (requirements.maxSizeBytes && size > requirements.maxSizeBytes) {
+        return false;
+    }
+    return true;
+}
+function generateConvertedId(originalId) {
+    return `${originalId}_converted_${Date.now()}`;
+}
+function generateOptimizedId(originalId) {
+    return `${originalId}_optimized_${Date.now()}`;
+}
+function generateThumbnailId(originalId, size) {
+    return `${originalId}_thumb_${size}_${Date.now()}`;
+}
+function generateModelReadyId(originalId) {
+    return `${originalId}_model_ready_${Date.now()}`;
+}
 function createFormatConverterAdapter() {
     return {
         async convertFormat(imageData, targetFormat) {
             try {
                 const processed = await (0, image_processor_1.processImage)(imageData.base64Data, {
                     format: targetFormat,
-                    quality: this.getOptimalQuality(targetFormat),
+                    quality: getOptimalQuality(targetFormat),
                     preserveMetadata: true
                 });
                 return {
                     ...imageData,
-                    id: this.generateConvertedId(imageData.id),
+                    id: generateConvertedId(imageData.id),
                     mimeType: `image/${targetFormat}`,
                     base64Data: processed.base64,
                     size: processed.size,
@@ -41,7 +88,7 @@ function createFormatConverterAdapter() {
             });
             return {
                 ...imageData,
-                id: this.generateOptimizedId(imageData.id),
+                id: generateOptimizedId(imageData.id),
                 mimeType: 'image/jpeg',
                 base64Data: optimized.base64,
                 size: optimized.size,
@@ -59,7 +106,7 @@ function createFormatConverterAdapter() {
             };
         },
         async createThumbnail(imageData, size) {
-            const dimensions = this.getThumbnailDimensions(size);
+            const dimensions = getThumbnailDimensions(size);
             const thumbnail = await (0, image_processor_1.processImage)(imageData.base64Data, {
                 maxWidth: dimensions.width,
                 maxHeight: dimensions.height,
@@ -69,7 +116,7 @@ function createFormatConverterAdapter() {
             });
             return {
                 ...imageData,
-                id: this.generateThumbnailId(imageData.id, size),
+                id: generateThumbnailId(imageData.id, size),
                 base64Data: thumbnail.base64,
                 size: thumbnail.size,
                 dimensions: {
@@ -88,7 +135,7 @@ function createFormatConverterAdapter() {
         async prepareForModel(imageData, requirements) {
             try {
                 // Check if image already meets requirements
-                if (this.meetsRequirements(imageData, requirements)) {
+                if (meetsRequirements(imageData, requirements)) {
                     return imageData;
                 }
                 // Process image to meet requirements
@@ -119,7 +166,7 @@ function createFormatConverterAdapter() {
                 }
                 return {
                     ...imageData,
-                    id: this.generateModelReadyId(imageData.id),
+                    id: generateModelReadyId(imageData.id),
                     mimeType: `image/${requirements.format}`,
                     base64Data: processed.base64,
                     size: processed.size,
@@ -139,53 +186,6 @@ function createFormatConverterAdapter() {
             catch (error) {
                 throw new Error(`Model preparation failed: ${error.message}`);
             }
-        },
-        // Helper methods
-        getOptimalQuality(format) {
-            switch (format) {
-                case 'jpeg': return 0.9;
-                case 'webp': return 0.85;
-                case 'png': return 1.0; // PNG is lossless
-                case 'gif': return 1.0; // GIF is lossless
-                default: return 0.9;
-            }
-        },
-        getThumbnailDimensions(size) {
-            switch (size) {
-                case 'small': return { width: 150, height: 150 };
-                case 'medium': return { width: 300, height: 300 };
-                case 'large': return { width: 600, height: 600 };
-                case 'custom': return { width: 400, height: 400 }; // Default for custom
-                default: return { width: 300, height: 300 };
-            }
-        },
-        meetsRequirements(imageData, requirements) {
-            const { dimensions, size, mimeType } = imageData;
-            // Check format
-            if (mimeType !== `image/${requirements.format}`) {
-                return false;
-            }
-            // Check dimensions
-            if (dimensions.width > requirements.maxWidth || dimensions.height > requirements.maxHeight) {
-                return false;
-            }
-            // Check size if specified
-            if (requirements.maxSizeBytes && size > requirements.maxSizeBytes) {
-                return false;
-            }
-            return true;
-        },
-        generateConvertedId(originalId) {
-            return `${originalId}_converted_${Date.now()}`;
-        },
-        generateOptimizedId(originalId) {
-            return `${originalId}_optimized_${Date.now()}`;
-        },
-        generateThumbnailId(originalId, size) {
-            return `${originalId}_thumb_${size}_${Date.now()}`;
-        },
-        generateModelReadyId(originalId) {
-            return `${originalId}_model_ready_${Date.now()}`;
         }
     };
 }

@@ -110,6 +110,14 @@ export interface ToolExecutorEvents {
 /**
  * Configuration for tool executor
  */
+/**
+ * Dependencies required by tool executor
+ */
+export interface ToolExecutorDependencies {
+    mcpProtocolAdapter: any;
+    resultTransformerAdapter: any;
+    toolService: any;
+}
 export interface ToolExecutorConfig {
     defaultTimeout: number;
     maxConcurrentExecutions: number;

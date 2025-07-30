@@ -1,153 +1,185 @@
 import { ReasoningService } from '@olympian/shared/services/reasoning-service';
-import { ReasoningPanelProps, ReasoningBlock, ReasoningPanelConfig } from '@olympian/shared/features/ui/reasoning-panel/contract';
+import { ReasoningBlock, ReasoningPanelProps, ExportFormat } from '@olympian/shared/features/ui/reasoning-panel/contract';
 import { reasoningDataAdapter } from '@olympian/shared/adapters/features/ui/reasoning-panel/reasoning-data-adapter';
+import { eventBus } from '@olympian/shared/utils/event-bus';
+import { 
+  ReasoningBlockAddedEvent,
+  ReasoningBlockUpdatedEvent, 
+  ReasoningBlockRemovedEvent,
+  ReasoningPanelToggledEvent,
+  ReasoningClearedEvent,
+  ReasoningExportedEvent 
+} from '@olympian/shared/events/ui/reasoning-events';
 
 /**
- * ReasoningService Implementation
+ * ReasoningService Implementation with Event Publishing
  * 
- * Implements the ReasoningService interface for frontend reasoning panel management.
- * Uses adapters for data transformation and maintains reasoning state.
+ * Manages reasoning blocks and panel state with event publishing.
+ * Uses adapters for data transformation and publishes events for all operations.
  */
 class ReasoningServiceImpl implements ReasoningService {
-  private currentState: ReasoningPanelProps = {
-    isOpen: false,
+  private panelState: ReasoningPanelProps = {
+    visible: false,
+    expanded: false,
     blocks: [],
-    totalSteps: 0,
-    currentStep: 0,
-    config: {
-      maxBlocks: 50,
-      autoCollapse: true,
-      exportFormat: 'markdown'
-    }
+    exportFormat: 'text'
   };
 
-  private nextStepNumber = 1;
-
-  getReasoningPanel(): ReasoningPanelProps {
-    return { ...this.currentState };
+  getCurrentState(): ReasoningPanelProps {
+    return { ...this.panelState };
   }
 
-  async addReasoningBlock(
-    blockData: Omit<ReasoningBlock, 'id' | 'timestamp' | 'stepNumber'>
-  ): Promise<ReasoningPanelProps> {
-    const block: ReasoningBlock = {
-      ...blockData,
-      id: this.generateBlockId(),
-      timestamp: new Date().toISOString(),
-      stepNumber: this.nextStepNumber++
-    };
-
-    this.currentState.blocks.push(block);
-    this.currentState.totalSteps = this.currentState.blocks.length;
-    this.currentState.currentStep = this.currentState.totalSteps;
-
-    // Auto-collapse if configured and limit reached
-    if (this.currentState.config.autoCollapse && 
-        this.currentState.blocks.length > this.currentState.config.maxBlocks) {
-      this.currentState.blocks = this.currentState.blocks.slice(-this.currentState.config.maxBlocks);
-    }
-
-    return this.getReasoningPanel();
-  }
-
-  async updateReasoningBlock(blockId: string, updates: Partial<ReasoningBlock>): Promise<ReasoningPanelProps> {
-    const blockIndex = this.currentState.blocks.findIndex(block => block.id === blockId);
+  async addReasoningBlock(content: string, type: 'thinking' | 'conclusion' = 'thinking'): Promise<ReasoningBlock> {
+    const block = reasoningDataAdapter.createBlock(content, type);
+    this.panelState.blocks.push(block);
     
-    if (blockIndex !== -1) {
-      this.currentState.blocks[blockIndex] = {
-        ...this.currentState.blocks[blockIndex],
-        ...updates
-      };
-    }
-
-    return this.getReasoningPanel();
-  }
-
-  async removeReasoningBlock(blockId: string): Promise<ReasoningPanelProps> {
-    this.currentState.blocks = this.currentState.blocks.filter(block => block.id !== blockId);
-    this.currentState.totalSteps = this.currentState.blocks.length;
-    
-    return this.getReasoningPanel();
-  }
-
-  async clearReasoning(): Promise<ReasoningPanelProps> {
-    this.currentState.blocks = [];
-    this.currentState.totalSteps = 0;
-    this.currentState.currentStep = 0;
-    this.nextStepNumber = 1;
-
-    return this.getReasoningPanel();
-  }
-
-  async toggleReasoningPanel(): Promise<ReasoningPanelProps> {
-    this.currentState.isOpen = !this.currentState.isOpen;
-    return this.getReasoningPanel();
-  }
-
-  async processReasoningData(data: string | any): Promise<ReasoningBlock[]> {
-    try {
-      return await reasoningDataAdapter.transform(data);
-    } catch (error) {
-      console.error('Failed to process reasoning data:', error);
-      return [];
-    }
-  }
-
-  async exportReasoning(): Promise<string> {
-    const format = this.currentState.config.exportFormat;
-    
-    if (format === 'markdown') {
-      return this.exportAsMarkdown();
-    } else if (format === 'text') {
-      return this.exportAsText();
-    } else {
-      return JSON.stringify(this.currentState.blocks, null, 2);
-    }
-  }
-
-  async configurePanel(config: Partial<ReasoningPanelConfig>): Promise<ReasoningPanelProps> {
-    this.currentState.config = {
-      ...this.currentState.config,
-      ...config
-    };
-
-    return this.getReasoningPanel();
-  }
-
-  private generateBlockId(): string {
-    return `block-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-  }
-
-  private exportAsMarkdown(): string {
-    let markdown = '# Reasoning Process\n\n';
-    
-    this.currentState.blocks.forEach((block, index) => {
-      markdown += `## Step ${block.stepNumber}: ${block.type.toUpperCase()}\n\n`;
-      markdown += `**${block.title}**\n\n`;
-      markdown += `${block.content}\n\n`;
-      
-      if (block.duration) {
-        markdown += `*Duration: ${block.duration}ms*\n\n`;
+    // Publish block added event
+    const event: ReasoningBlockAddedEvent = {
+      type: 'reasoning-block-added',
+      payload: {
+        block,
+        panelState: this.getCurrentState(),
+        timestamp: new Date()
       }
-      
-      markdown += '---\n\n';
-    });
-
-    return markdown;
+    };
+    await eventBus.publish(event);
+    
+    return block;
   }
 
-  private exportAsText(): string {
-    let text = 'REASONING PROCESS\n';
-    text += '================\n\n';
+  async updateReasoningBlock(blockId: string, updates: Partial<ReasoningBlock>): Promise<ReasoningBlock | null> {
+    const blockIndex = this.panelState.blocks.findIndex(b => b.id === blockId);
+    if (blockIndex === -1) return null;
     
-    this.currentState.blocks.forEach((block) => {
-      text += `STEP ${block.stepNumber}: ${block.type.toUpperCase()}\n`;
-      text += `${block.title}\n`;
-      text += `${'-'.repeat(block.title.length)}\n`;
-      text += `${block.content}\n\n`;
-    });
+    this.panelState.blocks[blockIndex] = { ...this.panelState.blocks[blockIndex], ...updates };
+    const updatedBlock = this.panelState.blocks[blockIndex];
+    
+    // Publish block updated event
+    const event: ReasoningBlockUpdatedEvent = {
+      type: 'reasoning-block-updated',
+      payload: {
+        blockId,
+        updates,
+        panelState: this.getCurrentState(),
+        timestamp: new Date()
+      }
+    };
+    await eventBus.publish(event);
+    
+    return updatedBlock;
+  }
 
-    return text;
+  async removeReasoningBlock(blockId: string): Promise<boolean> {
+    const initialLength = this.panelState.blocks.length;
+    this.panelState.blocks = this.panelState.blocks.filter(b => b.id !== blockId);
+    const wasRemoved = this.panelState.blocks.length < initialLength;
+    
+    if (wasRemoved) {
+      // Publish block removed event
+      const event: ReasoningBlockRemovedEvent = {
+        type: 'reasoning-block-removed',
+        payload: {
+          blockId,
+          panelState: this.getCurrentState(),
+          timestamp: new Date()
+        }
+      };
+      await eventBus.publish(event);
+    }
+    
+    return wasRemoved;
+  }
+
+  async clearReasoning(): Promise<void> {
+    const previousBlockCount = this.panelState.blocks.length;
+    this.panelState.blocks = [];
+    
+    // Publish cleared event
+    const event: ReasoningClearedEvent = {
+      type: 'reasoning-cleared',
+      payload: {
+        previousBlockCount,
+        panelState: this.getCurrentState(),
+        timestamp: new Date()
+      }
+    };
+    await eventBus.publish(event);
+  }
+
+  async togglePanel(): Promise<ReasoningPanelProps> {
+    this.panelState.visible = !this.panelState.visible;
+    
+    // Publish panel toggled event
+    const event: ReasoningPanelToggledEvent = {
+      type: 'reasoning-panel-toggled',
+      payload: {
+        visible: this.panelState.visible,
+        expanded: this.panelState.expanded,
+        panelState: this.getCurrentState(),
+        timestamp: new Date()
+      }
+    };
+    await eventBus.publish(event);
+    
+    return this.getCurrentState();
+  }
+
+  async expandPanel(): Promise<ReasoningPanelProps> {
+    this.panelState.expanded = true;
+    
+    // Publish panel toggled event (expanded = true)
+    const event: ReasoningPanelToggledEvent = {
+      type: 'reasoning-panel-toggled',
+      payload: {
+        visible: this.panelState.visible,
+        expanded: this.panelState.expanded,
+        panelState: this.getCurrentState(),
+        timestamp: new Date()
+      }
+    };
+    await eventBus.publish(event);
+    
+    return this.getCurrentState();
+  }
+
+  async collapsePanel(): Promise<ReasoningPanelProps> {
+    this.panelState.expanded = false;
+    
+    // Publish panel toggled event (expanded = false)
+    const event: ReasoningPanelToggledEvent = {
+      type: 'reasoning-panel-toggled',
+      payload: {
+        visible: this.panelState.visible,
+        expanded: this.panelState.expanded,
+        panelState: this.getCurrentState(),
+        timestamp: new Date()
+      }
+    };
+    await eventBus.publish(event);
+    
+    return this.getCurrentState();
+  }
+
+  async exportReasoning(format: ExportFormat): Promise<string> {
+    const content = reasoningDataAdapter.export(this.panelState.blocks, format);
+    
+    // Publish export event
+    const event: ReasoningExportedEvent = {
+      type: 'reasoning-exported',
+      payload: {
+        format,
+        content,
+        blockCount: this.panelState.blocks.length,
+        timestamp: new Date()
+      }
+    };
+    await eventBus.publish(event);
+    
+    return content;
+  }
+
+  async setExportFormat(format: ExportFormat): Promise<void> {
+    this.panelState.exportFormat = format;
   }
 }
 

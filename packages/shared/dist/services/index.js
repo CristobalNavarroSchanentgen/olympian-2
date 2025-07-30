@@ -24,4 +24,6 @@ __exportStar(require("./message-service"), exports);
 __exportStar(require("./streaming-service"), exports);
 __exportStar(require("./vision-service"), exports);
 __exportStar(require("./model-registry-service"), exports);
+__exportStar(require("./layout-service"), exports);
+__exportStar(require("./reasoning-service"), exports);
 //# sourceMappingURL=index.js.map

@@ -22,4 +22,6 @@ __exportStar(require("./message-events"), exports);
 __exportStar(require("./connection-events"), exports);
 __exportStar(require("./server-events"), exports);
 __exportStar(require("./vision-events"), exports);
+__exportStar(require("./ui/layout-events"), exports);
+__exportStar(require("./ui/reasoning-events"), exports);
 //# sourceMappingURL=index.js.map

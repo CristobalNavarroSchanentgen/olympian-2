@@ -1,32 +1,25 @@
 // Contract for dual-pane layout feature
+
 export interface DualPaneLayoutProps {
-  conversationPanel: {
-    visible: boolean;
-    width?: number;
-    showReasoningPanel?: boolean;
-  };
-  codeEditor: {
-    visible: boolean;
-    language?: string;
-    content?: string;
-    readOnly?: boolean;
-  };
-  header: {
-    title: string;
-    showNavigation?: boolean;
-    showModelSelector?: boolean;
-  };
+  sidebarOpen: boolean;
+  conversationPanelWidth: number;
+  codeEditorOpen: boolean;  
+  reasoningPanelOpen: boolean;
+  theme: 'light' | 'dark';
+}
+
+export interface LayoutConfig {
+  sidebarOpen: boolean;
+  conversationPanelWidth: number;
+  codeEditorOpen: boolean; 
+  reasoningPanelOpen: boolean;
+  theme: 'light' | 'dark';
 }
 
 export interface ConversationPanelProps {
   messages: Message[];
   onSendMessage: (content: string) => void;
   isLoading?: boolean;
-  reasoning?: {
-    visible: boolean;
-    content: ReasoningBlock[];
-    metadata: ReasoningMetadata;
-  };
   conversations: Conversation[];
   activeConversationId?: string;
   onConversationSelect: (id: string) => void;
@@ -40,11 +33,19 @@ export interface Message {
   timestamp: Date;
 }
 
-export interface ReasoningBlock {
-  type: 'planning' | 'step' | 'conclusion';
+export interface Conversation {
+  id: string;
   title: string;
+  messages: Message[];
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface ReasoningBlock {
+  id: string;
+  type: 'thinking' | 'conclusion';
   content: string;
-  duration?: number;
+  timestamp: Date;
 }
 
 export interface ReasoningMetadata {

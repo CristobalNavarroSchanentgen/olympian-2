@@ -1,7 +1,6 @@
-"use strict";
 /**
  * Vision Service Interface
  * Defines the contract for vision-related operations
  */
-Object.defineProperty(exports, "__esModule", { value: true });
+export {};
 //# sourceMappingURL=vision-service.js.map

@@ -1,6 +1,5 @@
-"use strict";
 /**
  * Streaming service interface
  */
-Object.defineProperty(exports, "__esModule", { value: true });
+export {};
 //# sourceMappingURL=streaming-service.js.map

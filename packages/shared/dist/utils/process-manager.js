@@ -1,22 +1,14 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.validateProcessConfig = validateProcessConfig;
-exports.buildEnvironment = buildEnvironment;
-exports.spawnProcess = spawnProcess;
-exports.spawnProcessFromConfig = spawnProcessFromConfig;
-exports.killProcess = killProcess;
-exports.getProcessInfo = getProcessInfo;
-function validateProcessConfig(config) {
+export function validateProcessConfig(config) {
     const errors = [];
     if (!config.command)
         errors.push('Command required');
     return { isValid: errors.length === 0, errors };
 }
-function buildEnvironment(baseEnv = {}, additionalEnv = {}) {
+export function buildEnvironment(baseEnv = {}, additionalEnv = {}) {
     return { ...baseEnv, ...additionalEnv };
 }
 // Updated function signature to match adapter usage
-function spawnProcess(command, args, options) {
+export function spawnProcess(command, args, options) {
     return new Promise((resolve, reject) => {
         const startTime = new Date();
         try {
@@ -38,17 +30,17 @@ function spawnProcess(command, args, options) {
     });
 }
 // Backward compatibility: support old signature
-function spawnProcessFromConfig(config) {
+export function spawnProcessFromConfig(config) {
     return spawnProcess(config.command, config.args, {
         cwd: config.cwd,
         env: config.env,
         timeout: config.timeout
     });
 }
-function killProcess(pid, signal) {
+export function killProcess(pid, signal) {
     return Promise.resolve();
 }
-function getProcessInfo(pid) {
+export function getProcessInfo(pid) {
     return Promise.resolve(null);
 }
 //# sourceMappingURL=process-manager.js.map

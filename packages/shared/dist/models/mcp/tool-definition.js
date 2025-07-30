@@ -1,6 +1,5 @@
-"use strict";
 /**
  * MCP Tool Definition Models
  */
-Object.defineProperty(exports, "__esModule", { value: true });
+export {};
 //# sourceMappingURL=tool-definition.js.map

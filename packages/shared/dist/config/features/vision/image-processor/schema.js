@@ -1,13 +1,9 @@
-"use strict";
 /**
  * Configuration Schema: Vision Image Processor
  *
  * Validates configuration for image processing and vision capabilities.
  */
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.imageProcessorDefaults = void 0;
-exports.validateImageProcessorConfig = validateImageProcessorConfig;
-exports.imageProcessorDefaults = {
+export const imageProcessorDefaults = {
     upload: {
         maxFileSize: 10 * 1024 * 1024, // 10MB
         maxFiles: 10,
@@ -33,7 +29,7 @@ exports.imageProcessorDefaults = {
         processingTimeout: 45000,
     },
 };
-function validateImageProcessorConfig(config) {
+export function validateImageProcessorConfig(config) {
     if (!config || typeof config !== 'object')
         return false;
     const c = config;

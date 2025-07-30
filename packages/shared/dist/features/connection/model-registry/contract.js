@@ -1,8 +1,7 @@
-"use strict";
 /**
  * Feature Contract: Model Registry Manager
  *
  * Manages predefined model capabilities registry for custom configuration mode
  */
-Object.defineProperty(exports, "__esModule", { value: true });
+export {};
 //# sourceMappingURL=contract.js.map

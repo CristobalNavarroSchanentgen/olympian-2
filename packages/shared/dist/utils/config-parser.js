@@ -1,20 +1,12 @@
-"use strict";
 /**
  * Configuration Parser Utility
  * Pure functions for parsing and validating configuration files
  * Follows AI-Native architecture - utility functions only
  */
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.parseConfig = void 0;
-exports.parseMcpConfig = parseMcpConfig;
-exports.parseServerConfig = parseServerConfig;
-exports.validateConfig = validateConfig;
-exports.stringifyConfig = stringifyConfig;
-exports.mergeConfigs = mergeConfigs;
 /**
  * Parse MCP configuration file
  */
-function parseMcpConfig(rawConfig) {
+export function parseMcpConfig(rawConfig) {
     const errors = [];
     const warnings = [];
     if (!rawConfig || typeof rawConfig !== 'object') {
@@ -60,7 +52,7 @@ function parseMcpConfig(rawConfig) {
 /**
  * Parse individual server configuration
  */
-function parseServerConfig(name, config) {
+export function parseServerConfig(name, config) {
     const errors = [];
     const warnings = [];
     if (!config || typeof config !== 'object') {
@@ -104,7 +96,7 @@ function parseServerConfig(name, config) {
 /**
  * Validate configuration schema
  */
-function validateConfig(config) {
+export function validateConfig(config) {
     const errors = [];
     const warnings = [];
     // Check for empty servers
@@ -134,13 +126,13 @@ function validateConfig(config) {
 /**
  * Convert configuration to JSON string
  */
-function stringifyConfig(config, pretty = true) {
+export function stringifyConfig(config, pretty = true) {
     return JSON.stringify(config, null, pretty ? 2 : 0);
 }
 /**
  * Merge multiple configuration files
  */
-function mergeConfigs(configs) {
+export function mergeConfigs(configs) {
     const merged = {
         servers: {},
         version: '1.0.0',
@@ -157,5 +149,5 @@ function mergeConfigs(configs) {
     return merged;
 }
 // Compatibility aliases for existing adapters
-exports.parseConfig = parseMcpConfig;
+export const parseConfig = parseMcpConfig;
 //# sourceMappingURL=config-parser.js.map

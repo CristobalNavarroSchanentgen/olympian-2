@@ -1,6 +1,5 @@
-"use strict";
 /**
  * MCP service interface
  */
-Object.defineProperty(exports, "__esModule", { value: true });
+export {};
 //# sourceMappingURL=mcp-service.js.map

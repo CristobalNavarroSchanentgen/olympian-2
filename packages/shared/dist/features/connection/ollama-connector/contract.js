@@ -1,8 +1,7 @@
-"use strict";
 /**
  * Feature Contract: Ollama Connector
  *
  * Manages connection to Ollama instance and model communication.
  */
-Object.defineProperty(exports, "__esModule", { value: true });
+export {};
 //# sourceMappingURL=contract.js.map

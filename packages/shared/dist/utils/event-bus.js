@@ -1,12 +1,9 @@
-"use strict";
 /**
  * Event Bus - AI-Native Architecture
  *
  * Simple event system for pub/sub communication.
  * Pure utility - no business logic or external dependencies.
  */
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.eventBus = void 0;
 class EventBus {
     listeners = new Map();
     middlewares = [];
@@ -66,5 +63,5 @@ class EventBus {
     }
 }
 // Export singleton instance
-exports.eventBus = new EventBus();
+export const eventBus = new EventBus();
 //# sourceMappingURL=event-bus.js.map

@@ -1,6 +1,5 @@
-"use strict";
 /**
  * Conversation-related events
  */
-Object.defineProperty(exports, "__esModule", { value: true });
+export {};
 //# sourceMappingURL=conversation-events.js.map

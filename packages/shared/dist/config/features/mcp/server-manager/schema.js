@@ -1,13 +1,9 @@
-"use strict";
 /**
  * Configuration Schema: MCP Server Manager
  *
  * Validates configuration for MCP server lifecycle management.
  */
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.serverManagerDefaults = void 0;
-exports.validateServerManagerConfig = validateServerManagerConfig;
-exports.serverManagerDefaults = {
+export const serverManagerDefaults = {
     processes: {
         maxServers: 10,
         startupTimeout: 30000,
@@ -33,7 +29,7 @@ exports.serverManagerDefaults = {
         logRetention: 86400000, // 24 hours
     },
 };
-function validateServerManagerConfig(config) {
+export function validateServerManagerConfig(config) {
     if (!config || typeof config !== 'object')
         return false;
     const c = config;

@@ -1,13 +1,9 @@
-"use strict";
 /**
  * Configuration Schema: Artifact Manager
  *
  * Validates configuration for artifact creation and management.
  */
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.artifactManagerDefaults = void 0;
-exports.validateArtifactManagerConfig = validateArtifactManagerConfig;
-exports.artifactManagerDefaults = {
+export const artifactManagerDefaults = {
     creation: {
         maxArtifactsPerMessage: 5,
         maxContentSize: 1024 * 1024, // 1MB
@@ -33,7 +29,7 @@ exports.artifactManagerDefaults = {
         cleanupInterval: 86400000, // 24 hours
     },
 };
-function validateArtifactManagerConfig(config) {
+export function validateArtifactManagerConfig(config) {
     if (!config || typeof config !== 'object')
         return false;
     const c = config;

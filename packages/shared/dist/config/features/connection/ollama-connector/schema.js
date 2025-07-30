@@ -1,13 +1,9 @@
-"use strict";
 /**
  * Configuration Schema: Ollama Connector
  *
  * Validates configuration for Ollama instance connection management.
  */
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.ollamaConnectorDefaults = void 0;
-exports.validateOllamaConnectorConfig = validateOllamaConnectorConfig;
-exports.ollamaConnectorDefaults = {
+export const ollamaConnectorDefaults = {
     connection: {
         baseUrl: 'http://localhost:11434',
         timeout: 30000,
@@ -33,7 +29,7 @@ exports.ollamaConnectorDefaults = {
         preloadModels: [],
     },
 };
-function validateOllamaConnectorConfig(config) {
+export function validateOllamaConnectorConfig(config) {
     if (!config || typeof config !== 'object')
         return false;
     const c = config;

@@ -1,6 +1,5 @@
-"use strict";
 /**
  * Message service interface
  */
-Object.defineProperty(exports, "__esModule", { value: true });
+export {};
 //# sourceMappingURL=message-service.js.map

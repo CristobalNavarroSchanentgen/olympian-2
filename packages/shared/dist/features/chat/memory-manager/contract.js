@@ -1,8 +1,7 @@
-"use strict";
 /**
  * Feature Contract: Chat Memory Manager
  *
  * Manages conversation context, token budgets, and memory optimization.
  */
-Object.defineProperty(exports, "__esModule", { value: true });
+export {};
 //# sourceMappingURL=contract.js.map

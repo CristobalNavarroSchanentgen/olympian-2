@@ -1,13 +1,9 @@
-"use strict";
 /**
  * Configuration Schema: Chat Message Processor
  *
  * Validates configuration for message processing and streaming.
  */
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.messageProcessorDefaults = void 0;
-exports.validateMessageProcessorConfig = validateMessageProcessorConfig;
-exports.messageProcessorDefaults = {
+export const messageProcessorDefaults = {
     streaming: {
         chunkSize: 64,
         bufferTimeout: 100,
@@ -32,7 +28,7 @@ exports.messageProcessorDefaults = {
         bufferPercentage: 10,
     },
 };
-function validateMessageProcessorConfig(config) {
+export function validateMessageProcessorConfig(config) {
     if (!config || typeof config !== 'object')
         return false;
     const c = config;

@@ -1,21 +1,12 @@
-"use strict";
 /**
  * Health Checker Utility
  * Pure functions for checking service health
  * Follows AI-Native architecture - utility functions only
  */
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.checkHttpEndpoint = checkHttpEndpoint;
-exports.checkOllamaHealth = checkOllamaHealth;
-exports.checkMcpServerHealth = checkMcpServerHealth;
-exports.performHealthChecks = performHealthChecks;
-exports.aggregateHealthResults = aggregateHealthResults;
-exports.toHealthStatus = toHealthStatus;
-exports.checkHealth = checkHealth;
 /**
  * Check health of a single HTTP endpoint
  */
-async function checkHttpEndpoint(url, timeout = 5000) {
+export async function checkHttpEndpoint(url, timeout = 5000) {
     const startTime = Date.now();
     try {
         const controller = new AbortController();
@@ -63,13 +54,13 @@ async function checkHttpEndpoint(url, timeout = 5000) {
 /**
  * Check health of Ollama instance
  */
-async function checkOllamaHealth(baseUrl = 'http://localhost:11434') {
+export async function checkOllamaHealth(baseUrl = 'http://localhost:11434') {
     return checkHttpEndpoint(`${baseUrl}/api/tags`);
 }
 /**
  * Check health of MCP server process
  */
-async function checkMcpServerHealth(serverId, processId) {
+export async function checkMcpServerHealth(serverId, processId) {
     const startTime = Date.now();
     try {
         // In a real implementation, this would check the actual process
@@ -99,7 +90,7 @@ async function checkMcpServerHealth(serverId, processId) {
 /**
  * Perform health checks on multiple endpoints
  */
-async function performHealthChecks(config) {
+export async function performHealthChecks(config) {
     const checks = [];
     for (const endpoint of config.endpoints) {
         let result;
@@ -118,7 +109,7 @@ async function performHealthChecks(config) {
 /**
  * Aggregate health check results
  */
-function aggregateHealthResults(checks) {
+export function aggregateHealthResults(checks) {
     const summary = {
         total: checks.length,
         healthy: checks.filter(c => c.status === 'healthy').length,
@@ -144,7 +135,7 @@ function aggregateHealthResults(checks) {
 /**
  * Convert health results to status object
  */
-function toHealthStatus(aggregated) {
+export function toHealthStatus(aggregated) {
     return {
         status: aggregated.overall,
         timestamp: new Date(),
@@ -172,7 +163,7 @@ async function mockCheckProcess(processId) {
     return processId > 0;
 }
 // Generic health check wrapper for adapter compatibility
-async function checkHealth(endpoint, timeout) {
+export async function checkHealth(endpoint, timeout) {
     const result = await checkHttpEndpoint(endpoint, timeout || 5000);
     return {
         status: result.status === "healthy" ? 'healthy' : 'unhealthy',

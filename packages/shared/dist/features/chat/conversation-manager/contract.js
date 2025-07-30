@@ -1,4 +1,3 @@
-"use strict";
 /**
  * Feature Contract: Chat Conversation Manager
  *
@@ -6,5 +5,5 @@
  * conversation manager feature. This is the SINGLE SOURCE OF TRUTH for
  * what this feature can and cannot do.
  */
-Object.defineProperty(exports, "__esModule", { value: true });
+export {};
 //# sourceMappingURL=contract.js.map

@@ -1,19 +1,12 @@
-"use strict";
 /**
  * Capability Detector Utility
  * Pure functions for detecting model capabilities
  * Follows AI-Native architecture - utility functions only
  */
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.testVisionCapability = testVisionCapability;
-exports.testCodeCapability = testCodeCapability;
-exports.getDefaultDetectionMethods = getDefaultDetectionMethods;
-exports.summarizeCapabilities = summarizeCapabilities;
-exports.detectCapabilities = detectCapabilities;
 /**
  * Test a model's vision capabilities
  */
-async function testVisionCapability(modelEndpoint) {
+export async function testVisionCapability(modelEndpoint) {
     const startTime = Date.now();
     try {
         // This would be a real test in implementation
@@ -45,7 +38,7 @@ async function testVisionCapability(modelEndpoint) {
 /**
  * Test a model's code generation capabilities
  */
-async function testCodeCapability(modelEndpoint) {
+export async function testCodeCapability(modelEndpoint) {
     const startTime = Date.now();
     try {
         const hasCodeGen = await mockCodeTest(modelEndpoint);
@@ -76,7 +69,7 @@ async function testCodeCapability(modelEndpoint) {
 /**
  * Default detection methods for model capabilities
  */
-function getDefaultDetectionMethods() {
+export function getDefaultDetectionMethods() {
     return [
         {
             name: 'vision_test',
@@ -95,7 +88,7 @@ function getDefaultDetectionMethods() {
 /**
  * Combine detection results into capability summary
  */
-function summarizeCapabilities(results) {
+export function summarizeCapabilities(results) {
     const capabilities = results.filter(r => r.detected).map(r => r.capability);
     const averageConfidence = results.reduce((sum, r) => sum + r.confidence, 0) / results.length;
     return {
@@ -125,7 +118,7 @@ async function mockCodeTest(endpoint) {
 /**
  * Main capability detection function - combines all detection methods
  */
-async function detectCapabilities(modelName, options) {
+export async function detectCapabilities(modelName, options) {
     const { endpoint, timeout = 30000, methods = [], testImage = false } = options;
     try {
         // Simulate detection process with the available test functions

@@ -1,6 +1,5 @@
-"use strict";
 /**
  * Server-related events
  */
-Object.defineProperty(exports, "__esModule", { value: true });
+export {};
 //# sourceMappingURL=server-events.js.map

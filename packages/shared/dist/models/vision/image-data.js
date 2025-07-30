@@ -1,6 +1,5 @@
-"use strict";
 /**
  * Vision domain models
  */
-Object.defineProperty(exports, "__esModule", { value: true });
+export {};
 //# sourceMappingURL=image-data.js.map

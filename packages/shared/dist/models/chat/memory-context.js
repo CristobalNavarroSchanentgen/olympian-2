@@ -1,6 +1,5 @@
-"use strict";
 /**
  * Memory Context Models
  */
-Object.defineProperty(exports, "__esModule", { value: true });
+export {};
 //# sourceMappingURL=memory-context.js.map

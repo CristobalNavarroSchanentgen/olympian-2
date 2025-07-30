@@ -1,10 +1,7 @@
-"use strict";
 /**
  * Message sent event
  */
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.createMessageSentEvent = createMessageSentEvent;
-function createMessageSentEvent(messageId, conversationId, role, content, tokenCount, imageCount = 0, model) {
+export function createMessageSentEvent(messageId, conversationId, role, content, tokenCount, imageCount = 0, model) {
     return {
         type: 'message-sent',
         messageId,

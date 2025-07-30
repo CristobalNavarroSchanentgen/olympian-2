@@ -1,13 +1,9 @@
-"use strict";
 /**
  * Configuration Schema: MCP Tool Executor
  *
  * Validates configuration for MCP tool execution and management.
  */
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.toolExecutorDefaults = void 0;
-exports.validateToolExecutorConfig = validateToolExecutorConfig;
-exports.toolExecutorDefaults = {
+export const toolExecutorDefaults = {
     execution: {
         maxConcurrentTools: 5,
         executionTimeout: 60000,
@@ -33,7 +29,7 @@ exports.toolExecutorDefaults = {
         cachePersistent: false,
     },
 };
-function validateToolExecutorConfig(config) {
+export function validateToolExecutorConfig(config) {
     if (!config || typeof config !== 'object')
         return false;
     const c = config;

@@ -1,13 +1,9 @@
-"use strict";
 /**
  * Configuration Schema: Model Detector
  *
  * Validates configuration for model capability detection.
  */
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.modelDetectorDefaults = void 0;
-exports.validateModelDetectorConfig = validateModelDetectorConfig;
-exports.modelDetectorDefaults = {
+export const modelDetectorDefaults = {
     detection: {
         scanMethod: 'automatic',
         testTimeout: 30000,
@@ -33,7 +29,7 @@ exports.modelDetectorDefaults = {
         backupOverrides: true,
     },
 };
-function validateModelDetectorConfig(config) {
+export function validateModelDetectorConfig(config) {
     if (!config || typeof config !== 'object')
         return false;
     const c = config;

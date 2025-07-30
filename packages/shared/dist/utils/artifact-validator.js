@@ -1,11 +1,8 @@
-"use strict";
 /**
  * Artifact Validator Utility
  * Pure functions for validating artifacts
  */
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.validateArtifact = validateArtifact;
-function validateArtifact(artifact) {
+export function validateArtifact(artifact) {
     const warnings = [];
     const suggestions = [];
     const errors = [];

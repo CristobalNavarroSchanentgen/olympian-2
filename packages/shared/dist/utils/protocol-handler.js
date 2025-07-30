@@ -1,13 +1,7 @@
-"use strict";
 /**
  * Protocol Handler Utility
  */
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.parseMessage = parseMessage;
-exports.formatMessage = formatMessage;
-exports.createRequest = createRequest;
-exports.createProtocolHandler = createProtocolHandler;
-function parseMessage(data) {
+export function parseMessage(data) {
     try {
         const parsed = JSON.parse(data);
         return parsed;
@@ -16,17 +10,17 @@ function parseMessage(data) {
         return null;
     }
 }
-function formatMessage(message) {
+export function formatMessage(message) {
     return JSON.stringify(message);
 }
-function createRequest(method, params) {
+export function createRequest(method, params) {
     return {
         id: Date.now().toString(),
         method,
         params
     };
 }
-function createProtocolHandler() {
+export function createProtocolHandler() {
     const messageCallbacks = [];
     return {
         async sendMessage(message) {

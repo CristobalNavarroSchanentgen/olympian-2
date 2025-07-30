@@ -1,13 +1,9 @@
-"use strict";
 /**
  * Configuration Schema: Chat Memory Manager
  *
  * Validates configuration for context and memory management.
  */
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.memoryManagerDefaults = void 0;
-exports.validateMemoryManagerConfig = validateMemoryManagerConfig;
-exports.memoryManagerDefaults = {
+export const memoryManagerDefaults = {
     context: {
         defaultTokenBudget: 4000,
         maxTokenBudget: 8000,
@@ -32,7 +28,7 @@ exports.memoryManagerDefaults = {
         maxCachedContexts: 50,
     },
 };
-function validateMemoryManagerConfig(config) {
+export function validateMemoryManagerConfig(config) {
     if (!config || typeof config !== 'object')
         return false;
     const c = config;

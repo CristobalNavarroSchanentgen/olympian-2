@@ -1,17 +1,12 @@
-"use strict";
 /**
  * Model Registry Helper Utilities
  */
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.getFormattedModelList = getFormattedModelList;
-exports.isRegistryModeEnabled = isRegistryModeEnabled;
-exports.getModelsByCapabilityGroup = getModelsByCapabilityGroup;
-const model_registry_1 = require("../models/connection/model-registry");
+import { PREDEFINED_MODEL_REGISTRY } from '../models/connection/model-registry';
 /**
  * Get formatted model information for UI display
  */
-function getFormattedModelList() {
-    return model_registry_1.PREDEFINED_MODEL_REGISTRY.map(model => {
+export function getFormattedModelList() {
+    return PREDEFINED_MODEL_REGISTRY.map(model => {
         const capabilities = [];
         if (model.hasVision)
             capabilities.push('Vision');
@@ -58,13 +53,13 @@ function generateModelDescription(model) {
 /**
  * Check if registry mode is enabled
  */
-function isRegistryModeEnabled() {
+export function isRegistryModeEnabled() {
     return process.env.AUTO_SCAN_MODELS === 'false';
 }
 /**
  * Get models grouped by capability
  */
-function getModelsByCapabilityGroup() {
+export function getModelsByCapabilityGroup() {
     const groups = {
         'Vision Models': [],
         'Tool-Enabled Models': [],

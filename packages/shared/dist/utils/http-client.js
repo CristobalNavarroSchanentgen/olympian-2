@@ -1,13 +1,8 @@
-"use strict";
 /**
  * HTTP Client Utility
  * Pure functions for HTTP requests with verbose logging support
  */
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.httpRequest = exports.httpClient = exports.HttpError = void 0;
-exports.makeHttpRequest = makeHttpRequest;
-exports.createHttpClient = createHttpClient;
-class HttpError extends Error {
+export class HttpError extends Error {
     status;
     statusText;
     data;
@@ -19,7 +14,6 @@ class HttpError extends Error {
         this.name = 'HttpError';
     }
 }
-exports.HttpError = HttpError;
 // Debug logging configuration
 const DEBUG_HTTP = process.env.DEBUG_HTTP === 'true' || process.env.NODE_ENV === 'development';
 const DEBUG_OLLAMA = process.env.DEBUG_OLLAMA === 'true';
@@ -93,7 +87,7 @@ ${prefix} ERROR [${requestId}] ❌`);
     console.log(`🔗 URL: ${url}`);
     console.log('');
 }
-async function makeHttpRequest(url, config) {
+export async function makeHttpRequest(url, config) {
     const startTime = Date.now();
     const requestId = Math.random().toString(36).substring(7);
     const { method = 'GET', headers = {}, body, timeout = 30000, retries = 3, retryDelay = 1000 } = config;
@@ -157,7 +151,7 @@ async function makeHttpRequest(url, config) {
     }
     throw lastError;
 }
-function createHttpClient(baseConfig = {}) {
+export function createHttpClient(baseConfig = {}) {
     return {
         async request(url, config = {}) {
             return makeHttpRequest(url, { method: 'GET', ...baseConfig, ...config });
@@ -170,6 +164,6 @@ function createHttpClient(baseConfig = {}) {
         }
     };
 }
-exports.httpClient = createHttpClient();
-exports.httpRequest = makeHttpRequest;
+export const httpClient = createHttpClient();
+export const httpRequest = makeHttpRequest;
 //# sourceMappingURL=http-client.js.map

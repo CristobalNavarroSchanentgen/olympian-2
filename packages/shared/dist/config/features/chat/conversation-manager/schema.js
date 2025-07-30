@@ -1,14 +1,10 @@
-"use strict";
 /**
  * Configuration Schema: Chat Conversation Manager
  *
  * Validates runtime configuration for conversation lifecycle management.
  * Pure validation schema - no behavior or side effects.
  */
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.conversationManagerDefaults = void 0;
-exports.validateConversationManagerConfig = validateConversationManagerConfig;
-exports.conversationManagerDefaults = {
+export const conversationManagerDefaults = {
     database: {
         collectionName: 'conversations',
         connectionTimeout: 5000,
@@ -31,7 +27,7 @@ exports.conversationManagerDefaults = {
         archiveAfterDays: 365,
     },
 };
-function validateConversationManagerConfig(config) {
+export function validateConversationManagerConfig(config) {
     if (!config || typeof config !== 'object')
         return false;
     const c = config;

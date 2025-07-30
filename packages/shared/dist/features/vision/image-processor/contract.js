@@ -1,8 +1,7 @@
-"use strict";
 /**
  * Feature Contract: Vision Image Processor
  *
  * Handles image upload, processing, and vision model integration.
  */
-Object.defineProperty(exports, "__esModule", { value: true });
+export {};
 //# sourceMappingURL=contract.js.map

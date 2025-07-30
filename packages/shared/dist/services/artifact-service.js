@@ -1,6 +1,5 @@
-"use strict";
 /**
  * Artifact management service interface
  */
-Object.defineProperty(exports, "__esModule", { value: true });
+export {};
 //# sourceMappingURL=artifact-service.js.map

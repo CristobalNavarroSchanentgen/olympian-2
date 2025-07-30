@@ -1,7 +1,6 @@
-"use strict";
 /**
  * Version Model
  * Represents an artifact version in the system
  */
-Object.defineProperty(exports, "__esModule", { value: true });
+export {};
 //# sourceMappingURL=version.js.map

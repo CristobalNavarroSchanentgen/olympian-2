@@ -1,6 +1,5 @@
-"use strict";
 /**
  * Connection service interface
  */
-Object.defineProperty(exports, "__esModule", { value: true });
+export {};
 //# sourceMappingURL=connection-service.js.map

@@ -1,6 +1,5 @@
-"use strict";
 /**
  * Memory-related events
  */
-Object.defineProperty(exports, "__esModule", { value: true });
+export {};
 //# sourceMappingURL=memory-events.js.map

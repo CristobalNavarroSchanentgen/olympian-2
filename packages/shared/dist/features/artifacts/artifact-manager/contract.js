@@ -1,8 +1,7 @@
-"use strict";
 /**
  * Feature Contract: Artifact Manager
  *
  * Manages creation, versioning, and lifecycle of conversation artifacts.
  */
-Object.defineProperty(exports, "__esModule", { value: true });
+export {};
 //# sourceMappingURL=contract.js.map

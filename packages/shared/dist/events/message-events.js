@@ -1,6 +1,5 @@
-"use strict";
 /**
  * Message-related events
  */
-Object.defineProperty(exports, "__esModule", { value: true });
+export {};
 //# sourceMappingURL=message-events.js.map

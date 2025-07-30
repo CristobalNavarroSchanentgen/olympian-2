@@ -1,10 +1,7 @@
-"use strict";
 /**
  * Tokens processed event
  */
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.createTokensProcessedEvent = createTokensProcessedEvent;
-function createTokensProcessedEvent(conversationId, messageId, tokenCount, cumulativeTokens, model, processingTime, streamingComplete, contextWindowUsed) {
+export function createTokensProcessedEvent(conversationId, messageId, tokenCount, cumulativeTokens, model, processingTime, streamingComplete, contextWindowUsed) {
     return {
         type: 'tokens-processed',
         conversationId,

@@ -1,10 +1,7 @@
-"use strict";
 /**
  * Tool invoked event
  */
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.createToolInvokedEvent = createToolInvokedEvent;
-function createToolInvokedEvent(toolName, serverName, invocationId, arguments_, timeout, retryCount = 0, conversationId, messageId) {
+export function createToolInvokedEvent(toolName, serverName, invocationId, arguments_, timeout, retryCount = 0, conversationId, messageId) {
     return {
         type: 'tool-invoked',
         toolName,

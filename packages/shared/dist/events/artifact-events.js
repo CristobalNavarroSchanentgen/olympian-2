@@ -1,6 +1,5 @@
-"use strict";
 /**
  * Artifact-related events
  */
-Object.defineProperty(exports, "__esModule", { value: true });
+export {};
 //# sourceMappingURL=artifact-events.js.map

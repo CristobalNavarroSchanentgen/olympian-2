@@ -1,13 +1,8 @@
-"use strict";
 /**
  * Context Manager Utility
  * Pure functions for managing conversation context
  */
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.calculateContextWindow = calculateContextWindow;
-exports.optimizeMessageHistory = optimizeMessageHistory;
-exports.createMemoryContext = createMemoryContext;
-function calculateContextWindow(maxTokens = 4096, systemTokens = 100, responseTokens = 500) {
+export function calculateContextWindow(maxTokens = 4096, systemTokens = 100, responseTokens = 500) {
     return {
         maxTokens,
         reservedSystemTokens: systemTokens,
@@ -15,7 +10,7 @@ function calculateContextWindow(maxTokens = 4096, systemTokens = 100, responseTo
         availableForHistory: maxTokens - systemTokens - responseTokens
     };
 }
-function optimizeMessageHistory(messages, availableTokens, strategy) {
+export function optimizeMessageHistory(messages, availableTokens, strategy) {
     if (messages.length === 0)
         return [];
     // Keep system messages if strategy says so
@@ -45,7 +40,7 @@ function optimizeMessageHistory(messages, availableTokens, strategy) {
         : selectedMessages;
     return [...systemMessages, ...finalMessages];
 }
-function createMemoryContext(conversationId, tokenBudget, usedTokens = 0) {
+export function createMemoryContext(conversationId, tokenBudget, usedTokens = 0) {
     return {
         conversationId,
         tokenBudget,

@@ -1,6 +1,5 @@
-"use strict";
 /**
  * Model capability detection service interface
  */
-Object.defineProperty(exports, "__esModule", { value: true });
+export {};
 //# sourceMappingURL=detection-service.js.map

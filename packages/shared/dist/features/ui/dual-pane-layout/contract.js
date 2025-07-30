@@ -1,4 +1,3 @@
-"use strict";
 // Contract for dual-pane layout feature
-Object.defineProperty(exports, "__esModule", { value: true });
+export {};
 //# sourceMappingURL=contract.js.map

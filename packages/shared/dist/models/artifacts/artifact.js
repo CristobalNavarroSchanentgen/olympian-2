@@ -1,7 +1,6 @@
-"use strict";
 /**
  * Artifact Model
  * Represents a created artifact in the system
  */
-Object.defineProperty(exports, "__esModule", { value: true });
+export {};
 //# sourceMappingURL=artifact.js.map

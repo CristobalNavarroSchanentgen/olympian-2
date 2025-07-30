@@ -1,18 +1,12 @@
-"use strict";
 /**
  * Token Counter Utility
  * Pure functions for counting tokens
  */
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.countTokens = countTokens;
-exports.countMessageTokens = countMessageTokens;
-exports.calculateTokenBreakdown = calculateTokenBreakdown;
-exports.estimateTokens = estimateTokens;
-function countTokens(text) {
+export function countTokens(text) {
     // Rough estimation: ~4 characters per token for English
     return Math.ceil(text.length / 4);
 }
-function countMessageTokens(content, role = 'user') {
+export function countMessageTokens(content, role = 'user') {
     const contentTokens = countTokens(content);
     const roleTokens = countTokens(role);
     const formatTokens = 4; // For message formatting
@@ -23,7 +17,7 @@ function countMessageTokens(content, role = 'user') {
         total
     };
 }
-function calculateTokenBreakdown(messages) {
+export function calculateTokenBreakdown(messages) {
     let messagesTokens = 0;
     let contextTokens = 0;
     let systemTokens = 0;
@@ -55,7 +49,7 @@ function calculateTokenBreakdown(messages) {
     };
 }
 // Phase 1 stub - implement in Phase 2
-function estimateTokens(text) {
+export function estimateTokens(text) {
     return countTokens(text);
 }
 //# sourceMappingURL=token-counter.js.map

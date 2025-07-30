@@ -1,7 +1,9 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { ChevronDown, ChevronRight, Clock, BookOpen, Eye, Download, Trash2 } from 'lucide-react';
 import { reasoningService } from '../../services';
 import { ReasoningPanelProps, ReasoningBlock } from '@olympian/shared/features/ui/reasoning-panel/contract';
+import { ReasoningEvent } from "@olympian/shared/events/ui/reasoning-events";
+import { useEventSubscription } from "../../hooks/useEventSubscription";
 
 export function ReasoningPanel() {
   // AI-native service state

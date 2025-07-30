@@ -5,6 +5,8 @@ import { CodeEditor } from './CodeEditor';
 import { Sidebar } from '../chat/Sidebar';
 import { layoutService } from '../../services';
 import { DualPaneLayoutProps } from '@olympian/shared/features/ui/dual-pane-layout/contract';
+import { LayoutEvent } from "@olympian/shared/events/ui/layout-events";
+import { useEventSubscription } from "../../hooks/useEventSubscription";
 import { useChatStore } from '../../stores/chat-store';
 import { useAppStore } from '../../stores/app-store';
 import { chatService } from '../../services/chat-service';

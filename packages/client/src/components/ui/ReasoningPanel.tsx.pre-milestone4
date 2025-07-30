@@ -4,7 +4,6 @@ import { reasoningService } from '../../services';
 import { ReasoningPanelProps, ReasoningBlock } from '@olympian/shared/features/ui/reasoning-panel/contract';
 import { ReasoningEvent } from "@olympian/shared/events/ui/reasoning-events";
 import { useEventSubscription } from "../../hooks/useEventSubscription";
-// MILESTONE 4: Event-driven UI - This component uses event subscriptions instead of direct service calls
 
 export function ReasoningPanel() {
   // AI-native service state
@@ -26,8 +25,8 @@ export function ReasoningPanel() {
   // AI-native handlers using service
   const handleTogglePanel = async () => {
     try {
-      // Service will emit "reasoning-panel-toggled" event
-      await reasoningService.toggleReasoningPanel();
+      const updatedState = await reasoningService.toggleReasoningPanel();
+      setPanelState(updatedState);
     } catch (error) {
       console.error('Failed to toggle reasoning panel:', error);
     }
@@ -36,6 +35,7 @@ export function ReasoningPanel() {
   const handleClearReasoning = async () => {
     try {
       const updatedState = await reasoningService.clearReasoning();
+      setPanelState(updatedState);
       setExpandedBlocks(new Set());
     } catch (error) {
       console.error('Failed to clear reasoning:', error);

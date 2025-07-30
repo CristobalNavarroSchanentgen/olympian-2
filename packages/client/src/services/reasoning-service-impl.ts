@@ -1,6 +1,6 @@
 import { ReasoningService } from '@olympian/shared/services/reasoning-service';
 import { ReasoningBlock, ReasoningPanelProps, ExportFormat } from '@olympian/shared/features/ui/reasoning-panel/contract';
-import { reasoningDataAdapter } from '@olympian/shared/adapters/features/ui/reasoning-panel/reasoning-data-adapter';
+// import { reasoningDataAdapter } from '@olympian/shared/adapters/features/ui/reasoning-panel/reasoning-data-adapter';
 import { eventBus } from '@olympian/shared/utils/event-bus';
 import { 
   ReasoningBlockAddedEvent,

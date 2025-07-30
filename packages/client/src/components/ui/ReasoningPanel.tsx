@@ -6,7 +6,7 @@ import { ReasoningEvent } from "@olympian/shared/events/ui/reasoning-events";
 import { useEventSubscription } from "../../hooks/useEventSubscription";
 // MILESTONE 4: Event-driven UI - This component uses event subscriptions instead of direct service calls
 
-export function ReasoningPanel() {
+export function ReasoningPanel(props: { blocks: any; metadata: any; expanded: boolean; onToggle: () => void }) {
   // AI-native service state
   const [panelState, setPanelState] = useState<ReasoningPanelProps>(() =>
     reasoningService.getReasoningPanel()

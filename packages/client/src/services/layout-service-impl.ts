@@ -1,6 +1,6 @@
 import { LayoutService } from '@olympian/shared/services/layout-service';
 import { DualPaneLayoutProps, LayoutConfig } from '@olympian/shared/features/ui/dual-pane-layout/contract';
-import { layoutPersistenceAdapter } from '@olympian/shared/adapters/features/ui/dual-pane-layout/layout-persistence-adapter';
+// import { layoutPersistenceAdapter } from '@olympian/shared/adapters/features/ui/dual-pane-layout/layout-persistence-adapter';
 import { eventBus } from '@olympian/shared/utils/event-bus';
 import { 
   LayoutUpdatedEvent, 

@@ -5,11 +5,11 @@ import { useNavigate } from 'react-router-dom';
 import { chatService } from '../../services/chat-service';
 
 interface SidebarProps {
-  connected: boolean;
+  connected?: boolean; isOpen?: boolean; onToggle?: () => void;
   onNewConversation: () => void;
 }
 
-export const Sidebar: React.FC<SidebarProps> = ({ connected, onNewConversation }) => {
+export const Sidebar: React.FC<SidebarProps> = ({ connected = true, onNewConversation, isOpen, onToggle }) => {
   const navigate = useNavigate();
   const { conversations, currentConversationId, setConversations } = useChatStore();
 

@@ -6,20 +6,59 @@
   "types": "dist/index.d.ts",
   "exports": {
     ".": {
+      "import": "./dist/index.js",
       "require": "./dist/index.js",
       "types": "./dist/index.d.ts"
     },
-    "./utils/model-registry-helper": {
-      "require": "./dist/utils/model-registry-helper.js",
-      "types": "./dist/utils/model-registry-helper.d.ts"
+    "./utils/event-bus": {
+      "import": "./dist/utils/event-bus.js",
+      "require": "./dist/utils/event-bus.js",
+      "types": "./dist/utils/event-bus.d.ts"
     },
-    "./features/connection/model-registry": {
-      "require": "./dist/features/connection/model-registry/index.js",
-      "types": "./dist/features/connection/model-registry/index.d.ts"
+    "./utils/event-middleware": {
+      "import": "./dist/utils/event-middleware.js",
+      "require": "./dist/utils/event-middleware.js",
+      "types": "./dist/utils/event-middleware.d.ts"
     },
-    "./adapters/features/connection/model-registry/registry-loader-adapter": {
-      "require": "./dist/adapters/features/connection/model-registry/registry-loader-adapter.js",
-      "types": "./dist/adapters/features/connection/model-registry/registry-loader-adapter.d.ts"
+    "./features/ui/dual-pane-layout/contract": {
+      "import": "./dist/features/ui/dual-pane-layout/contract.js",
+      "require": "./dist/features/ui/dual-pane-layout/contract.js",
+      "types": "./dist/features/ui/dual-pane-layout/contract.d.ts"
+    },
+    "./features/ui/reasoning-panel/contract": {
+      "import": "./dist/features/ui/reasoning-panel/contract.js",
+      "require": "./dist/features/ui/reasoning-panel/contract.js",
+      "types": "./dist/features/ui/reasoning-panel/contract.d.ts"
+    },
+    "./events/ui/layout-events": {
+      "import": "./dist/events/ui/layout-events.js",
+      "require": "./dist/events/ui/layout-events.js",
+      "types": "./dist/events/ui/layout-events.d.ts"
+    },
+    "./events/ui/reasoning-events": {
+      "import": "./dist/events/ui/reasoning-events.js",
+      "require": "./dist/events/ui/reasoning-events.js",
+      "types": "./dist/events/ui/reasoning-events.d.ts"
+    },
+    "./services/layout-service": {
+      "import": "./dist/services/layout-service.js",
+      "require": "./dist/services/layout-service.js",
+      "types": "./dist/services/layout-service.d.ts"
+    },
+    "./services/reasoning-service": {
+      "import": "./dist/services/reasoning-service.js",
+      "require": "./dist/services/reasoning-service.js",
+      "types": "./dist/services/reasoning-service.d.ts"
+    },
+    "./adapters/features/ui/dual-pane-layout/layout-persistence-adapter": {
+      "import": "./dist/adapters/features/ui/dual-pane-layout/layout-persistence-adapter.js",
+      "require": "./dist/adapters/features/ui/dual-pane-layout/layout-persistence-adapter.js",
+      "types": "./dist/adapters/features/ui/dual-pane-layout/layout-persistence-adapter.d.ts"
+    },
+    "./adapters/features/ui/reasoning-panel/reasoning-data-adapter": {
+      "import": "./dist/adapters/features/ui/reasoning-panel/reasoning-data-adapter.js",
+      "require": "./dist/adapters/features/ui/reasoning-panel/reasoning-data-adapter.js",
+      "types": "./dist/adapters/features/ui/reasoning-panel/reasoning-data-adapter.d.ts"
     }
   },
   "scripts": {

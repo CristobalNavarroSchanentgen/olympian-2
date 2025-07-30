@@ -13,7 +13,7 @@ interface ApplicationHeaderProps {
   };
   onHistoryClick?: () => void;
   onConnectionsClick?: () => void;
-  onMCPClick?: () => void;
+  onMCPClick?: () => void; onToggleSidebar?: () => void; onToggleCodeEditor?: () => void; onToggleReasoningPanel?: () => void; connected?: boolean; sidebarOpen?: boolean; codeEditorOpen?: boolean; reasoningPanelOpen?: boolean;
 }
 
 const TEXT_MODELS = ['llama3.2:latest', 'llama3.2:3b', 'codellama:latest', 'mistral:latest'];

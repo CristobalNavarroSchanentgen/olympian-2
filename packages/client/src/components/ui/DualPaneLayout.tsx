@@ -31,9 +31,6 @@ export function DualPaneLayout() {
 
   // Subscribe to layout events
   useEventSubscription<LayoutEvent>("layout-updated", handleLayoutEvent);
-  useEventSubscription<LayoutEvent>("panel-toggled", handleLayoutEvent);
-    layoutService.getCurrentLayout()
-  );
 
   // Legacy store access (still needed for chat functionality until fully migrated)
   const { 
@@ -124,7 +121,7 @@ export function DualPaneLayout() {
       {/* Main Content */}
       <div className="flex-1 flex flex-col">
         {/* Header */}
-        <ApplicationHeader 
+        <ApplicationHeader title="Olympian AI" 
           onToggleSidebar={handleToggleSidebar}
           onToggleCodeEditor={handleToggleCodeEditor}
           onToggleReasoningPanel={handleToggleReasoningPanel}

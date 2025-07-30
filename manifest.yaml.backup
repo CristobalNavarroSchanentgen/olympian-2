@@ -3,6 +3,7 @@
 
 version: '1.0.0'
 name: 'olympian-ai-lightweight'
+    - model-registry-service
 description: 'AI-Native chat interface with integrated MCP support'
 
 # Core Domains and Features
@@ -121,6 +122,19 @@ domains:
         config: config/features/vision/image-processor/schema.ts
 
   artifacts:
+    features:
+      - name: artifact-manager
+        contract: features/artifacts/artifact-manager/contract.ts
+        adapters:
+          - artifact-storage-adapter
+          - version-tracker-adapter
+        services:
+          - artifact-service
+        events:
+          - artifact-created
+          - artifact-updated
+          - artifact-deleted
+        config: config/features/artifacts/artifact-manager/schema.ts
 
   ui:
     features:
@@ -147,19 +161,6 @@ domains:
           - reasoning-expanded
           - reasoning-collapsed
         config: config/features/ui/reasoning-panel/schema.ts
-    features:
-      - name: artifact-manager
-        contract: features/artifacts/artifact-manager/contract.ts
-        adapters:
-          - artifact-storage-adapter
-          - version-tracker-adapter
-        services:
-          - artifact-service
-        events:
-          - artifact-created
-          - artifact-updated
-          - artifact-deleted
-        config: config/features/artifacts/artifact-manager/schema.ts
 
 # External Dependencies (Services)
 services:
@@ -198,6 +199,15 @@ services:
     
   - name: artifact-service
     interface: services/artifact-service.ts
+    
+  - name: layout-service
+    interface: services/layout-service.ts
+    
+  - name: code-editor-service
+    interface: services/code-editor-service.ts
+    
+  - name: reasoning-service
+    interface: services/reasoning-service.ts
 
 # Event Schema
 events:
@@ -272,6 +282,18 @@ events:
     
   - name: artifact-deleted
     schema: events/artifact-deleted.ts
+    
+  - name: layout-changed
+    schema: events/layout-changed.ts
+    
+  - name: theme-switched
+    schema: events/theme-switched.ts
+    
+  - name: reasoning-expanded
+    schema: events/reasoning-expanded.ts
+    
+  - name: reasoning-collapsed
+    schema: events/reasoning-collapsed.ts
 
 # Models (Pure Types)
 models:
@@ -295,34 +317,13 @@ models:
     - processing-result.ts
     
   artifacts:
-
-  ui:
-    features:
-      - name: dual-pane-layout
-        contract: features/ui/dual-pane-layout/contract.ts
-        adapters:
-          - layout-persistence-adapter
-          - theme-adapter
-        services:
-          - layout-service
-          - code-editor-service
-        events:
-          - layout-changed
-          - theme-switched
-        config: config/features/ui/dual-pane-layout/schema.ts
-
-      - name: reasoning-panel
-        contract: features/ui/reasoning-panel/contract.ts
-        adapters:
-          - reasoning-data-adapter
-        services:
-          - reasoning-service
-        events:
-          - reasoning-expanded
-          - reasoning-collapsed
-        config: config/features/ui/reasoning-panel/schema.ts
     - artifact.ts
     - version.ts
+    
+  ui:
+    - layout-config.ts
+    - theme-config.ts
+    - reasoning-data.ts
 
 # Utilities (Pure Functions)
 utilities:
@@ -386,3 +387,22 @@ configuration:
   - mcp.config.json
   - docker-compose.yml
   - Makefile
+
+model-registry:
+  path: packages/shared/features/connection/model-registry
+  dependencies:
+    adapters:
+      - registry-loader: packages/shared/adapters/features/connection/model-registry/registry-loader-adapter.ts
+    services:
+      - model-registry-service
+    models:
+      - connection/model-registry
+    events:
+      - models-detected
+    config:
+      mode: registry | auto-scan
+  exports:
+    - ModelRegistryContract
+    - ModelRegistryManager
+    - createModelRegistryManager
+

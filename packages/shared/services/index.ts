@@ -8,3 +8,5 @@ export * from './message-service';
 export * from './streaming-service';
 export * from './vision-service';
 export * from "./model-registry-service";
+export * from './layout-service';
+export * from './reasoning-service';

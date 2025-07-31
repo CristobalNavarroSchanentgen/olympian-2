@@ -169,6 +169,12 @@ domains:
   - name: log-aggregation-requested
     schema: events/log-aggregation-requested.ts        config: config/features/ui/reasoning-panel/schema.ts
 
+  
+  observability:
+    - system-status.ts
+    - browser-log.ts
+    - log-collection-config.ts
+    - user-interaction.ts
   observability:
     features:
       - name: browser-logger
@@ -353,6 +359,12 @@ models:
     - theme-config.ts
     - reasoning-data.ts
     
+  
+  observability:
+    - system-status.ts
+    - browser-log.ts
+    - log-collection-config.ts
+    - user-interaction.ts
   observability:
     - browser-log.ts
     - log-collection-config.ts

@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { io, Socket } from 'socket.io-client';
 import { useAppStore } from '../stores/app-store';
+import { SystemStatusUpdate } from "../../models/observability/system-status";
 import { useChatStore } from '../stores/chat-store';
 
 export function useWebSocket() {
@@ -54,7 +55,7 @@ export function useWebSocket() {
       setStreaming(null);
     });
 
-    socket.on('status:update', (status) => {
+    socket.on('status:update', (status: SystemStatusUpdate) => {
       setSystemStatus({
         database: status.database?.connected || false,
         mcp: Array.isArray(status.mcp?.servers) && status.mcp.servers.some((s: any) => s.status === "running") || false,

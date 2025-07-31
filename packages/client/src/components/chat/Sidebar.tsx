@@ -38,7 +38,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ connected = true, onNewConvers
     e.stopPropagation();
     try {
       await chatService.deleteConversation(id);
-      setConversations(conversations.filter(c => c.id !== id));
+      setConversations((conversations || []).filter(c => c.id !== id));
       if (currentConversationId === id) {
         navigate('/chat');
       }

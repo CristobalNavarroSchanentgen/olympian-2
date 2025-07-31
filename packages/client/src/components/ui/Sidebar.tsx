@@ -38,7 +38,7 @@ export function Sidebar({ connected, onNewConversation, isOpen, onToggle }: Side
     
     try {
       await chatService.deleteConversation(conversationId);
-      const filtered = conversations.filter(c => c.id !== conversationId);
+      const filtered = (conversations || []).filter(c => c.id !== conversationId);
       setConversations(filtered);
       
       if (currentConversationId === conversationId) {
@@ -73,7 +73,7 @@ export function Sidebar({ connected, onNewConversation, isOpen, onToggle }: Side
       {/* Conversations List */}
       <div className="flex-1 overflow-y-auto custom-scrollbar p-2">
         <div className="space-y-1">
-          {conversations.map(conversation => (
+          {(conversations || []).map(conversation => (
             <div
               key={conversation.id}
               onClick={() => navigate(`/chat/${conversation.id}`)}

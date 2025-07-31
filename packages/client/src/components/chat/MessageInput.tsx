@@ -108,7 +108,7 @@ export function MessageInput() {
       {/* Selected Images Preview */}
       {selectedImages.length > 0 && (
         <div className="mb-4 flex flex-wrap gap-3 animate-slide-up">
-          {selectedImages.map((image, index) => (
+          {(selectedImages || []).map((image, index) => (
             <div key={index} className="relative">
               <img
                 src={image}

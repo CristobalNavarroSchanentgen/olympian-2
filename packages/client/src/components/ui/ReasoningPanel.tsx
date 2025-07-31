@@ -82,7 +82,7 @@ export function ReasoningPanel({ blocks, metadata, expanded, onToggle }: Reasoni
           </div>
         ) : (
           <div className="space-y-2">
-            {blocks.map(block => (
+            {(blocks || []).map(block => (
               <div key={block.id} className="border border-gray-600 rounded-lg overflow-hidden">
                 <button
                   onClick={() => toggleBlock(block.id)}

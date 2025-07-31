@@ -142,7 +142,7 @@ export function ConfigPage() {
                   <div className="mt-4">
                     <span className="text-sm text-muted-foreground mb-2 block">Models:</span>
                     <div className="space-y-1 max-h-32 overflow-y-auto">
-                      {models.map((model, idx) => (
+                      {(models || []).map((model, idx) => (
                         <div key={idx} className="text-sm font-mono px-2 py-1 bg-muted rounded">
                           {model.name}
                         </div>
@@ -175,7 +175,7 @@ export function ConfigPage() {
                   <div className="mt-4">
                     <span className="text-sm text-muted-foreground mb-2 block">Servers:</span>
                     <div className="space-y-2">
-                      {mcpServers.map((server, idx) => (
+                      {(mcpServers || []).map((server, idx) => (
                         <div key={idx} className="flex items-center justify-between p-2 bg-muted rounded">
                           <span className="text-sm font-mono">{server.name}</span>
                           <span className={`text-xs px-2 py-1 rounded ${

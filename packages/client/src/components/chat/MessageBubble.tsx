@@ -40,7 +40,7 @@ export function MessageBubble({ message }: MessageBubbleProps) {
           {/* Images */}
           {message.images && message.images.length > 0 && (
             <div className="mb-3 flex flex-wrap gap-3 animate-scale-in">
-              {message.images.map((image, idx) => (
+              {(message.images || []).map((image, idx) => (
                 <img
                   key={idx}
                   src={image}

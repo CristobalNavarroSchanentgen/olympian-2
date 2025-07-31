@@ -46,10 +46,10 @@ export const useChatStore = create<ChatState>()((set, get) => ({
   currentConversationId: null,
   setConversations: (conversations) => set({ conversations }),
   addConversation: (conversation) => set({ 
-    conversations: [conversation, ...get().conversations] 
+    conversations: [conversation, ...(get().conversations || [])] 
   }),
   updateConversation: (id, updates) => set({
-    conversations: get().conversations.map(c => 
+    conversations: get().conversations?.map(c => 
       c.id === id ? { ...c, ...updates } : c
     )
   }),
@@ -73,7 +73,7 @@ export const useChatStore = create<ChatState>()((set, get) => ({
     messages: Object.fromEntries(
       Object.entries(get().messages).map(([conversationId, msgs]) => [
         conversationId,
-        msgs.map(msg => msg.id === messageId ? { ...msg, ...updates } : msg)
+        ((msgs || []).map(msg => msg.id === messageId ? { ...msg, ...updates } : msg)
       ])
     )
   }),

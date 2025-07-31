@@ -57,7 +57,7 @@ export function useWebSocket() {
     socket.on('status:update', (status) => {
       setSystemStatus({
         database: status.database?.connected || false,
-        mcp: status.mcp?.servers?.some((s: any) => s.status === 'running') || false,
+        mcp: Array.isArray(status.mcp?.servers) && status.mcp.servers.some((s: any) => s.status === "running") || false,
         ollama: status.ollama?.connected || false,
       });
     });

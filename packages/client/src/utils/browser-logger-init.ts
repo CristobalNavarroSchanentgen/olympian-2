@@ -12,7 +12,7 @@ export function initializeBrowserLogger(): BrowserLogger {
   }
 
   // Configuration based on environment
-  const isDevelopment = import.meta.env.DEV;
+  const isDevelopment = import.meta.env.DEV || false;
   const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3001';
 
   globalLogger = createBrowserLogger({

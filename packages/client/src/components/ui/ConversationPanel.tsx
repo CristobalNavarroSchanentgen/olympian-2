@@ -5,31 +5,44 @@ import { ReasoningPanel } from './ReasoningPanel';
 import { useChatStore } from '../../stores/chat-store';
 
 interface ConversationPanelProps {
+  conversationId?: string | null;
   className?: string;
 }
 
-export function ConversationPanel({ className = '' }: ConversationPanelProps) {
+export function ConversationPanel({ conversationId, className = '' }: ConversationPanelProps) {
   const { currentConversationId, messages, conversations } = useChatStore();
   const [reasoningExpanded, setReasoningExpanded] = useState(false);
   
-  // Mock reasoning data - in real implementation this would come from the AI response
+  // Use the provided conversationId or fall back to the store's current one
+  const activeConversationId = conversationId || currentConversationId;
+  
+  // Mock reasoning data with proper structure
   const mockReasoningBlocks = [
     {
+      id: 'block-1',
       type: 'planning' as const,
       title: 'Understanding the request',
       content: 'Analyzing the user request to transform the UI to match dual-pane specifications with navy/blue theme and integrated code editor.',
+      stepNumber: 1,
+      timestamp: new Date(),
       duration: 1200
     },
     {
+      id: 'block-2',
       type: 'step' as const,
       title: 'Architecture analysis',
       content: 'Reviewing the current AI-native codebase structure and identifying components that need modification.',
+      stepNumber: 2,
+      timestamp: new Date(),
       duration: 800
     },
     {
+      id: 'block-3',
       type: 'step' as const,
       title: 'Implementation strategy',
       content: 'Planning the systematic transformation approach using editing tools to minimize token usage.',
+      stepNumber: 3,
+      timestamp: new Date(),
       duration: 950
     }
   ];
@@ -40,10 +53,10 @@ export function ConversationPanel({ className = '' }: ConversationPanelProps) {
     estimatedReadingTime: 1
   };
   
-  const currentMessages = currentConversationId ? messages[currentConversationId] || [] : [];
-  const currentConversation = conversations.find(c => c.id === currentConversationId);
+  const currentMessages = activeConversationId ? messages[activeConversationId] || [] : [];
+  const currentConversation = conversations.find(c => c.id === activeConversationId);
 
-  if (!currentConversationId) {
+  if (!activeConversationId) {
     return (
       <div className={`flex flex-col h-full ${className}`}>
         <div className="flex-1 flex items-center justify-center text-muted-foreground">

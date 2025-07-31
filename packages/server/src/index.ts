@@ -64,7 +64,7 @@ async function startServer() {
     console.log("🦙 Ollama service initialized");
 
     // Setup WebSocket handling
-    const wsHandler = new WebSocketHandler(io, dbService, mcpManager, ollamaService);
+    const wsHandler = new WebSocketHandler(io, conversationService, messageService, mcpManager, ollamaService);
     console.log("🔌 WebSocket handler initialized");
 
     // Setup all API routes with service injection

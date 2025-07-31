@@ -11,7 +11,7 @@ export declare class ConversationServiceImpl implements ConversationService {
     getConversation(id: string): Promise<Conversation | null>;
     updateConversation(id: string, updates: Partial<Pick<Conversation, 'title' | 'model' | 'metadata'>>): Promise<Conversation>;
     deleteConversation(id: string): Promise<boolean>;
-    listConversations(filter?: ConversationFilter, limit?: number, offset?: number): Promise<ConversationSummary[]>;
+    listConversations(filter?: ConversationFilter): Promise<ConversationSummary[]>;
     searchConversations(query: string, limit?: number): Promise<ConversationSummary[]>;
     getConversationCount(filter?: ConversationFilter): Promise<number>;
     conversationExists(id: string): Promise<boolean>;

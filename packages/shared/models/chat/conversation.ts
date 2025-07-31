@@ -27,4 +27,5 @@ export interface ConversationFilter {
   createdAfter?: Date;
   createdBefore?: Date;
   hasMessages?: boolean;
-}
+  since?: Date;
+  limit?: number;}

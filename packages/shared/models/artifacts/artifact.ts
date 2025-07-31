@@ -37,4 +37,5 @@ export interface ArtifactFilter {
   tags?: string[];
   createdAfter?: Date;
   createdBefore?: Date;
-}
+  since?: Date;
+  limit?: number;}

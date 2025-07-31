@@ -81,10 +81,9 @@ class ConversationRepository {
         return docs.map(doc => ({
             id: doc._id.toString(),
             title: doc.title,
-            model: doc.model,
-            createdAt: doc.createdAt,
-            updatedAt: doc.updatedAt,
-            messageCount: doc.messageCount
+            messageCount: doc.messageCount,
+            lastActivity: doc.updatedAt,
+            preview: doc.title.length > 50 ? doc.title.substring(0, 50) + "..." : undefined
         }));
     }
     async updateMessageCount(id, count) {

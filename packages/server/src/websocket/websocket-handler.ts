@@ -1,5 +1,6 @@
 import { Server as SocketIOServer, Socket } from 'socket.io';
-import { DatabaseService } from '../services/database-service-fix';
+import { ConversationService } from "@olympian/shared/services/conversation-service";
+import { MessageService } from "@olympian/shared/services/message-service";
 import { MCPManager } from '../mcp/mcp-manager-stub';
 import { OllamaService } from '../services/ollama-service';
 

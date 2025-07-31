@@ -213,4 +213,4 @@ class ArtifactServiceImpl {
     }
 }
 exports.ArtifactServiceImpl = ArtifactServiceImpl;
-//# sourceMappingURL=artifact-service-impl.js.map
+//# sourceMappingURL=artifact-service-impl.backup.js.map

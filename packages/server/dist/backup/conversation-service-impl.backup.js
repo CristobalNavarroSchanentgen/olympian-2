@@ -45,7 +45,7 @@ class ConversationServiceImpl {
         }
         return this.conversations.delete(id);
     }
-    async listConversations(filter, limit, offset) {
+    async listConversations(filter) {
         const conversations = Array.from(this.conversations.values());
         // Apply filtering if provided
         let filtered = conversations;
@@ -59,21 +59,14 @@ class ConversationServiceImpl {
             filtered = filtered.filter(c => c.createdAt <= filter.createdBefore);
         }
         // Convert to summaries and sort by updatedAt descending
-        const summaries = filtered
+        return filtered
             .map(c => ({
             id: c.id,
             title: c.title,
             messageCount: c.messageCount,
             lastActivity: c.updatedAt,
             preview: c.title.length > 50 ? c.title.substring(0, 50) + "..." : undefined
-        }))
-            .sort((a, b) => b.lastActivity.getTime() - a.lastActivity.getTime());
-        // Apply pagination
-        if (offset !== undefined) {
-            const sliced = summaries.slice(offset);
-            return limit !== undefined ? sliced.slice(0, limit) : sliced;
-        }
-        return limit !== undefined ? summaries.slice(0, limit) : summaries;
+        }));
     }
     // Additional required methods
     async searchConversations(query, limit) {
@@ -90,4 +83,4 @@ class ConversationServiceImpl {
     }
 }
 exports.ConversationServiceImpl = ConversationServiceImpl;
-//# sourceMappingURL=conversation-service-impl.js.map
+//# sourceMappingURL=conversation-service-impl.backup.js.map

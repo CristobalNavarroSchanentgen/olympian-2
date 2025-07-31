@@ -62,7 +62,7 @@ export class ConversationServiceImpl implements ConversationService {
     return this.conversations.delete(id);
   }
 
-  async listConversations(filter?: ConversationFilter): Promise<ConversationSummary[]> {
+  async listConversations(filter?: ConversationFilter, limit?: number, offset?: number): Promise<ConversationSummary[]> {
     const conversations = Array.from(this.conversations.values());
     
     // Apply filtering if provided
@@ -76,8 +76,9 @@ export class ConversationServiceImpl implements ConversationService {
     if (filter?.createdBefore) {
       filtered = filtered.filter(c => c.createdAt <= filter.createdBefore!);
     }
+    
     // Convert to summaries and sort by updatedAt descending
-    return filtered
+    const summaries = filtered
       .map(c => ({
         id: c.id,
         title: c.title,
@@ -85,8 +86,15 @@ export class ConversationServiceImpl implements ConversationService {
         lastActivity: c.updatedAt,
         preview: c.title.length > 50 ? c.title.substring(0, 50) + "..." : undefined
       }))
+      .sort((a, b) => b.lastActivity.getTime() - a.lastActivity.getTime());
+    
+    // Apply pagination
+    if (offset !== undefined) {
+      const sliced = summaries.slice(offset);
+      return limit !== undefined ? sliced.slice(0, limit) : sliced;
+    }
+    return limit !== undefined ? summaries.slice(0, limit) : summaries;
   }
-
 
   // Additional required methods
   

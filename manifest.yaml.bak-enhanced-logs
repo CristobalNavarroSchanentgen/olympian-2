@@ -157,32 +157,11 @@ domains:
           - reasoning-data-adapter
         services:
           - reasoning-service
-    
-  - name: logging-service
-    interface: services/logging-service.ts        events:
+        events:
           - reasoning-expanded
           - reasoning-collapsed
-    
-  - name: browser-log-captured
-    schema: events/browser-log-captured.ts
-    
-  - name: log-aggregation-requested
-    schema: events/log-aggregation-requested.ts        config: config/features/ui/reasoning-panel/schema.ts
+        config: config/features/ui/reasoning-panel/schema.ts
 
-  observability:
-    features:
-      - name: browser-logger
-        contract: features/observability/browser-logger/contract.ts
-        adapters:
-          - console-capture-adapter
-          - error-capture-adapter
-          - interaction-capture-adapter
-        services:
-          - logging-service
-        events:
-          - browser-log-captured
-          - log-aggregation-requested
-        config: config/features/observability/browser-logger/schema.ts
 # External Dependencies (Services)
 services:
   - name: conversation-service
@@ -228,9 +207,7 @@ services:
     interface: services/code-editor-service.ts
     
   - name: reasoning-service
-    
-  - name: logging-service
-    interface: services/logging-service.ts    interface: services/reasoning-service.ts
+    interface: services/reasoning-service.ts
 
 # Event Schema
 events:
@@ -316,12 +293,7 @@ events:
     schema: events/reasoning-expanded.ts
     
   - name: reasoning-collapsed
-    
-  - name: browser-log-captured
-    schema: events/browser-log-captured.ts
-    
-  - name: log-aggregation-requested
-    schema: events/log-aggregation-requested.ts    schema: events/reasoning-collapsed.ts
+    schema: events/reasoning-collapsed.ts
 
 # Models (Pure Types)
 models:
@@ -352,11 +324,7 @@ models:
     - layout-config.ts
     - theme-config.ts
     - reasoning-data.ts
-    
-  observability:
-    - browser-log.ts
-    - log-collection-config.ts
-    - user-interaction.ts
+
 # Utilities (Pure Functions)
 utilities:
   - name: token-counter

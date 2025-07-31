@@ -10,8 +10,7 @@ import { setupMessageRoutes } from './messages';
 import { setupArtifactRoutes } from './artifacts';
 import { setupMcpRoutes } from './mcp';
 import { setupOllamaRoutes } from './ollama';
-import logsRouter from './logs';
-
+import logsRouter from ./logs;
 // Service interfaces (contracts only)
 import { ConversationService } from '@olympian/shared/services/conversation-service';
 import { MessageService } from '@olympian/shared/services/message-service';
@@ -43,10 +42,6 @@ export function setupAllRoutes(app: Express, services: ApiServices) {
   // Integration routes
   setupMcpRoutes(app, services.mcpService);
   setupOllamaRoutes(app, services.modelRegistryService);
-  
-  // Observability routes
-  app.use('/api/logs', logsRouter);
-  
-  console.log('? All API routes configured');
-}l API routes configured');
+import logsRouter from ./logs;  
+  console.log('✅ All API routes configured');
 }

@@ -1,0 +1,15 @@
+
+  observability:
+    features:
+      - name: browser-logger
+        contract: features/observability/browser-logger/contract.ts
+        adapters:
+          - console-capture-adapter
+          - error-capture-adapter
+          - interaction-capture-adapter
+        services:
+          - logging-service
+        events:
+          - browser-log-captured
+          - log-aggregation-requested
+        config: config/features/observability/browser-logger/schema.ts

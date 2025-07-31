@@ -4,7 +4,7 @@
  */
 
 import { ArtifactService } from '@olympian/shared/services/artifact-service';
-import { Artifact, ArtifactType } from '@olympian/shared/models/chat/artifact';
+import { Artifact, ArtifactType } from '@olympian/shared/models/artifacts/artifact';
 
 export class ArtifactServiceImpl implements ArtifactService {
   private artifacts: Map<string, Artifact> = new Map();
@@ -13,12 +13,12 @@ export class ArtifactServiceImpl implements ArtifactService {
 
   async createArtifact(
     conversationId: string,
+    messageId: string,
+    type: string,
     title: string,
-    type: ArtifactType,
     content: string,
     metadata?: Record<string, unknown>
-  ): Promise<Artifact> {
-    const id = `art_${this.nextId++}`;
+  ): Promise<Artifact> {    const id = `art_${this.nextId++}`;
     const now = new Date();
     
     const artifact: Artifact = {
@@ -66,7 +66,7 @@ export class ArtifactServiceImpl implements ArtifactService {
     return updated;
   }
 
-  async deleteArtifact(id: string): Promise<void> {
+  async deleteArtifact(id: string): Promise<boolean> {
     const artifact = this.artifacts.get(id);
     if (!artifact) {
       throw new Error(`Artifact ${id} not found`);
@@ -77,9 +77,8 @@ export class ArtifactServiceImpl implements ArtifactService {
     const artifactIds = this.conversationArtifacts.get(conversationId) || [];
     const updatedIds = artifactIds.filter(artId => artId !== id);
     this.conversationArtifacts.set(conversationId, updatedIds);
-
     // Remove the artifact
-    this.artifacts.delete(id);
+    return this.artifacts.delete(id);
   }
 
   async getConversationArtifacts(conversationId: string): Promise<Artifact[]> {

@@ -38,7 +38,7 @@ export function setupMessageRoutes(app: any, messageService: MessageService) {
         });
       }
 
-      const draft = { content, metadata };
+      const draft = { content, role, metadata };
       const message = await messageService.createMessage(conversationId, draft, role);
       
       res.status(201).json({ message });

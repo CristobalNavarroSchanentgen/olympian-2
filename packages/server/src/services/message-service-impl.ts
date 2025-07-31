@@ -73,7 +73,7 @@ export class MessageServiceImpl implements MessageService {
     return messages.sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
   }
 
-  async deleteMessage(id: string): Promise<void> {
+  async deleteMessage(id: string): Promise<boolean> {
     const message = this.messages.get(id);
     if (!message) {
       throw new Error(`Message ${id} not found`);
@@ -87,19 +87,17 @@ export class MessageServiceImpl implements MessageService {
 
     // Remove the message
     this.messages.delete(id);
-  }
-}
 
-  // Additional interface methods (stubs for now)
+  }  // Additional interface methods
   async getMessageCount(conversationId?: string): Promise<number> {
     if (conversationId) {
-      return this.messages.filter(m => m.conversationId === conversationId).length;
+      return this.messages.size > 0 ? Array.from(this.messages.values()).filter(m => m.conversationId === conversationId).length : 0;
     }
-    return this.messages.length;
+    return this.messages.size;
   }
 
-  async searchMessages(query: string, conversationId?: string): Promise<any[]> {
-    let filtered = this.messages.filter(m => 
+  async searchMessages(query: string, conversationId?: string): Promise<Message[]> {
+    let filtered = Array.from(this.messages.values()).filter(m => 
       m.content.toLowerCase().includes(query.toLowerCase())
     );
     if (conversationId) {
@@ -108,43 +106,28 @@ export class MessageServiceImpl implements MessageService {
     return filtered;
   }
 
-  async getLatestMessage(conversationId: string): Promise<any | null> {
-    const messages = this.messages
+  async getLatestMessage(conversationId: string): Promise<Message | null> {
+    const messages = Array.from(this.messages.values())
       .filter(m => m.conversationId === conversationId)
-      .sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
+      .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
     return messages[0] || null;
   }
 
-  async deleteMessages(conversationId: string): Promise<void> {
-    this.messages = this.messages.filter(m => m.conversationId !== conversationId);
-  }
-
-  // Additional interface methods (stubs for now)
-  async getMessageCount(conversationId?: string): Promise<number> {
-    if (conversationId) {
-      return this.messages.filter(m => m.conversationId === conversationId).length;
-    }
-    return this.messages.length;
-  }
-
-  async searchMessages(query: string, conversationId?: string): Promise<any[]> {
-    let filtered = this.messages.filter(m => 
-      m.content.toLowerCase().includes(query.toLowerCase())
-    );
-    if (conversationId) {
-      filtered = filtered.filter(m => m.conversationId === conversationId);
-    }
-    return filtered;
-  }
-
-  async getLatestMessage(conversationId: string): Promise<any | null> {
-    const messages = this.messages
-      .filter(m => m.conversationId === conversationId)
-      .sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
-    return messages[0] || null;
-  }
-
-  async deleteMessages(conversationId: string): Promise<void> {
-    this.messages = this.messages.filter(m => m.conversationId !== conversationId);
+  async deleteMessages(messageIds: string[]): Promise<number> {
+    let deletedCount = 0;
+    messageIds.forEach(id => {
+      if (this.messages.delete(id)) {
+        deletedCount++;
+        // Remove from conversation messages mapping
+        for (const [conversationId, msgIds] of this.conversationMessages.entries()) {
+          const index = msgIds.indexOf(id);
+          if (index > -1) {
+            msgIds.splice(index, 1);
+            break;
+          }
+        }
+      }
+    });
+    return deletedCount;
   }
 }

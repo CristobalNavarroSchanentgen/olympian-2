@@ -1,2 +1,2 @@
-export declare function setupRoutes(app: any): void;
-export declare const simpleRoutes: typeof setupRoutes;
+import { ModelRegistryServiceImpl } from '../services/model-registry-service-impl';
+export declare function setupRoutes(app: any, modelRegistryService: ModelRegistryServiceImpl): void;

@@ -65,6 +65,42 @@ class MessageServiceImpl {
         this.conversationMessages.set(conversationId, updatedIds);
         // Remove the message
         this.messages.delete(id);
+    } // Additional interface methods
+    async getMessageCount(conversationId) {
+        if (conversationId) {
+            return this.messages.size > 0 ? Array.from(this.messages.values()).filter(m => m.conversationId === conversationId).length : 0;
+        }
+        return this.messages.size;
+    }
+    async searchMessages(query, conversationId) {
+        let filtered = Array.from(this.messages.values()).filter(m => m.content.toLowerCase().includes(query.toLowerCase()));
+        if (conversationId) {
+            filtered = filtered.filter(m => m.conversationId === conversationId);
+        }
+        return filtered;
+    }
+    async getLatestMessage(conversationId) {
+        const messages = Array.from(this.messages.values())
+            .filter(m => m.conversationId === conversationId)
+            .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+        return messages[0] || null;
+    }
+    async deleteMessages(messageIds) {
+        let deletedCount = 0;
+        messageIds.forEach(id => {
+            if (this.messages.delete(id)) {
+                deletedCount++;
+                // Remove from conversation messages mapping
+                for (const [conversationId, msgIds] of this.conversationMessages.entries()) {
+                    const index = msgIds.indexOf(id);
+                    if (index > -1) {
+                        msgIds.splice(index, 1);
+                        break;
+                    }
+                }
+            }
+        });
+        return deletedCount;
     }
 }
 exports.MessageServiceImpl = MessageServiceImpl;

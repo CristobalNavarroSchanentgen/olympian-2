@@ -33,7 +33,7 @@ function setupMessageRoutes(app, messageService) {
                     error: 'role must be user, assistant, or system'
                 });
             }
-            const draft = { content, metadata };
+            const draft = { content, role, metadata };
             const message = await messageService.createMessage(conversationId, draft, role);
             res.status(201).json({ message });
         }

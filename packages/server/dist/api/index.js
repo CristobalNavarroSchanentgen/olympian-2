@@ -17,7 +17,7 @@ const ollama_1 = require("./ollama");
  */
 function setupAllRoutes(app, services) {
     // Basic health/status routes
-    (0, simple_routes_1.setupRoutes)(app);
+    (0, simple_routes_1.setupRoutes)(app, services.modelRegistryService);
     // Core feature routes
     (0, conversations_1.setupConversationRoutes)(app, services.conversationService);
     (0, messages_1.setupMessageRoutes)(app, services.messageService);

@@ -12,5 +12,9 @@ export declare class MessageServiceImpl implements MessageService {
     getMessage(id: string): Promise<Message | null>;
     updateMessage(id: string, updates: Partial<Pick<Message, 'content' | 'metadata'>>): Promise<Message>;
     getConversationMessages(conversationId: string): Promise<Message[]>;
-    deleteMessage(id: string): Promise<void>;
+    deleteMessage(id: string): Promise<boolean>;
+    getMessageCount(conversationId?: string): Promise<number>;
+    searchMessages(query: string, conversationId?: string): Promise<Message[]>;
+    getLatestMessage(conversationId: string): Promise<Message | null>;
+    deleteMessages(messageIds: string[]): Promise<number>;
 }

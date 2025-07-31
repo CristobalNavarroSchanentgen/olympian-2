@@ -1,9 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.simpleRoutes = void 0;
 exports.setupRoutes = setupRoutes;
 const express_1 = require("express");
-function setupRoutes(app) {
+function setupRoutes(app, modelRegistryService) {
     const router = (0, express_1.Router)();
     router.get('/health', (req, res) => {
         res.json({ status: 'ok', timestamp: new Date() });
@@ -28,5 +27,4 @@ function setupRoutes(app) {
     });
     app.use('/api', router);
 }
-exports.simpleRoutes = setupRoutes;
 //# sourceMappingURL=simple-routes.js.map

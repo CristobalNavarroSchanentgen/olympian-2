@@ -9,7 +9,7 @@ class ArtifactServiceImpl {
     artifacts = new Map();
     conversationArtifacts = new Map();
     nextId = 1;
-    async createArtifact(conversationId, title, type, content, metadata) {
+    async createArtifact(conversationId, messageId, type, title, content, metadata) {
         const id = `art_${this.nextId++}`;
         const now = new Date();
         const artifact = {
@@ -57,7 +57,7 @@ class ArtifactServiceImpl {
         const updatedIds = artifactIds.filter(artId => artId !== id);
         this.conversationArtifacts.set(conversationId, updatedIds);
         // Remove the artifact
-        this.artifacts.delete(id);
+        return this.artifacts.delete(id);
     }
     async getConversationArtifacts(conversationId) {
         const artifactIds = this.conversationArtifacts.get(conversationId) || [];

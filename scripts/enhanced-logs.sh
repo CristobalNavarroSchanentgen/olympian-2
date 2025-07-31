@@ -73,11 +73,15 @@ stream_all_logs() {
     echo -e "${GREEN}? Streaming all logs (Ctrl+C to stop)...${NC}"
     echo ""
     
-    # Start Docker logs with unbuffered output
-    stdbuf -oL -eL docker-compose logs --no-color -f | stdbuf -oL sed "s/^/[DOCKER] /" | stdbuf -oL sed "s/\[DOCKER\]/\\033[0;34m[DOCKER]\\033[0m/" &
+    # Start Docker logs with immediate output (macOS compatible)
+    {
+        docker-compose logs --no-color -f | while IFS= read -r line; do
+            printf "\033[0;34m[DOCKER]\033[0m %s\n" "$line"
+        done
+    } &
     DOCKER_PID=$!
     
-    # Start browser logs polling with unbuffered output
+    # Start browser logs with immediate output  
     {
         while true; do
             if curl -s "$BACKEND_URL/api/logs?format=json" > /dev/null 2>&1; then

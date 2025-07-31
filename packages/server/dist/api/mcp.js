@@ -7,7 +7,7 @@ function setupMcpRoutes(app, mcpService) {
     // GET /api/mcp/servers - List all MCP servers
     router.get('/servers', async (req, res) => {
         try {
-            const servers = await mcpService.listServers();
+            const servers = await mcpService.getAllServerStatuses();
             res.json({ servers });
         }
         catch (error) {
@@ -52,7 +52,7 @@ function setupMcpRoutes(app, mcpService) {
     // GET /api/mcp/tools - List available tools from all servers
     router.get('/tools', async (req, res) => {
         try {
-            const tools = await mcpService.listTools();
+            const tools = await mcpService.getAvailableTools();
             res.json({ tools });
         }
         catch (error) {

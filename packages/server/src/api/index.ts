@@ -4,7 +4,7 @@
  */
 
 import { Express } from 'express';
-import { setupRoutes as setupSimpleRoutes } from './simple-routes';
+import { setupSimpleRoutes as setupSimpleRoutes } from './simple-routes';
 import { setupConversationRoutes } from './conversations';
 import { setupMessageRoutes } from './messages';
 import { setupArtifactRoutes } from './artifacts';

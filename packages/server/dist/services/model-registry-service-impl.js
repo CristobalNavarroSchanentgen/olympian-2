@@ -7,6 +7,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.ModelRegistryServiceImpl = void 0;
 class ModelRegistryServiceImpl {
     models = new Map();
+    registryMode = true;
     constructor() {
         // Initialize with some default models
         this.initializeDefaultModels();
@@ -43,14 +44,23 @@ class ModelRegistryServiceImpl {
         return Array.from(this.models.values());
     }
     async validateModelAccess(modelName) {
-        return this.models.has(modelName);
-    }
-    async getAllCapabilities() {
-        const allCapabilities = new Set();
-        for (const model of this.models.values()) {
-            model.capabilities.forEach(cap => allCapabilities.add(cap));
+        const hasModel = this.models.has(modelName);
+        if (hasModel) {
+            return { allowed: true };
         }
-        return Array.from(allCapabilities);
+        // Find similar models as alternatives
+        const suggestedAlternatives = Array.from(this.models.keys())
+            .filter(name => name.toLowerCase().includes(modelName.toLowerCase()) ||
+            modelName.toLowerCase().includes(name.toLowerCase()))
+            .slice(0, 3);
+        return {
+            allowed: false,
+            reason: `Model '${modelName}' not found in registry`,
+            suggestedAlternatives: suggestedAlternatives.length > 0 ? suggestedAlternatives : ['llama3.2', 'codellama']
+        };
+    }
+    async isRegistryMode() {
+        return this.registryMode;
     }
 }
 exports.ModelRegistryServiceImpl = ModelRegistryServiceImpl;

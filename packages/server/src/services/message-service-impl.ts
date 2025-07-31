@@ -87,7 +87,7 @@ export class MessageServiceImpl implements MessageService {
 
     // Remove the message
     this.messages.delete(id);
-
+    return true;
   }  // Additional interface methods
   async getMessageCount(conversationId?: string): Promise<number> {
     if (conversationId) {

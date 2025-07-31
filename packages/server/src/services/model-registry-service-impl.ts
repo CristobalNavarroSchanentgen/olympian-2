@@ -8,6 +8,7 @@ import { ModelCapabilityDefinition } from '@olympian/shared/models/connection';
 
 export class ModelRegistryServiceImpl implements ModelRegistryService {
   private models: Map<string, ModelCapabilityDefinition> = new Map();
+  private registryMode: boolean = true;
 
   constructor() {
     // Initialize with some default models
@@ -49,15 +50,31 @@ export class ModelRegistryServiceImpl implements ModelRegistryService {
     return Array.from(this.models.values());
   }
 
-  async validateModelAccess(modelName: string): Promise<boolean> {
-    return this.models.has(modelName);
+  async validateModelAccess(modelName: string): Promise<{
+    allowed: boolean;
+    reason?: string;
+    suggestedAlternatives?: string[];
+  }> {
+    const hasModel = this.models.has(modelName);
+    
+    if (hasModel) {
+      return { allowed: true };
+    }
+    
+    // Find similar models as alternatives
+    const suggestedAlternatives = Array.from(this.models.keys())
+      .filter(name => name.toLowerCase().includes(modelName.toLowerCase()) || 
+                     modelName.toLowerCase().includes(name.toLowerCase()))
+      .slice(0, 3);
+    
+    return {
+      allowed: false,
+      reason: `Model '${modelName}' not found in registry`,
+      suggestedAlternatives: suggestedAlternatives.length > 0 ? suggestedAlternatives : ['llama3.2', 'codellama']
+    };
   }
 
-  async getAllCapabilities(): Promise<string[]> {
-    const allCapabilities = new Set<string>();
-    for (const model of this.models.values()) {
-      model.capabilities.forEach(cap => allCapabilities.add(cap));
-    }
-    return Array.from(allCapabilities);
+  async isRegistryMode(): Promise<boolean> {
+    return this.registryMode;
   }
 }

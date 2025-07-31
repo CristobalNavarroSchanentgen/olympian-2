@@ -65,6 +65,7 @@ class MessageServiceImpl {
         this.conversationMessages.set(conversationId, updatedIds);
         // Remove the message
         this.messages.delete(id);
+        return true;
     } // Additional interface methods
     async getMessageCount(conversationId) {
         if (conversationId) {

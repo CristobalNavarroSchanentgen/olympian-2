@@ -1,29 +1,42 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.setupRoutes = setupRoutes;
+exports.setupSimpleRoutes = setupSimpleRoutes;
 const express_1 = require("express");
-function setupRoutes(app, modelRegistryService) {
+function setupSimpleRoutes(app, modelRegistryService) {
     const router = (0, express_1.Router)();
     router.get('/health', (req, res) => {
         res.json({ status: 'ok', timestamp: new Date() });
     });
-    router.get('/status', (req, res) => {
-        res.json({
-            database: true,
-            mcp: {},
-            ollama: true,
-            timestamp: new Date()
-        });
+    router.get('/status', async (req, res) => {
+        try {
+            const status = {
+                server: 'olympian-backend',
+                version: '1.0.0',
+                uptime: process.uptime(),
+                environment: process.env.NODE_ENV || 'development',
+                memory: process.memoryUsage(),
+                timestamp: new Date()
+            };
+            res.json(status);
+        }
+        catch (error) {
+            console.error('Error getting server status:', error);
+            res.status(500).json({ error: 'Failed to get server status' });
+        }
     });
     router.get('/models', async (req, res) => {
-        res.json({
-            models: await modelRegistryService.getAllRegisteredModels(),
-        });
-    });
-    router.get('/models/capabilities', async (req, res) => {
-        res.json({
-            capabilities: await modelRegistryService.getAllCapabilities(),
-        });
+        try {
+            const info = {
+                models: await modelRegistryService.getAllRegisteredModels(),
+                registryMode: await modelRegistryService.isRegistryMode(),
+                timestamp: new Date()
+            };
+            res.json(info);
+        }
+        catch (error) {
+            console.error('Error getting models info:', error);
+            res.status(500).json({ error: 'Failed to get models info' });
+        }
     });
     app.use('/api', router);
 }

@@ -70,25 +70,21 @@ export class ConversationServiceImpl implements ConversationService {
     if (filter?.model) {
       filtered = filtered.filter(c => c.model === filter.model);
     }
-    if (filter?.dateRange) {
-      const { start, end } = filter.dateRange;
-      filtered = filtered.filter(c => {
-        const date = c.createdAt;
-        return (!start || date >= start) && (!end || date <= end);
-      });
+    if (filter?.createdAfter) {
+      filtered = filtered.filter(c => c.createdAt >= filter.createdAfter!);
     }
-
+    if (filter?.createdBefore) {
+      filtered = filtered.filter(c => c.createdAt <= filter.createdBefore!);
+    }
     // Convert to summaries and sort by updatedAt descending
     return filtered
       .map(c => ({
         id: c.id,
         title: c.title,
-        model: c.model,
         messageCount: c.messageCount,
-        lastMessageAt: c.updatedAt,
-        createdAt: c.createdAt
+        lastActivity: c.updatedAt,
+        preview: c.title.length > 50 ? c.title.substring(0, 50) + "..." : undefined
       }))
-      .sort((a, b) => b.lastMessageAt.getTime() - a.lastMessageAt.getTime());
   }
 
 

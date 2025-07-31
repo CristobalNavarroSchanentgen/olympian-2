@@ -3,9 +3,15 @@
  */
 export interface ModelCapabilityDefinition {
     modelName: string;
-    hasTools: boolean;
-    hasReasoning: boolean;
-    hasVision: boolean;
+    provider: string;
+    capabilities: string[];
+    contextLength: number;
+    maxTokens: number;
+    streaming: boolean;
+    metadata?: Record<string, unknown>;
+    hasTools?: boolean;
+    hasReasoning?: boolean;
+    hasVision?: boolean;
 }
 export interface ModelRegistry {
     models: ModelCapabilityDefinition[];

@@ -1,1 +1,0 @@
-        mcp: Array.isArray(status.mcp?.servers) && status.mcp.servers.some((s: any) => s.status === 'running') || false,

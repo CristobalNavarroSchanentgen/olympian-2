@@ -11,6 +11,8 @@ RUN npm ci
 COPY packages/shared/ ./packages/shared/
 COPY packages/client/ ./packages/client/
 
+COPY features/ ./features/
+COPY adapters/ ./adapters/
 RUN npm run build --workspace=packages/shared
 RUN npm run build --workspace=packages/client
 

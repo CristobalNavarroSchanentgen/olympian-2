@@ -13,6 +13,8 @@ COPY packages/server/package.json ./packages/server/
 RUN npm ci
 
 # Copy source files
+COPY features/ ./features/
+COPY adapters/ ./adapters/
 COPY packages/shared/ ./packages/shared/
 COPY packages/server/ ./packages/server/
 

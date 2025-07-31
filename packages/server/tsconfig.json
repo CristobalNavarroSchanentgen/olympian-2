@@ -4,7 +4,7 @@
     "module": "commonjs",
     "lib": ["ES2022"],
     "outDir": "./dist",
-    "rootDir": "./src",
+    "rootDir": "../../",
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
@@ -18,13 +18,13 @@
     "baseUrl": "."
   },
   "include": [
-    "src/**/*.ts"
+    "src/**/*.ts", "../../features/**/*.ts", "../../adapters/**/*.ts"
   ],
   "exclude": [
     "node_modules",
     "dist",
     "**/*.test.ts",
     "src/backup/**/*",
-    "**/*.backup.*"
+    "**/*.backup.*", "../../adapters/**/browser-logger/**/*", "../../features/observability/browser-logger/**/*", "../../features/ui/**/*"
   ]
 }

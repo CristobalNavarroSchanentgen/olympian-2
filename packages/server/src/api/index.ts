@@ -48,5 +48,4 @@ export function setupAllRoutes(app: Express, services: ApiServices) {
   app.use('/api/logs', logsRouter);
   
   console.log('? All API routes configured');
-}l API routes configured');
 }

@@ -34,7 +34,7 @@ export function useWebSocket() {
       addMessage(message);
     });
 
-    socket.on('chat:token', (data) => {
+    socket.on('chat:stream', (data) => {
       const { messageId, fullContent } = data;
       setStreaming(messageId, fullContent);
       updateMessage(messageId, { content: fullContent });
@@ -71,11 +71,11 @@ export function useWebSocket() {
 
   useEffect(() => {
     if (socketRef.current && currentConversationId) {
-      socketRef.current.emit('join:conversation', currentConversationId);
+      socketRef.current.emit('conversation:join', currentConversationId);
       
       return () => {
         if (socketRef.current) {
-          socketRef.current.emit('leave:conversation', currentConversationId);
+          socketRef.current.emit('conversation:leave', currentConversationId);
         }
       };
     }

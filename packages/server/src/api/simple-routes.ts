@@ -16,19 +16,16 @@ export function setupRoutes(app: any) {
     });
   });
   
-  // Model registry routes - temporarily disabled
   router.get('/models', async (req, res) => {
     res.json({
-      mode: 'temporary',
-      models: [],
-      message: 'Model registry temporarily disabled'
+      
+      models: await modelRegistryService.getAllRegisteredModels(),
     });
   });
   
   router.get('/models/capabilities', async (req, res) => {
     res.json({
-      capabilities: [],
-      message: 'Model registry temporarily disabled'
+      capabilities: await modelRegistryService.getAllCapabilities(),
     });
   });
 

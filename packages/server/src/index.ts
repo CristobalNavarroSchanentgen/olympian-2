@@ -6,7 +6,7 @@ import { Server as SocketIOServer } from "socket.io";
 import dotenv from "dotenv";
 
 // Service implementations  
-import { DatabaseService } from "./services/database-service-fix";
+import { getDatabaseService } from "./database";
 import { ConversationServiceImpl } from "./services/conversation-service-impl";
 import { MessageServiceImpl } from "./services/message-service-impl";
 import { ArtifactServiceImpl } from "./services/artifact-service-impl";
@@ -42,9 +42,9 @@ app.use(express.urlencoded({ extended: true, limit: "50mb" }));
 async function startServer() {
   try {
     // Initialize database
-    const dbService = new DatabaseService();
+    const dbService = getDatabaseService();
     await dbService.connect();
-    console.log("📊 Database connected");
+    console.log("📊 MongoDB connected and ready");
 
     // Initialize business logic services
     const conversationService = new ConversationServiceImpl();

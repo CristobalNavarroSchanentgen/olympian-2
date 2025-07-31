@@ -73,44 +73,35 @@ stream_all_logs() {
     echo -e "${GREEN}? Streaming all logs (Ctrl+C to stop)...${NC}"
     echo ""
     
-    # Start Docker logs with unbuffered output
-    stdbuf -oL -eL docker-compose logs --no-color -f | stdbuf -oL sed "s/^/[DOCKER] /" | stdbuf -oL sed "s/\[DOCKER\]/\\033[0;34m[DOCKER]\\033[0m/" &
-    DOCKER_PID=$!
-    
-    # Start browser logs polling with unbuffered output
+    # Use stdbuf to disable output buffering and stream directly
     {
+        # Docker logs with immediate output
+        stdbuf -oL docker-compose logs --no-color -f | 
+        stdbuf -oL sed "s/^/\[DOCKER\] /" | 
+        stdbuf -oL sed "s/\[DOCKER\]/\033[0;34m[DOCKER]\033[0m/" &
+        
+        # Browser logs with immediate output
         while true; do
             if curl -s "$BACKEND_URL/api/logs?format=json" > /dev/null 2>&1; then
-                LOGS=$(curl -s "$BACKEND_URL/api/logs?format=json" 2>/dev/null | jq -r '.logs[]? | "[" + .timestamp + "] [" + .level + "] [" + (.source // "browser") + "] " + .message' 2>/dev/null)
-                if [ -n "$LOGS" ]; then
+                LOGS=$(curl -s "$BACKEND_URL/api/logs?format=json" | jq -r ".logs[] | "[" + .timestamp + "] [" + .level + "] [" + .source + "] " + .message")
+                if [ ! -z "$LOGS" ]; then
                     echo "$LOGS" | while IFS= read -r line; do
                         if [[ $line == *"[error]"* ]]; then
-                            printf "\033[0;31m[BROWSER]\033[0m %s\n" "$line"
+                            echo -e "\033[0;31m[BROWSER]\033[0m $line"
                         elif [[ $line == *"[warn]"* ]]; then
-                            printf "\033[1;33m[BROWSER]\033[0m %s\n" "$line"
+                            echo -e "\033[1;33m[BROWSER]\033[0m $line"
                         else
-                            printf "\033[0;36m[BROWSER]\033[0m %s\n" "$line"
+                            echo -e "\033[0;36m[BROWSER]\033[0m $line"
                         fi
                     done
                 fi
             fi
-            sleep 3
-        done
-    } &
-    BROWSER_PID=$!
-    
-    # Handle cleanup on interrupt
-    cleanup() {
-        echo ""
-        echo -e "${YELLOW}? Stopping log streams...${NC}"
-        kill $DOCKER_PID $BROWSER_PID 2>/dev/null || true
-        exit 0
+            sleep 2
+        done &
+        
+        # Wait for interrupt
+        wait
     }
-    
-    trap cleanup INT TERM
-    
-    # Wait for interrupt
-    wait
 }
 
 export_logs() {

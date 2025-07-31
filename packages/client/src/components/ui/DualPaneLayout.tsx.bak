@@ -1,144 +1,74 @@
-import { useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { ChatInterface } from './ChatInterface';
 import { ApplicationHeader } from './ApplicationHeader';
-import { ConversationPanel } from './ConversationPanel';
-import { CodeEditor } from './CodeEditor';
-import { Sidebar } from '../chat/Sidebar';
-import { layoutService } from '../../services';
-import { DualPaneLayoutProps } from '@olympian/shared/features/ui/dual-pane-layout/contract';
+import { Sidebar } from './Sidebar';
 import { useChatStore } from '../../stores/chat-store';
 import { useAppStore } from '../../stores/app-store';
-import { chatService } from '../../services/chat-service';
+import { chatService } from '../../services/index';
 
 export function DualPaneLayout() {
-  // AI-native service state
-  const [layoutState, setLayoutState] = useState<DualPaneLayoutProps>(() => 
-    layoutService.getCurrentLayout()
-  );
-
-  // Legacy store access (still needed for chat functionality until fully migrated)
+  const { conversationId } = useParams();
   const { 
     setConversations, 
     currentConversationId, 
-    addConversation
+    setCurrentConversation, 
+    setMessages, 
+    setArtifacts 
   } = useChatStore();
-  
   const { connected } = useAppStore();
 
-  // Load layout configuration and conversations on mount
+  // Load initial data
   useEffect(() => {
-    const initializeLayout = async () => {
-      try {
-        // Load persisted layout
-        const savedLayout = await layoutService.loadLayout();
-        if (savedLayout) {
-          const updatedLayout = await layoutService.updateLayout(savedLayout);
-          setLayoutState(updatedLayout);
-        }
-      } catch (error) {
-        console.error('Failed to initialize layout:', error);
-      }
-    };
-
     const loadConversations = async () => {
       try {
-        const existingConversations = await chatService.getConversations();
-        setConversations(existingConversations);
-        
-        if (existingConversations.length === 0 || !currentConversationId) {
-          handleNewConversation();
-        }
+        const conversations = await chatService.getConversations();
+        setConversations(conversations);
       } catch (error) {
         console.error('Failed to load conversations:', error);
-        handleNewConversation();
       }
     };
 
-    initializeLayout();
     loadConversations();
-  }, []);
+  }, [setConversations]);
 
-  // AI-native layout handlers using service
-  const handleToggleSidebar = async () => {
-    try {
-      const updatedLayout = await layoutService.updateLayout({ 
-        sidebarOpen: !layoutState.sidebarOpen 
-      });
-      setLayoutState(updatedLayout);
-    } catch (error) {
-      console.error('Failed to toggle sidebar:', error);
+  // Handle conversation loading
+  useEffect(() => {
+    if (conversationId && conversationId !== currentConversationId) {
+      const loadConversation = async () => {
+        try {
+          setCurrentConversation(conversationId);
+          
+          const messages = await chatService.getMessages(conversationId);
+          setMessages(conversationId, messages);
+          
+          const artifacts = await chatService.getArtifacts(conversationId);
+          setArtifacts(conversationId, artifacts);
+        } catch (error) {
+          console.error('Failed to load conversation:', error);
+        }
+      };
+
+      loadConversation();
+    } else if (!conversationId) {
+      setCurrentConversation(null);
     }
-  };
-
-  const handleToggleCodeEditor = async () => {
-    try {
-      const updatedLayout = await layoutService.togglePanel('codeEditor');
-      setLayoutState(updatedLayout);
-    } catch (error) {
-      console.error('Failed to toggle code editor:', error);
-    }
-  };
-
-  const handleToggleReasoningPanel = async () => {
-    try {
-      const updatedLayout = await layoutService.togglePanel('reasoning');
-      setLayoutState(updatedLayout);
-    } catch (error) {
-      console.error('Failed to toggle reasoning panel:', error);
-    }
-  };
-
-  const handleNewConversation = () => {
-    const newConversation = addConversation('New Chat');
-    console.log('Created new conversation:', newConversation.id);
-  };
+  }, [conversationId, currentConversationId, setCurrentConversation, setMessages, setArtifacts]);
 
   return (
-    <div className="flex h-screen bg-gray-900 text-white">
-      {/* Sidebar */}
-      <Sidebar 
-        isOpen={layoutState.sidebarOpen}
-        onToggle={handleToggleSidebar}
-        onNewConversation={handleNewConversation}
-      />
-
-      {/* Main Content */}
-      <div className="flex-1 flex flex-col">
-        {/* Header */}
-        <ApplicationHeader 
-          onToggleSidebar={handleToggleSidebar}
-          onToggleCodeEditor={handleToggleCodeEditor}
-          onToggleReasoningPanel={handleToggleReasoningPanel}
+    <div className="flex flex-col h-screen">
+      <ApplicationHeader title="Olympian AI" />
+      <div className="flex flex-1 overflow-hidden">
+        <Sidebar 
           connected={connected}
-          sidebarOpen={layoutState.sidebarOpen}
-          codeEditorOpen={layoutState.codeEditorOpen}
-          reasoningPanelOpen={layoutState.reasoningPanelOpen}
+          onNewConversation={() => {}}
+          isOpen={true}
+          onToggle={() => {}}
         />
-
-        {/* Dual Pane Content */}
-        <div className="flex flex-1 overflow-hidden">
-          {/* Conversation Panel */}
-          <div 
-            className="flex flex-col border-r border-gray-700"
-            style={{ 
-              width: layoutState.codeEditorOpen 
-                ? `${layoutState.conversationPanelWidth}%` 
-                : '100%' 
-            }}
-          >
-            <ConversationPanel />
-          </div>
-
-          {/* Code Editor Panel */}
-          {layoutState.codeEditorOpen && (
-            <div 
-              className="flex flex-col"
-              style={{ 
-                width: `${100 - layoutState.conversationPanelWidth}%` 
-              }}
-            >
-              <CodeEditor />
-            </div>
-          )}
+        <div className="flex-1 flex flex-col">
+          <ChatInterface 
+            conversationId={conversationId || currentConversationId}
+          />
         </div>
       </div>
     </div>

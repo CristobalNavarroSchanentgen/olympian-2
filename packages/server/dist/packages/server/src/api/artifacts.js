@@ -12,7 +12,19 @@ function setupArtifactRoutes(app, artifactService) {
                 return res.status(400).json({ error: 'conversationId query parameter is required' });
             }
             const artifacts = await artifactService.getConversationArtifacts(conversationId);
-            res.json({ artifacts });
+            res.json(artifacts);
+        }
+        catch (error) {
+            console.error('Error getting artifacts:', error);
+            res.status(500).json({ error: 'Failed to get artifacts' });
+        }
+    });
+    // GET /api/artifacts/conversation/:conversationId - Get artifacts for a conversation (alternative route)
+    router.get('/conversation/:conversationId', async (req, res) => {
+        try {
+            const { conversationId } = req.params;
+            const artifacts = await artifactService.getConversationArtifacts(conversationId);
+            res.json(artifacts);
         }
         catch (error) {
             console.error('Error getting artifacts:', error);

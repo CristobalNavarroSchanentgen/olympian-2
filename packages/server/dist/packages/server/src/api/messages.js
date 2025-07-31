@@ -12,7 +12,19 @@ function setupMessageRoutes(app, messageService) {
                 return res.status(400).json({ error: 'conversationId query parameter is required' });
             }
             const messages = await messageService.getConversationMessages(conversationId);
-            res.json({ messages });
+            res.json(messages);
+        }
+        catch (error) {
+            console.error('Error getting messages:', error);
+            res.status(500).json({ error: 'Failed to get messages' });
+        }
+    });
+    // GET /api/messages/conversation/:conversationId - Get messages for a conversation (alternative route)
+    router.get('/conversation/:conversationId', async (req, res) => {
+        try {
+            const { conversationId } = req.params;
+            const messages = await messageService.getConversationMessages(conversationId);
+            res.json(messages);
         }
         catch (error) {
             console.error('Error getting messages:', error);

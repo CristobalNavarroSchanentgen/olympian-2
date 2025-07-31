@@ -69,7 +69,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ connected = true, onNewConvers
 
       <div className="flex-1 overflow-y-auto custom-scrollbar p-2">
         <div className="space-y-1">
-          {conversations.map((conv) => (
+          {(conversations || []).map((conv) => (
             <div
               key={conv.id}
               onClick={() => navigate(`/chat/${conv.id}`)}

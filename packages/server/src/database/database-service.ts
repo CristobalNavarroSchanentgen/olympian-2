@@ -21,7 +21,7 @@ export class DatabaseService {
   
   constructor(connectionString?: string) {
     this.connectionString = connectionString || 
-      process.env.MONGODB_URL || 
+      process.env.MONGODB_URI || 
       'mongodb://localhost:27017/olympian';
   }
   

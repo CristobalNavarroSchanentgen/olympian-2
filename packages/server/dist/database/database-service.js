@@ -13,7 +13,7 @@ class DatabaseService {
     connectionString;
     constructor(connectionString) {
         this.connectionString = connectionString ||
-            process.env.MONGODB_URL ||
+            process.env.MONGODB_URI ||
             'mongodb://localhost:27017/olympian';
     }
     async connect() {

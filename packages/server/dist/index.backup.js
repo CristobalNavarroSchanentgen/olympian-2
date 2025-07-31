@@ -10,7 +10,7 @@ const http_1 = require("http");
 const socket_io_1 = require("socket.io");
 const dotenv_1 = __importDefault(require("dotenv"));
 // Service implementations  
-const database_1 = require("./database");
+const database_service_fix_1 = require("./services/database-service-fix");
 const conversation_service_impl_1 = require("./services/conversation-service-impl");
 const message_service_impl_1 = require("./services/message-service-impl");
 const artifact_service_impl_1 = require("./services/artifact-service-impl");
@@ -40,9 +40,9 @@ app.use(express_1.default.urlencoded({ extended: true, limit: "50mb" }));
 async function startServer() {
     try {
         // Initialize database
-        const dbService = (0, database_1.getDatabaseService)();
+        const dbService = new database_service_fix_1.DatabaseService();
         await dbService.connect();
-        console.log("📊 MongoDB connected and ready");
+        console.log("📊 Database connected");
         // Initialize business logic services
         const conversationService = new conversation_service_impl_1.ConversationServiceImpl();
         const messageService = new message_service_impl_1.MessageServiceImpl();
@@ -79,4 +79,4 @@ async function startServer() {
     }
 }
 startServer();
-//# sourceMappingURL=index.js.map
+//# sourceMappingURL=index.backup.js.map

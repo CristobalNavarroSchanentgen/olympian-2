@@ -41,7 +41,7 @@ class ArtifactServiceImpl {
             ...updates,
             metadata: {
                 ...updates.metadata,
-                size: updates.content?.length || 0,
+                size: updates.content?.length,
                 version: updates.metadata?.version || 1
             }
         });
@@ -90,7 +90,7 @@ class ArtifactServiceImpl {
         this.artifactVersions.get(artifactId).push(version);
         return version;
     }
-    async restoreToVersion(artifactId, version) {
+    async restoreToVersion(artifactId, versionId) {
         const versions = this.artifactVersions.get(artifactId) || [];
         const version = versions.find(v => v.id === versionId);
         if (!version) {
@@ -101,7 +101,7 @@ class ArtifactServiceImpl {
             metadata: { version: version.version, restored: true }
         });
     }
-    async validateArtifact(type, content) {
+    async validateArtifact(artifactId) {
         const artifact = await this.getArtifact(artifactId);
         if (!artifact) {
             return { valid: false, errors: ['Artifact not found'] };
@@ -126,4 +126,4 @@ class ArtifactServiceImpl {
     }
 }
 exports.ArtifactServiceImpl = ArtifactServiceImpl;
-//# sourceMappingURL=artifact-service-impl.js.map
+//# sourceMappingURL=artifact-service-impl.backup2.js.map

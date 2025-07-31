@@ -19,8 +19,8 @@ export declare class ArtifactServiceImpl implements ArtifactService {
     listArtifacts(filter?: ArtifactFilter): Promise<Artifact[]>;
     getArtifactVersions(artifactId: string): Promise<ArtifactVersion[]>;
     createVersion(artifactId: string, content: string, changeDescription?: string): Promise<ArtifactVersion>;
-    restoreToVersion(artifactId: string, version: number): Promise<Artifact>;
-    validateArtifact(type: string, content: string): Promise<{
+    restoreToVersion(artifactId: string, versionId: string): Promise<Artifact>;
+    validateArtifact(artifactId: string): Promise<{
         valid: boolean;
         errors: string[];
     }>;

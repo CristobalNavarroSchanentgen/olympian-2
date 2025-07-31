@@ -1,19 +1,22 @@
 "use strict";
 /**
  * Message Service Implementation
- * In-memory storage for Phase 1 - will be replaced with database integration
+ * MongoDB-backed persistence for messages
  */
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.MessageServiceImpl = void 0;
+const message_repository_1 = require("../database/message-repository");
+const conversation_repository_1 = require("../database/conversation-repository");
 class MessageServiceImpl {
-    messages = new Map();
-    conversationMessages = new Map();
-    nextId = 1;
+    messageRepo;
+    conversationRepo;
+    constructor() {
+        this.messageRepo = new message_repository_1.MessageRepository();
+        this.conversationRepo = new conversation_repository_1.ConversationRepository();
+    }
     async createMessage(conversationId, draft, role) {
-        const id = `msg_${this.nextId++}`;
         const now = new Date();
-        const message = {
-            id,
+        const messageData = {
             conversationId,
             role,
             content: draft.content,
@@ -21,88 +24,81 @@ class MessageServiceImpl {
             updatedAt: now,
             metadata: draft.metadata || {}
         };
-        this.messages.set(id, message);
-        // Track message in conversation
-        if (!this.conversationMessages.has(conversationId)) {
-            this.conversationMessages.set(conversationId, []);
-        }
-        this.conversationMessages.get(conversationId).push(id);
+        const message = await this.messageRepo.create(messageData);
+        // Update conversation message count
+        const count = await this.messageRepo.countByConversation(conversationId);
+        await this.conversationRepo.updateMessageCount(conversationId, count);
         return message;
     }
     async getMessage(id) {
-        return this.messages.get(id) || null;
+        return await this.messageRepo.findById(id);
     }
     async updateMessage(id, updates) {
-        const message = this.messages.get(id);
-        if (!message) {
-            throw new Error(`Message ${id} not found`);
+        const updated = await this.messageRepo.update(id, updates);
+        if (!updated) {
+            return false;
         }
-        const updated = {
-            ...message,
-            ...updates,
-            updatedAt: new Date()
-        };
-        this.messages.set(id, updated);
         return updated;
     }
-    async getConversationMessages(conversationId) {
-        const messageIds = this.conversationMessages.get(conversationId) || [];
-        const messages = messageIds
-            .map(id => this.messages.get(id))
-            .filter((msg) => msg !== undefined);
-        // Sort by creation time
-        return messages.sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
-    }
     async deleteMessage(id) {
-        const message = this.messages.get(id);
+        const message = await this.messageRepo.findById(id);
         if (!message) {
-            throw new Error(`Message ${id} not found`);
+            return false;
         }
-        // Remove from conversation tracking
-        const conversationId = message.conversationId;
-        const messageIds = this.conversationMessages.get(conversationId) || [];
-        const updatedIds = messageIds.filter(msgId => msgId !== id);
-        this.conversationMessages.set(conversationId, updatedIds);
-        // Remove the message
-        this.messages.delete(id);
-        return true;
-    } // Additional interface methods
+        const deleted = await this.messageRepo.delete(id);
+        if (!deleted) {
+            return false;
+        }
+        // Update conversation message count
+        const count = await this.messageRepo.countByConversation(message.conversationId);
+        await this.conversationRepo.updateMessageCount(message.conversationId, count);
+    }
+    async getConversationMessages(conversationId, limit, offset) {
+        return await this.messageRepo.findByConversation(conversationId, { limit, offset });
+    }
+    async listMessages(filter) {
+        return await this.messageRepo.list(filter);
+    }
     async getMessageCount(conversationId) {
         if (conversationId) {
-            return this.messages.size > 0 ? Array.from(this.messages.values()).filter(m => m.conversationId === conversationId).length : 0;
+            return await this.messageRepo.countByConversation(conversationId);
         }
-        return this.messages.size;
+        else {
+            return await this.messageRepo.list({ limit: 0 }).then(() => 0);
+        }
     }
-    async searchMessages(query, conversationId) {
-        let filtered = Array.from(this.messages.values()).filter(m => m.content.toLowerCase().includes(query.toLowerCase()));
+    async getLatestMessages(conversationId, count) {
+        return await this.messageRepo.getLatestInConversation(conversationId, count);
+    }
+    async searchMessages(query, conversationId, limit) {
+        const filter = { limit };
         if (conversationId) {
-            filtered = filtered.filter(m => m.conversationId === conversationId);
+            filter.conversationId = conversationId;
         }
-        return filtered;
+        // Simple search implementation - MongoDB text search would be better for production
+        const messages = await this.messageRepo.list(filter);
+        return messages.filter(msg => msg.content.toLowerCase().includes(query.toLowerCase()));
     }
-    async getLatestMessage(conversationId) {
-        const messages = Array.from(this.messages.values())
-            .filter(m => m.conversationId === conversationId)
-            .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
-        return messages[0] || null;
-    }
-    async deleteMessages(messageIds) {
-        let deletedCount = 0;
-        messageIds.forEach(id => {
-            if (this.messages.delete(id)) {
-                deletedCount++;
-                // Remove from conversation messages mapping
-                for (const [conversationId, msgIds] of this.conversationMessages.entries()) {
-                    const index = msgIds.indexOf(id);
-                    if (index > -1) {
-                        msgIds.splice(index, 1);
-                        break;
-                    }
-                }
-            }
-        });
-        return deletedCount;
+    async deleteConversationMessages(conversationId) {
+        return await this.messageRepo.deleteByConversation(conversationId);
     }
 }
 exports.MessageServiceImpl = MessageServiceImpl;
+async;
+getLatestMessage(conversationId, string);
+Promise < message_1.Message | null > {
+    const: messages = await this.messageRepo.getLatestInConversation(conversationId, 1),
+    return: messages.length > 0 ? messages[0] : null
+};
+async;
+deleteMessages(messageIds, string[]);
+Promise < number > {
+    let, deletedCount = 0,
+    for(, id, of, messageIds) {
+        const deleted = await this.messageRepo.delete(id);
+        if (deleted)
+            deletedCount++;
+    },
+    return: deletedCount
+};
 //# sourceMappingURL=message-service-impl.js.map

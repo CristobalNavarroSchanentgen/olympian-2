@@ -1,146 +1,87 @@
 "use strict";
+/**
+ * Database Service - MongoDB Integration
+ * Provides centralized database connection and collection management
+ */
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.DatabaseService = void 0;
+exports.getDatabaseService = getDatabaseService;
 const mongodb_1 = require("mongodb");
 class DatabaseService {
-    client;
-    db;
-    constructor() {
-        const uri = process.env.MONGODB_URI || 'mongodb://root:olympian123@localhost:27017/olympian?authSource=admin&replicaSet=rs0';
-        this.client = new mongodb_1.MongoClient(uri);
+    client = null;
+    db = null;
+    connectionString;
+    constructor(connectionString) {
+        this.connectionString = connectionString ||
+            process.env.MONGODB_URL ||
+            'mongodb://localhost:27017/olympian';
     }
     async connect() {
-        await this.client.connect();
-        this.db = this.client.db('olympian');
-        console.log('📊 Connected to MongoDB');
+        try {
+            this.client = new mongodb_1.MongoClient(this.connectionString);
+            await this.client.connect();
+            // Extract database name from connection string or use default
+            const dbName = this.extractDbName(this.connectionString) || 'olympian';
+            this.db = this.client.db(dbName);
+            // Create indexes for performance
+            await this.createIndexes();
+            console.log(`✅ MongoDB connected: ${dbName}`);
+        }
+        catch (error) {
+            console.error('❌ MongoDB connection failed:', error);
+            throw error;
+        }
     }
     async disconnect() {
-        await this.client.close();
+        if (this.client) {
+            await this.client.close();
+            this.client = null;
+            this.db = null;
+            console.log('🔌 MongoDB disconnected');
+        }
     }
-    // Conversation operations
-    async createConversation(conversation) {
-        const coll = this.db.collection('conversations');
-        const result = await coll.insertOne({
-            ...conversation,
-            id: new Date().getTime().toString(),
-            createdAt: new Date(),
-            updatedAt: new Date()
-        });
-        return await coll.findOne({ _id: result.insertedId });
+    getCollections() {
+        if (!this.db) {
+            throw new Error('Database not connected. Call connect() first.');
+        }
+        return {
+            conversations: this.db.collection('conversations'),
+            messages: this.db.collection('messages'),
+            artifacts: this.db.collection('artifacts')
+        };
     }
-    async getConversation(id) {
-        const coll = this.db.collection('conversations');
-        return await coll.findOne({ id });
+    isConnected() {
+        return this.client !== null && this.db !== null;
     }
-    async updateConversation(id, updates) {
-        const coll = this.db.collection('conversations');
-        await coll.updateOne({ id }, { $set: { ...updates, updatedAt: new Date() } });
+    extractDbName(connectionString) {
+        const match = connectionString.match(/\/([^/?]+)(\?|$)/);
+        return match ? match[1] : null;
     }
-    async deleteConversation(id) {
-        const coll = this.db.collection('conversations');
-        await coll.deleteOne({ id });
-        // Also delete related messages and artifacts
-        await this.db.collection('messages').deleteMany({ conversationId: id });
-        await this.db.collection('artifacts').deleteMany({ conversationId: id });
-    }
-    async listConversations(limit = 50, offset = 0) {
-        const coll = this.db.collection('conversations');
-        return await coll
-            .find({})
-            .sort({ updatedAt: -1 })
-            .limit(limit)
-            .skip(offset)
-            .toArray();
-    }
-    async searchConversations(query) {
-        const coll = this.db.collection('conversations');
-        return await coll
-            .find({
-            $or: [
-                { title: { $regex: query, $options: 'i' } },
-                { model: { $regex: query, $options: 'i' } }
-            ]
-        })
-            .sort({ updatedAt: -1 })
-            .toArray();
-    }
-    // Message operations
-    async createMessage(message) {
-        const coll = this.db.collection('messages');
-        const result = await coll.insertOne({
-            ...message,
-            id: new Date().getTime().toString(),
-            createdAt: new Date()
-        });
-        return await coll.findOne({ _id: result.insertedId });
-    }
-    async getMessages(conversationId, limit = 100) {
-        const coll = this.db.collection('messages');
-        return await coll
-            .find({ conversationId })
-            .sort({ createdAt: 1 })
-            .limit(limit)
-            .toArray();
-    }
-    async updateMessage(id, updates) {
-        const coll = this.db.collection('messages');
-        await coll.updateOne({ id }, { $set: updates });
-    }
-    async deleteMessage(id) {
-        const coll = this.db.collection('messages');
-        await coll.deleteOne({ id });
-    }
-    // Artifact operations
-    async createArtifact(artifact) {
-        const coll = this.db.collection('artifacts');
-        const result = await coll.insertOne({
-            ...artifact,
-            id: new Date().getTime().toString(),
-            createdAt: new Date(),
-            updatedAt: new Date()
-        });
-        return await coll.findOne({ _id: result.insertedId });
-    }
-    async getArtifacts(conversationId) {
-        const coll = this.db.collection('artifacts');
-        return await coll
-            .find({ conversationId })
-            .sort({ createdAt: -1 })
-            .toArray();
-    }
-    async updateArtifact(id, updates) {
-        const coll = this.db.collection('artifacts');
-        await coll.updateOne({ id }, { $set: { ...updates, updatedAt: new Date() } });
-    }
-    // Configuration operations
-    async setConfig(key, value) {
-        const coll = this.db.collection('config');
-        await coll.replaceOne({ key }, { key, value, updatedAt: new Date() }, { upsert: true });
-    }
-    async getConfig(key) {
-        const coll = this.db.collection('config');
-        const result = await coll.findOne({ key });
-        return result?.value;
-    }
-    // Model capabilities
-    async saveModelCapabilities(modelName, capabilities, isCustom = false) {
-        const coll = this.db.collection('modelCapabilities');
-        await coll.replaceOne({ modelName }, {
-            modelName,
-            capabilities,
-            isCustom,
-            updatedAt: new Date()
-        }, { upsert: true });
-    }
-    async getModelCapabilities(modelName) {
-        const coll = this.db.collection('modelCapabilities');
-        const result = await coll.findOne({ modelName });
-        return result?.capabilities || null;
-    }
-    async getAllModelCapabilities() {
-        const coll = this.db.collection('modelCapabilities');
-        return await coll.find({}).toArray();
+    async createIndexes() {
+        const collections = this.getCollections();
+        // Conversations indexes
+        await collections.conversations.createIndex({ createdAt: -1 });
+        await collections.conversations.createIndex({ updatedAt: -1 });
+        await collections.conversations.createIndex({ model: 1 });
+        // Messages indexes
+        await collections.messages.createIndex({ conversationId: 1, createdAt: 1 });
+        await collections.messages.createIndex({ createdAt: -1 });
+        await collections.messages.createIndex({ role: 1 });
+        // Artifacts indexes
+        await collections.artifacts.createIndex({ conversationId: 1 });
+        await collections.artifacts.createIndex({ messageId: 1 });
+        await collections.artifacts.createIndex({ type: 1 });
+        await collections.artifacts.createIndex({ createdAt: -1 });
+        console.log('📊 Database indexes created');
     }
 }
 exports.DatabaseService = DatabaseService;
+// Singleton instance
+let databaseService = null;
+function getDatabaseService() {
+    if (!databaseService) {
+        databaseService = new DatabaseService();
+    }
+    return databaseService;
+}
 //# sourceMappingURL=database-service.js.map

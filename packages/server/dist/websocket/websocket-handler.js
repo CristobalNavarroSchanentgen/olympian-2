@@ -3,12 +3,14 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.WebSocketHandler = void 0;
 class WebSocketHandler {
     io;
-    dbService;
+    conversationService;
+    messageService;
     mcpManager;
     ollamaService;
-    constructor(io, dbService, mcpManager, ollamaService) {
+    constructor(io, conversationService, messageService, mcpManager, ollamaService) {
         this.io = io;
-        this.dbService = dbService;
+        this.conversationService = conversationService;
+        this.messageService = messageService;
         this.mcpManager = mcpManager;
         this.ollamaService = ollamaService;
         this.setupHandlers();
@@ -34,19 +36,9 @@ class WebSocketHandler {
     }
     async handleChatMessage(socket, data) {
         try {
-            const userMessage = await this.dbService.createMessage({
-                conversationId: data.conversationId,
-                role: 'user',
-                content: data.content,
-                timestamp: new Date()
-            });
+            const userMessage = await this.messageService.createMessage(data.conversationId, { content: data.content, role: "user" }, "user");
             this.io.to('conversation:' + data.conversationId).emit('chat:message', userMessage);
-            const assistantMessage = await this.dbService.createMessage({
-                conversationId: data.conversationId,
-                role: 'assistant',
-                content: '',
-                timestamp: new Date()
-            });
+            const assistantMessage = await this.messageService.createMessage(data.conversationId, { content: "", role: "assistant" }, "assistant");
             const chatRequest = {
                 model: data.model || 'llama3.2',
                 messages: [{ role: 'user', content: data.content }]
@@ -62,7 +54,7 @@ class WebSocketHandler {
                     });
                 }
             }
-            await this.dbService.updateMessage(assistantMessage.id, {
+            await this.messageService.updateMessage(assistantMessage.id, {
                 content: fullResponse,
                 metadata: { streaming: false, completed: true }
             });
@@ -70,8 +62,8 @@ class WebSocketHandler {
                 messageId: assistantMessage.id,
                 fullContent: fullResponse
             });
-            await this.dbService.updateConversation(data.conversationId, {
-                updatedAt: new Date()
+            await this.conversationService.updateConversation(data.conversationId, {
+                metadata: { updatedAt: new Date().toISOString() }
             });
         }
         catch (error) {

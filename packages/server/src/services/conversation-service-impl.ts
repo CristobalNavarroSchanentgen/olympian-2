@@ -90,7 +90,7 @@ export class ConversationServiceImpl implements ConversationService {
       }))
       .sort((a, b) => b.lastMessageAt.getTime() - a.lastMessageAt.getTime());
   }
-}
+
 
   // Additional required methods
   

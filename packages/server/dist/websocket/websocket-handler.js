@@ -20,6 +20,9 @@ class WebSocketHandler {
                 socket.join('conversation:' + conversationId);
                 this.sendSystemStatus(socket);
             });
+            socket.on('conversation:leave', (conversationId) => {
+                socket.leave('conversation:' + conversationId);
+            });
             socket.on('chat:message', (data) => this.handleChatMessage(socket, data));
             socket.on('tool:execute', (data) => this.handleToolExecution(socket, data));
             socket.on('image:upload', (data) => this.handleImageUpload(socket, data));

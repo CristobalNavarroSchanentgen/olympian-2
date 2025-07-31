@@ -3,11 +3,11 @@
  * Follows AI-native architecture: minimal context, explicit contracts
  */
 import { Express } from 'express';
-import { ConversationService } from '../../../shared/services/conversation-service';
-import { MessageService } from '../../../shared/services/message-service';
-import { ArtifactService } from '../../../shared/services/artifact-service';
-import { McpService } from '../../../shared/services/mcp-service';
-import { ModelRegistryService } from '../../../shared/services/model-registry-service';
+import { ConversationService } from '@olympian/shared/services/conversation-service';
+import { MessageService } from '@olympian/shared/services/message-service';
+import { ArtifactService } from '@olympian/shared/services/artifact-service';
+import { McpService } from '@olympian/shared/services/mcp-service';
+import { ModelRegistryService } from '@olympian/shared/services/model-registry-service';
 export interface ApiServices {
     conversationService: ConversationService;
     messageService: MessageService;

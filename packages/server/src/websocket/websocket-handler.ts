@@ -29,11 +29,11 @@ export class WebSocketHandler {
       
       socket.on('conversation:join', (conversationId: string) => {
         socket.join('conversation:' + conversationId);
-
-      socket.on("conversation:leave", (conversationId: string) => {
-        socket.leave("conversation:" + conversationId);
-      });
         this.sendSystemStatus(socket);
+      });
+
+      socket.on('conversation:leave', (conversationId: string) => {
+        socket.leave('conversation:' + conversationId);
       });
 
       socket.on('chat:message', (data) => this.handleChatMessage(socket, data));

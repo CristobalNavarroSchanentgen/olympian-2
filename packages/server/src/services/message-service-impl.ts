@@ -89,3 +89,62 @@ export class MessageServiceImpl implements MessageService {
     this.messages.delete(id);
   }
 }
+
+  // Additional interface methods (stubs for now)
+  async getMessageCount(conversationId?: string): Promise<number> {
+    if (conversationId) {
+      return this.messages.filter(m => m.conversationId === conversationId).length;
+    }
+    return this.messages.length;
+  }
+
+  async searchMessages(query: string, conversationId?: string): Promise<any[]> {
+    let filtered = this.messages.filter(m => 
+      m.content.toLowerCase().includes(query.toLowerCase())
+    );
+    if (conversationId) {
+      filtered = filtered.filter(m => m.conversationId === conversationId);
+    }
+    return filtered;
+  }
+
+  async getLatestMessage(conversationId: string): Promise<any | null> {
+    const messages = this.messages
+      .filter(m => m.conversationId === conversationId)
+      .sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
+    return messages[0] || null;
+  }
+
+  async deleteMessages(conversationId: string): Promise<void> {
+    this.messages = this.messages.filter(m => m.conversationId !== conversationId);
+  }
+
+  // Additional interface methods (stubs for now)
+  async getMessageCount(conversationId?: string): Promise<number> {
+    if (conversationId) {
+      return this.messages.filter(m => m.conversationId === conversationId).length;
+    }
+    return this.messages.length;
+  }
+
+  async searchMessages(query: string, conversationId?: string): Promise<any[]> {
+    let filtered = this.messages.filter(m => 
+      m.content.toLowerCase().includes(query.toLowerCase())
+    );
+    if (conversationId) {
+      filtered = filtered.filter(m => m.conversationId === conversationId);
+    }
+    return filtered;
+  }
+
+  async getLatestMessage(conversationId: string): Promise<any | null> {
+    const messages = this.messages
+      .filter(m => m.conversationId === conversationId)
+      .sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
+    return messages[0] || null;
+  }
+
+  async deleteMessages(conversationId: string): Promise<void> {
+    this.messages = this.messages.filter(m => m.conversationId !== conversationId);
+  }
+}

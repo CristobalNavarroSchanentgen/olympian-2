@@ -2,8 +2,8 @@
  * Artifact Service Implementation
  * In-memory storage for Phase 1 - will be replaced with database integration
  */
-import { ArtifactService } from '../../../shared/services/artifact-service';
-import { Artifact, ArtifactType } from '../../../shared/models/chat/artifact';
+import { ArtifactService } from '@olympian/shared/services/artifact-service';
+import { Artifact, ArtifactType } from '@olympian/shared/models/chat/artifact';
 export declare class ArtifactServiceImpl implements ArtifactService {
     private artifacts;
     private conversationArtifacts;

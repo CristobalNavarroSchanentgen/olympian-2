@@ -2,8 +2,8 @@
  * Message Service Implementation
  * In-memory storage for Phase 1 - will be replaced with database integration
  */
-import { MessageService } from '../../../shared/services/message-service';
-import { Message, MessageDraft } from '../../../shared/models/chat/message';
+import { MessageService } from '@olympian/shared/services/message-service';
+import { Message, MessageDraft } from '@olympian/shared/models/chat/message';
 export declare class MessageServiceImpl implements MessageService {
     private messages;
     private conversationMessages;

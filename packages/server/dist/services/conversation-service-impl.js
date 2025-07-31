@@ -43,7 +43,7 @@ class ConversationServiceImpl {
         if (!this.conversations.has(id)) {
             throw new Error(`Conversation ${id} not found`);
         }
-        this.conversations.delete(id);
+        return this.conversations.delete(id);
     }
     async listConversations(filter) {
         const conversations = Array.from(this.conversations.values());
@@ -70,6 +70,19 @@ class ConversationServiceImpl {
             createdAt: c.createdAt
         }))
             .sort((a, b) => b.lastMessageAt.getTime() - a.lastMessageAt.getTime());
+    }
+    // Additional required methods
+    async searchConversations(query, limit) {
+        const all = await this.listConversations();
+        const filtered = all.filter(c => c.title.toLowerCase().includes(query.toLowerCase()));
+        return limit ? filtered.slice(0, limit) : filtered;
+    }
+    async getConversationCount(filter) {
+        const conversations = await this.listConversations(filter);
+        return conversations.length;
+    }
+    async conversationExists(id) {
+        return this.conversations.has(id);
     }
 }
 exports.ConversationServiceImpl = ConversationServiceImpl;

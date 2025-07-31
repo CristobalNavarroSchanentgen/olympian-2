@@ -32,7 +32,7 @@ export interface ApiServices {
  */
 export function setupAllRoutes(app: Express, services: ApiServices) {
   // Basic health/status routes
-  setupSimpleRoutes(app);
+  setupSimpleRoutes(app, services.modelRegistryService);
   
   // Core feature routes
   setupConversationRoutes(app, services.conversationService);

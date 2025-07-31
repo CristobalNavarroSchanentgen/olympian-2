@@ -1,2 +1,2 @@
-import { MessageService } from '../../../shared/services/message-service';
+import { MessageService } from '@olympian/shared/services/message-service';
 export declare function setupMessageRoutes(app: any, messageService: MessageService): void;

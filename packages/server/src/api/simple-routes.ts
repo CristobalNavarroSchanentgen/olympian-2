@@ -1,6 +1,7 @@
 import { Router } from 'express';
+import { ModelRegistryServiceImpl } from '../services/model-registry-service-impl';
 
-export function setupRoutes(app: any) {
+export function setupRoutes(app: any, modelRegistryService: ModelRegistryServiceImpl) {
   const router = Router();
   
   router.get('/health', (req, res) => {
@@ -18,7 +19,6 @@ export function setupRoutes(app: any) {
   
   router.get('/models', async (req, res) => {
     res.json({
-      
       models: await modelRegistryService.getAllRegisteredModels(),
     });
   });
@@ -28,8 +28,6 @@ export function setupRoutes(app: any) {
       capabilities: await modelRegistryService.getAllCapabilities(),
     });
   });
-
+  
   app.use('/api', router);
 }
-
-export const simpleRoutes = setupRoutes;

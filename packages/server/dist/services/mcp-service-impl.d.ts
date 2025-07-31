@@ -2,10 +2,10 @@
  * MCP Service Implementation (Stub for Phase 1)
  * Will be replaced with real MCP integration in Phase 3
  */
-import { McpService } from '../../../shared/services/mcp-service';
-import { McpServerStatus } from '../../../shared/models/mcp/server-config';
-import { ToolDefinition } from '../../../shared/models/mcp/tool-definition';
-import { ExecutionResult } from '../../../shared/models/mcp/execution-result';
+import { McpService } from '@olympian/shared/services/mcp-service';
+import { McpServerStatus } from '@olympian/shared/models/mcp/server-config';
+import { ToolDefinition } from '@olympian/shared/models/mcp/tool-definition';
+import { ExecutionResult } from '@olympian/shared/models/mcp/execution-result';
 export declare class McpServiceImpl implements McpService {
     private servers;
     startServer(serverName: string): Promise<boolean>;

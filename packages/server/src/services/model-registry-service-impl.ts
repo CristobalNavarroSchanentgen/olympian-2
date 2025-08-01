@@ -19,6 +19,7 @@ export class ModelRegistryServiceImpl implements ModelRegistryService {
     const defaultModels: ModelCapabilityDefinition[] = [
       {
         modelName: 'llama3.2',
+        name: 'llama3.2',
         provider: 'ollama',
         capabilities: ['text-generation', 'conversation'],
         contextLength: 8192,
@@ -28,6 +29,7 @@ export class ModelRegistryServiceImpl implements ModelRegistryService {
       },
       {
         modelName: 'codellama',
+        name: 'codellama',
         provider: 'ollama', 
         capabilities: ['code-generation', 'text-generation'],
         contextLength: 16384,
@@ -48,6 +50,10 @@ export class ModelRegistryServiceImpl implements ModelRegistryService {
 
   async getAllRegisteredModels(): Promise<ModelCapabilityDefinition[]> {
     return Array.from(this.models.values());
+  }
+
+  async getAllModels(): Promise<ModelCapabilityDefinition[]> {
+    return this.getAllRegisteredModels();
   }
 
   async validateModelAccess(modelName: string): Promise<{

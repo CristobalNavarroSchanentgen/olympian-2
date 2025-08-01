@@ -81,13 +81,15 @@ export class SmartModelRouter implements SmartModelRouterContract {
 
     // 5. Publish routing event
     this.deps.eventPublisher.publishModelRouted({
-      model: selectedModel,
-      reason: routingReason,
-      analysisResult: analysis,
-      timestamp: new Date()
+      selectedModel: selectedModel,
+      conversationId: "",
+      modelCapabilities: selectedModelCapability.capabilities,
+      routingReason: routingReason,
+      timestamp: new Date().toISOString()
     });
 
     return {
+      fallbackModel: fallbacks[0] || "llama3.2:3b",
       selectedModel,
       routingReason,
       modelCapabilities,
@@ -126,6 +128,7 @@ export class SmartModelRouter implements SmartModelRouterContract {
     });
 
     return {
+      fallbackModel: fallbacks[0] || "llama3.2:3b",
       model: ranked[0]?.name || 'llama3.2:3b', // fallback
       confidence: ranked.length > 0 ? 0.8 : 0.3,
       alternatives: ranked.slice(1, 4).map(m => m.name)
@@ -141,6 +144,7 @@ export class SmartModelRouter implements SmartModelRouterContract {
     const textAnalysis = await this.deps.contentAnalysisAdapter.analyzeTextComplexity(params.content);
     
     return {
+      fallbackModel: fallbacks[0] || "llama3.2:3b",
       requiresVision,
       suggestedCapabilities: textAnalysis.suggestedCapabilities as ('tools' | 'reasoning')[],
       complexity: textAnalysis.complexity,
@@ -163,6 +167,7 @@ export class SmartModelRouter implements SmartModelRouterContract {
     const allModels = await this.deps.modelRegistryService.getAllRegisteredModels();
     
     return {
+      fallbackModel: fallbacks[0] || "llama3.2:3b",
       textModels: this.deps.modelSelectionAdapter.filterTextModels(allModels),
       visionModels: this.deps.modelSelectionAdapter.filterVisionModels(allModels),
       allModels
@@ -213,14 +218,14 @@ export class SmartModelRouter implements SmartModelRouterContract {
     });
 
     this.deps.eventPublisher.publishRoutingFailed({
-      failedModel: params.failedModel,
+      conversationId: "",
+      requestedCapabilities: params.originalRequest.images ? ["vision"] : ["text-generation"],
       error: params.error.message,
-      fallbackModel: fallbacks[0],
-      timestamp: new Date()
+      timestamp: new Date().toISOString()
     });
 
     return {
-      fallbackModel: fallbacks[0] || 'llama3.2:3b',
+      fallbackModel: fallbacks[0] || "llama3.2:3b",
       strategy: fallbacks.length > 0 ? 'capability-match' as const : 'simple-fallback' as const
     };
   }
@@ -240,7 +245,8 @@ export class SmartModelRouter implements SmartModelRouterContract {
       // Preference for reasoning models
       if (model.capabilities.includes('reasoning')) score += 1;
       
-      return { model, score };
+      return {
+      fallbackModel: fallbacks[0] || "llama3.2:3b", model, score };
     });
     
     // Sort by score (descending) and return the best

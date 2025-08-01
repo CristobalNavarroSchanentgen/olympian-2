@@ -11,7 +11,7 @@ export interface ModelRegistryService {
      * Get all registered models
      */
     getAllRegisteredModels(): Promise<ModelCapabilityDefinition[]>;
-    /**
+    getAllModels(): Promise<ModelCapabilityDefinition[]>;    /**
      * Validate if model access is allowed
      */
     validateModelAccess(modelName: string): Promise<{

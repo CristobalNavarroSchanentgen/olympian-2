@@ -3,6 +3,7 @@
  */
 export interface ModelCapabilityDefinition {
     modelName: string;
+    name: string;
     provider: string;
     capabilities: string[];
     contextLength: number;

@@ -25,7 +25,12 @@ export interface ModelRegistryService {
   }>;
   
   /**
-   * Check if using registry mode
+  /**
+   * Get all available models
+   */
+  getAllModels(): Promise<ModelCapabilityDefinition[]>;
+
+  /**   * Check if using registry mode
    */
   isRegistryMode(): Promise<boolean>;
 }

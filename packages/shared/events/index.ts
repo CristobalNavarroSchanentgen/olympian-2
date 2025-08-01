@@ -8,3 +8,4 @@ export * from './server-events';
 export * from './vision-events';
 export * from './ui/layout-events';
 export * from './ui/reasoning-events';
+export * from './router-events';

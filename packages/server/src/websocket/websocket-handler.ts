@@ -72,6 +72,7 @@ export class WebSocketHandler {
       preferredVisionModel?: string;
     };
   }): Promise<void> {
+    let routingResult: any;
     try {
       // Create user message
       const userMessage = await this.messageService.createMessage(
@@ -82,7 +83,7 @@ export class WebSocketHandler {
       this.io.to('conversation:' + data.conversationId).emit('chat:message', userMessage);
 
       // Use smart model router to select optimal model
-      const routingResult = await this.smartModelRouter.routeMessage({
+      routingResult = await this.smartModelRouter.routeMessage({
         content: data.content,
         images: data.images,
         userPreferences: data.userPreferences
@@ -160,9 +161,10 @@ export class WebSocketHandler {
       console.error('Chat message error:', error);
       
       // Attempt fallback routing if available
-      try {
+      let routingResult: any;
+    try {
         const fallbackResult = await this.smartModelRouter.handleRoutingFailure({
-          failedModel: data.model || 'unknown',
+          failedModel: routingResult?.selectedModel || 'unknown',
           originalRequest: {
             content: data.content,
             images: data.images
@@ -219,6 +221,7 @@ export class WebSocketHandler {
     toolName: string;
     arguments: any;
   }): Promise<void> {
+    let routingResult: any;
     try {
       const result = await this.mcpManager.executeTool(
         data.serverName,
@@ -239,6 +242,7 @@ export class WebSocketHandler {
     imageData: string;
     filename: string;
   }): Promise<void> {
+    let routingResult: any;
     try {
       const imageBuffer = Buffer.from(data.imageData.split(',')[1], 'base64');
       
@@ -255,6 +259,7 @@ export class WebSocketHandler {
   }
 
   private async sendSystemStatus(socket: Socket): Promise<void> {
+    let routingResult: any;
     try {
       const mcpStatus = this.mcpManager.getServerStatus();
       const tools = this.mcpManager.getAllTools();
@@ -303,6 +308,7 @@ export class WebSocketHandler {
   }
 
   private async handleModelsList(socket: Socket): Promise<void> {
+    let routingResult: any;
     try {
       const models = await this.modelRegistryService.getAllModels();
       socket.emit('models:list', {
@@ -321,6 +327,7 @@ export class WebSocketHandler {
     images?: string[];
     requiredCapabilities?: ('vision' | 'tools' | 'reasoning')[];
   }): Promise<void> {
+    let routingResult: any;
     try {
       // Analyze content to determine requirements
       const analysis = await this.smartModelRouter.analyzeContent({
@@ -346,7 +353,19 @@ export class WebSocketHandler {
       });
     }
   }
-  private sendStatusUpdate(socket: Socket): void {    const mcpStatus = this.mcpManager.getServerStatus();
+  private async handleModelsAvailability(socket: Socket): Promise<void> {
+    let routingResult: any;
+    try {
+      const models = await this.modelRegistryService.getAllModels();
+      socket.emit("models:list", { models });
+    } catch (error) {
+      socket.emit("models:error", { 
+        error: error instanceof Error ? error.message : "Failed to get models"
+      });
+    }
+  }
+
+    private sendStatusUpdate(socket: Socket): void {    const mcpStatus = this.mcpManager.getServerStatus();
     const tools = this.mcpManager.getAllTools();
 
     socket.emit('status:update', {

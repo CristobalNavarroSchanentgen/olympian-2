@@ -25,7 +25,7 @@ export function createAvailabilityAdapter(ollamaBaseUrl: string = 'http://localh
           return { available: false, healthy: false };
         }
         
-        const modelsData = await modelsResponse.json();
+        const modelsData = await modelsResponse.json() as { models?: Array<{ name: string }> };
         const modelExists = modelsData.models?.some((m: any) => m.name === modelName);
         
         if (!modelExists) {

@@ -4,9 +4,11 @@
 
 export interface ModelCapabilityDefinition {
   modelName: string;
+  name: string; // Alias for modelName
   provider: string;
   capabilities: string[];
-  contextLength: number;   maxTokens: number;
+  contextLength: number;
+  maxTokens: number;
   streaming: boolean;
   metadata?: Record<string, unknown>;
   // Legacy compatibility
@@ -23,7 +25,8 @@ export interface ModelRegistry {
 // Hardcoded model registry for custom configuration
 export const PREDEFINED_MODEL_REGISTRY: ModelCapabilityDefinition[] = [
   { 
-    modelName: 'llama3.2-vision:11b', 
+    modelName: 'llama3.2-vision:11b',
+    name: 'llama3.2-vision:11b',
     provider: 'ollama',
     capabilities: ['vision', 'text-generation'],
     contextLength: 8192,
@@ -34,7 +37,8 @@ export const PREDEFINED_MODEL_REGISTRY: ModelCapabilityDefinition[] = [
     hasVision: true 
   },
   { 
-    modelName: 'granite3.2-vision:2b', 
+    modelName: 'granite3.2-vision:2b',
+    name: 'granite3.2-vision:2b',
     provider: 'ollama',
     capabilities: ['vision', 'text-generation'],
     contextLength: 4096,
@@ -45,7 +49,8 @@ export const PREDEFINED_MODEL_REGISTRY: ModelCapabilityDefinition[] = [
     hasVision: true 
   },
   { 
-    modelName: 'phi4:14b', 
+    modelName: 'phi4:14b',
+    name: 'phi4:14b',
     provider: 'ollama',
     capabilities: ['text-generation'],
     contextLength: 16384,
@@ -56,7 +61,8 @@ export const PREDEFINED_MODEL_REGISTRY: ModelCapabilityDefinition[] = [
     hasVision: false 
   },
   { 
-    modelName: 'llama3.2:3b', 
+    modelName: 'llama3.2:3b',
+    name: 'llama3.2:3b',
     provider: 'ollama',
     capabilities: ['text-generation'],
     contextLength: 8192,
@@ -67,7 +73,8 @@ export const PREDEFINED_MODEL_REGISTRY: ModelCapabilityDefinition[] = [
     hasVision: false 
   },
   { 
-    modelName: 'phi4-mini:3.8b', 
+    modelName: 'phi4-mini:3.8b',
+    name: 'phi4-mini:3.8b',
     provider: 'ollama',
     capabilities: ['text-generation', 'tool-use'],
     contextLength: 8192,
@@ -78,7 +85,8 @@ export const PREDEFINED_MODEL_REGISTRY: ModelCapabilityDefinition[] = [
     hasVision: false 
   },
   { 
-    modelName: 'deepseek-r1:14b', 
+    modelName: 'deepseek-r1:14b',
+    name: 'deepseek-r1:14b',
     provider: 'ollama',
     capabilities: ['text-generation', 'tool-use', 'reasoning'],
     contextLength: 16384,
@@ -89,7 +97,8 @@ export const PREDEFINED_MODEL_REGISTRY: ModelCapabilityDefinition[] = [
     hasVision: false 
   },
   { 
-    modelName: 'qwen3:4b', 
+    modelName: 'qwen3:4b',
+    name: 'qwen3:4b',
     provider: 'ollama',
     capabilities: ['text-generation', 'tool-use', 'reasoning'],
     contextLength: 8192,
@@ -100,7 +109,8 @@ export const PREDEFINED_MODEL_REGISTRY: ModelCapabilityDefinition[] = [
     hasVision: false 
   },
   { 
-    modelName: 'gemma3:4b', 
+    modelName: 'gemma3:4b',
+    name: 'gemma3:4b',
     provider: 'ollama',
     capabilities: ['text-generation'],
     contextLength: 8192,

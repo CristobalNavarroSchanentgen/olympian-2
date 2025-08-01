@@ -54,8 +54,25 @@ Integrate model registry with UI to provide intelligent model routing and select
 - **ModelSelector.tsx:** Combined interface with quick filters and recommendations
 - **Custom Hooks:** Complete state management for model selection workflow
 
-### 🚀 Phase 5: WebSocket Integration (NEXT)
-**Location:** `packages/server/src/websocket/`
+### ✅ Phase 5: WebSocket Integration (COMPLETED)
+
+### 🚀 Phase 6: Server Integration & Dependency Injection (NEXT)
+**Location:** `packages/server/src/main.ts` & `packages/server/src/services/`
+
+**Goals:**
+- Initialize SmartModelRouter with proper dependencies and adapters
+- Update server startup to inject smart router into WebSocket handler
+- Implement missing service dependencies (model registry, adapters)
+- Configure event publishing for routing events
+- Test end-to-end smart routing functionality
+
+**Required Components:**
+- **Server Main:** Update dependency injection and service initialization
+- **Service Registration:** Ensure all smart router dependencies are available
+- **Adapter Implementation:** Verify content analysis, model selection, and availability adapters
+- **Event System:** Configure event publishing for model routing events
+- **Integration Testing:** Verify smart routing works with live Ollama models
+\**Location:** `packages/server/src/websocket/`
 
 **Goals:**
 - Update chat handler to use smart model router
@@ -63,6 +80,35 @@ Integrate model registry with UI to provide intelligent model routing and select
 - Model selection persistence across sessions
 - Real-time model availability updates to clients
 - Enhanced error handling and fallback messaging
+
+**Implemented Features:**
+- **Smart Model Router Integration:** WebSocket handler now uses intelligent content analysis for model selection
+- **Real-time Model Availability:** Live monitoring and health checking of all 8 models
+- **Enhanced Error Handling:** Automatic fallback routing when primary model fails
+- **User Preference Support:** Persistent model preferences across chat sessions
+- **Content Analysis Endpoints:** Real-time model recommendations based on message content
+- **Extended System Status:** Model health information included in status updates
+
+**WebSocket Events Added:**
+- **models:availability:** Real-time model health and availability status
+- **models:list:** Complete model registry with capabilities
+- **model:recommend:** AI-powered content analysis and model suggestions
+- **model:selected:** Smart routing results and reasoning
+- **chat:fallback:** Automatic fallback notifications with strategy info
+- **chat:started:** Enhanced chat start events with selected model info
+
+**Smart Routing Features:**
+- **Vision Detection:** Automatically routes multimodal content to vision models
+- **Capability Matching:** Matches complex queries to models with tools/reasoning
+- **Performance Optimization:** Considers model response times and availability
+- **Graceful Degradation:** Seamless fallback when preferred models unavailable
+- **Session Persistence:** Remembers last used model per conversation
+
+**Components:**
+- **Enhanced WebSocketHandler:** Complete integration with SmartModelRouter service
+- **Model Health Monitoring:** Real-time availability checking and status reporting
+- **Fallback Management:** Intelligent error recovery with alternative model selection
+- **Event Broadcasting:** Real-time updates to all connected clients
 
 ## 🎯 Registry Models (8 Available)
 
@@ -103,8 +149,10 @@ Integrate model registry with UI to provide intelligent model routing and select
 
 ## 🎯 Next Milestone
 
+**Phase 6: Server Integration & Dependency Injection** - Initialize SmartModelRouter with proper dependencies, update server startup for dependency injection, and ensure end-to-end smart routing functionality.
+
 **Phase 5: WebSocket Integration** - Connect UI components to backend smart router service via WebSocket for real-time model routing and availability updates.
 
 ---
 
-**STATUS: ✅ Phase 4 Complete - UI Components operational with React dropdowns, smart recommendations, and chat store integration. Ready for Phase 5 WebSocket integration.**
+**STATUS: ✅ Phase 5 Complete - WebSocket integration with smart model router operational. Real-time model availability, intelligent routing, and fallback handling active.

@@ -10,17 +10,17 @@ export const chatService = {
   // Conversations
   async getConversations(): Promise<Conversation[]> {
     const { data } = await api.get('/conversations');
-    return data;
+        return Array.isArray(data) ? data : [];
   },
 
   async getConversation(id: string): Promise<Conversation> {
     const { data } = await api.get(`/conversations/${id}`);
-    return data;
+        return Array.isArray(data) ? data : [];
   },
 
   async createConversation(conversation: { title: string; model: string; metadata?: any }): Promise<Conversation> {
     const { data } = await api.post('/conversations', conversation);
-    return data;
+        return Array.isArray(data) ? data : [];
   },
 
   async updateConversation(id: string, updates: Partial<Conversation>): Promise<void> {
@@ -34,7 +34,7 @@ export const chatService = {
   // Messages
   async getMessages(conversationId: string): Promise<Message[]> {
     const { data } = await api.get(`/messages/conversation/${conversationId}`);
-    return data;
+        return Array.isArray(data) ? data : [];
   },
 
   async createMessage(message: {
@@ -45,35 +45,35 @@ export const chatService = {
     metadata?: any;
   }): Promise<Message> {
     const { data } = await api.post('/messages', message);
-    return data;
+        return Array.isArray(data) ? data : [];
   },
 
   // Artifacts
   async getArtifacts(conversationId: string): Promise<Artifact[]> {
     const { data } = await api.get(`/artifacts/conversation/${conversationId}`);
-    return data;
+        return Array.isArray(data) ? data : [];
   },
 
   // Ollama
   async getOllamaStatus(): Promise<{ connected: boolean; baseUrl: string }> {
     const { data } = await api.get('/ollama/status');
-    return data;
+        return Array.isArray(data) ? data : [];
   },
 
   async getModels(): Promise<any[]> {
     const { data } = await api.get('/ollama/models');
-    return data;
+        return Array.isArray(data) ? data : [];
   },
 
   // MCP
   async getMCPServers(): Promise<any[]> {
     const { data } = await api.get('/mcp/servers');
-    return data;
+        return Array.isArray(data) ? data : [];
   },
 
   async getMCPTools(): Promise<any[]> {
     const { data } = await api.get('/mcp/tools');
-    return data;
+        return Array.isArray(data) ? data : [];
   },
 
   async executeTool(serverName: string, toolName: string, args: any): Promise<any> {
@@ -82,6 +82,6 @@ export const chatService = {
       toolName,
       arguments: args,
     });
-    return data;
+        return Array.isArray(data) ? data : [];
   },
 };

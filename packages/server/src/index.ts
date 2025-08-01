@@ -12,7 +12,7 @@ import { MessageServiceImpl } from "./services/message-service-impl";
 import { ArtifactServiceImpl } from "./services/artifact-service-impl";
 import { McpServiceImpl } from "./services/mcp-service-impl";
 import { ModelRegistryServiceImpl } from "./services/model-registry-service-impl";
-import { SmartModelRouterService } from "./services/smart-model-router-service-impl";
+// import { SmartModelRouterService } from "./services/smart-model-router-service-impl";
 
 // Model Selector Features
 import { createTextModelSelector } from "./features/ui/text-model-selector";
@@ -87,7 +87,7 @@ async function startServer() {
     );
 
     // Initialize Smart Model Router Service
-    const smartModelRouterService = new SmartModelRouterService(modelRegistryService, ollamaService);
+//     const smartModelRouterService = new SmartModelRouterService(modelRegistryService, ollamaService);
     const smartModelRouter = smartModelRouterService.getRouter();
     
     console.log("💼 Business services initialized");

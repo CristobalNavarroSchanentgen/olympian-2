@@ -1,0 +1,50 @@
+
+> olympian-ai-lightweight@1.0.0 dev
+> npm run dev --workspace=packages/client & npm run dev --workspace=packages/server
+
+
+> @olympian/client@1.0.0 dev
+> vite
+
+
+> @olympian/server@1.0.0 dev
+> tsx watch src/index.ts
+
+node:internal/modules/cjs/loader:1405
+  const err = new Error(message);
+              ^
+
+Error: Cannot find module './features/ui/text-model-selector'
+Require stack:
+- /Users/cristobalnavarro/Desktop/olympian-2/packages/server/src/index.ts
+    at node:internal/modules/cjs/loader:1405:15
+    at nextResolveSimple (/Users/cristobalnavarro/Desktop/olympian-2/node_modules/tsx/dist/register-D46fvsV_.cjs:4:1004)
+    at /Users/cristobalnavarro/Desktop/olympian-2/node_modules/tsx/dist/register-D46fvsV_.cjs:3:2630
+    at /Users/cristobalnavarro/Desktop/olympian-2/node_modules/tsx/dist/register-D46fvsV_.cjs:3:1542
+    at resolveTsPaths (/Users/cristobalnavarro/Desktop/olympian-2/node_modules/tsx/dist/register-D46fvsV_.cjs:4:760)
+    at /Users/cristobalnavarro/Desktop/olympian-2/node_modules/tsx/dist/register-D46fvsV_.cjs:4:1102
+    at m._resolveFilename (file:///Users/cristobalnavarro/Desktop/olympian-2/node_modules/tsx/dist/register-B7jrtLTO.mjs:1:789)
+    at defaultResolveImpl (node:internal/modules/cjs/loader:1061:19)
+    at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1066:22)
+    at Function._load (node:internal/modules/cjs/loader:1215:37) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [
+    '/Users/cristobalnavarro/Desktop/olympian-2/packages/server/src/index.ts'
+  ]
+}
+
+Node.js v23.11.0
+
+  VITE v5.4.19  ready in 280 ms
+
+  ➜  Local:   http://localhost:3000/
+  ➜  Network: http://192.168.1.13:3000/
+  ➜  Network: http://100.115.91.114:3000/
+11:26:22 PM [vite] http proxy error: /api/conversations
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1139:18)
+    at afterConnectMultiple (node:net:1714:7)
+11:26:27 PM [vite] http proxy error: /api/conversations
+AggregateError [ECONNREFUSED]: 
+    at internalConnectMultiple (node:net:1139:18)
+    at afterConnectMultiple (node:net:1714:7)

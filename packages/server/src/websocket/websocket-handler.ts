@@ -4,7 +4,7 @@ import { MessageService } from "@olympian/shared/services/message-service";
 import { MessageRole } from "@olympian/shared/models/chat/message";
 import { MCPManager } from '../mcp/mcp-manager-stub';
 import { OllamaService } from '../services/ollama-service';
-import { SmartModelRouter } from "@olympian/shared/features/chat/smart-model-router";
+// import { SmartModelRouter } from "@olympian/shared/features/chat/smart-model-router";
 import { ModelRegistryService } from "@olympian/shared/services/model-registry-service";
 import { TextModelSelectorContract } from "../features/ui/text-model-selector/contract";
 import { VisionModelSelectorContract } from "../features/ui/vision-model-selector/contract";
@@ -15,7 +15,7 @@ export class WebSocketHandler {
   private messageService: MessageService;
   private mcpManager: MCPManager;
   private ollamaService: OllamaService;
-  private smartModelRouter: SmartModelRouter;
+//   private smartModelRouter: SmartModelRouter;
   private modelRegistryService: ModelRegistryService;
     textModelSelector: TextModelSelectorContract,
     visionModelSelector: VisionModelSelectorContract
@@ -28,7 +28,7 @@ export class WebSocketHandler {
     messageService: MessageService,
     mcpManager: MCPManager,
     ollamaService: OllamaService,
-    smartModelRouter: SmartModelRouter,
+//     smartModelRouter: SmartModelRouter,
     modelRegistryService: ModelRegistryService
     textModelSelector: TextModelSelectorContract,
     visionModelSelector: VisionModelSelectorContract

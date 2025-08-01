@@ -56,13 +56,15 @@ export function useWebSocket() {
     });
 
     socket.on('status:update', (status: SystemStatusUpdate) => {
+      const mcpServers = status.mcp?.servers;
       setSystemStatus({
         database: status.database?.connected || false,
-        const mcpServers = status.mcp?.servers;
-        mcp: Array.isArray(mcpServers) && mcpServers.some((s: any) => s.status === "running") || false,      });
+        mcp: Array.isArray(mcpServers) && mcpServers.some((s: any) => s.status === "running") || false,
         ollama: status.ollama?.connected || false,
       });
-    socket.emit('status:request');
+    });
+
+    socket.emit("status:request");
 
     return () => {
       socket.disconnect();

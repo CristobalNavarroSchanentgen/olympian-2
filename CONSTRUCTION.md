@@ -1,358 +1,110 @@
-# Model Registry UI Integration Plan
+# Model Registry UI Integration
 
-## 🎯 Project Objective
+## 🎯 Objective
+Integrate model registry with UI to provide distinct selectors for text and vision models, enabling smart routing to appropriate Ollama models.
 
-Integrate the fixed model registry with the UI to provide distinct model selectors for text-to-text and vision models, enabling users to route requests to appropriate Ollama models through the predefined registry system.
+## 🏗️ Current Architecture Status
 
-## 🏗️ Architecture Integration Strategy
+### ✅ Foundation (Already Built)
+- **Model Registry:** 8 predefined models with capabilities
+- **Registry Service:** Interface and implementation complete
+- **WebSocket Infrastructure:** Chat handling ready
+- **Ollama Integration:** Model connection service active
 
-This plan leverages the existing AI-Native architecture to seamlessly integrate model selection capabilities while maintaining the contract-first, minimal-context principles already established.
+### ✅ Phase 1-2: Model Selectors & Adapters (COMPLETED)
+- **Text Model Selector:** `/features/ui/text-model-selector/`
+- **Vision Model Selector:** `/features/ui/vision-model-selector/` 
+- **Filter Adapters:** Text/Vision model filtering logic
+- **Persistence Adapter:** Selection state management
+- **Image Detection:** Automatic vision requirement detection
 
-### Current Architecture Assets
-- ✅ Fixed model registry: `packages/shared/models/connection/model-registry.ts`
-- ✅ ModelRegistryManager: `packages/shared/features/connection/model-registry/`
-- ✅ Registry adapter: `packages/shared/adapters/features/connection/model-registry/`
-- ✅ WebSocket chat infrastructure
-- ✅ Ollama connection service
+## 📋 Implementation Status
 
-## 📋 Implementation Phases
+### ✅ COMPLETED FEATURES
 
-### Phase 1: Model Selection UI Features 🚀
+#### Text Model Selector
+- **Contract:** Defines selection, validation, availability interfaces
+- **Implementation:** Filters 6 text-generation models from registry
+- **Adapter:** Excludes vision-only models, adds metadata
 
-#### 1.1 Text Model Selector Feature
-**Location:** `packages/shared/features/ui/text-model-selector/`
+#### Vision Model Selector  
+- **Contract:** Vision model selection with image detection
+- **Implementation:** Manages 2 vision-capable models
+- **Adapter:** Auto-detects image content requirements
 
-**Contract:** `contract.ts`
-```typescript
-export interface TextModelSelectorContract {
-  // Get available text-generation models from registry
-  getAvailableTextModels(): Promise<ModelCapabilityDefinition[]>;
-  
-  // Get currently selected text model
-  getCurrentTextModel(): Promise<string | null>;
-  
-  // Set selected text model
-  setTextModel(modelName: string): Promise<void>;
-  
-  // Validate text model selection
-  validateTextModelSelection(modelName: string): Promise<ValidationResult>;
-}
-```
+#### Supporting Adapters
+- **Text Filter:** `text-model-filter-adapter.ts` - Capability-based filtering
+- **Vision Filter:** `vision-model-filter-adapter.ts` - Vision model isolation  
+- **Persistence:** `selection-persistence-adapter.ts` - In-memory state management
+- **Image Detection:** `image-detection-adapter.ts` - Content analysis for routing
 
-**Dependencies:**
-- Services: `model-registry-service`, `user-preference-service`
-- Adapters: `text-model-filter-adapter`, `selection-persistence-adapter`
-- Events: `text-model-selected`, `text-model-validation-failed`
+## 🎯 Registry Models (Validated)
 
-**Implementation:** `index.ts`
-- Filter registry models by `capabilities: ['text-generation']`
-- Exclude vision-only models (`hasVision: true` without text-generation)
-- Persist user selection via adapter
-- Emit selection events
+### Text Models (6 available)
+- `phi4:14b` - Standard text generation
+- `llama3.2:3b` - Lightweight text generation  
+- `phi4-mini:3.8b` - Text + tool use
+- `deepseek-r1:14b` - Text + tools + reasoning
+- `qwen3:4b` - Text + tools + reasoning
+- `gemma3:4b` - Standard text generation
 
-#### 1.2 Vision Model Selector Feature  
-**Location:** `packages/shared/features/ui/vision-model-selector/`
+### Vision Models (2 available)
+- `llama3.2-vision:11b` - Vision + text (large)
+- `granite3.2-vision:2b` - Vision + text (compact)
 
-**Contract:** `contract.ts`
-```typescript
-export interface VisionModelSelectorContract {
-  // Get available vision models from registry
-  getAvailableVisionModels(): Promise<ModelCapabilityDefinition[]>;
-  
-  // Get currently selected vision model
-  getCurrentVisionModel(): Promise<string | null>;
-  
-  // Set selected vision model
-  setVisionModel(modelName: string): Promise<void>;
-  
-  // Check if vision model is required for current input
-  isVisionModelRequired(input: MessageInput): Promise<boolean>;
-}
-```
+## 🚀 Next Phase: Smart Model Router
 
-**Dependencies:**
-- Services: `model-registry-service`, `user-preference-service`
-- Adapters: `vision-model-filter-adapter`, `image-detection-adapter`
-- Events: `vision-model-selected`, `vision-input-detected`
+### Phase 3: Intelligent Routing
+**Location:** `features/chat/smart-model-router/`
+**Status:** Ready to implement
 
-**Implementation:** `index.ts`
-- Filter registry models by `hasVision: true`
-- Auto-detect image uploads requiring vision models
-- Fallback to text model when no images present
+**Goals:**
+- Route messages based on content analysis
+- Integrate with existing model selectors
+- Handle fallbacks when models unavailable
+- Validate routing decisions against registry
 
-### Phase 2: Registry Integration Adapters 🔧
+### Phase 4: UI Components
+**Location:** `packages/client/src/components/`
+**Status:** Pending Phase 3 completion
 
-#### 2.1 Model Filter Adapters
-**Location:** `packages/shared/adapters/features/ui/text-model-selector/`
+**Goals:**
+- React model selector dropdowns
+- Custom hooks for model management
+- Real-time model availability updates
 
-**Text Model Filter Adapter:** `text-model-filter-adapter.ts`
-```typescript
-export function createTextModelFilterAdapter(): ModelFilterAdapter {
-  return {
-    filterTextModels(models: ModelCapabilityDefinition[]): ModelCapabilityDefinition[] {
-      return models.filter(model => 
-        model.capabilities.includes('text-generation') && 
-        !isVisionOnlyModel(model)
-      );
-    }
-  };
-}
-```
+### Phase 5: WebSocket Integration
+**Location:** `packages/server/src/websocket/`
+**Status:** Pending UI components
 
-**Vision Model Filter Adapter:** `vision-model-filter-adapter.ts`
-```typescript
-export function createVisionModelFilterAdapter(): ModelFilterAdapter {
-  return {
-    filterVisionModels(models: ModelCapabilityDefinition[]): ModelCapabilityDefinition[] {
-      return models.filter(model => model.hasVision === true);
-    }
-  };
-}
-```
+**Goals:**
+- Update chat handler for dynamic routing
+- Model selection persistence across sessions
+- Error handling and fallback messaging
 
-#### 2.2 Selection Persistence Adapter
-**Location:** `packages/shared/adapters/features/ui/model-selector/`
+## 🔧 Architecture Principles Maintained
 
-**Selection Persistence Adapter:** `selection-persistence-adapter.ts`
-```typescript
-export function createSelectionPersistenceAdapter(): SelectionAdapter {
-  return {
-    saveTextModelSelection(modelName: string): Promise<void>,
-    saveVisionModelSelection(modelName: string): Promise<void>,
-    getTextModelSelection(): Promise<string | null>,
-    getVisionModelSelection(): Promise<string | null>
-  };
-}
-```
+- **AI-Native Design:** All files under 200 lines
+- **Contract-First:** Clear interfaces before implementation  
+- **Minimal Context:** Each component standalone with explicit dependencies
+- **Adapter Pattern:** Clean separation between features and utilities
+- **Zero Cross-Dependencies:** Features only communicate via services/events
 
-### Phase 3: Chat Router Enhancement 📡
+## 📊 Success Metrics
 
-#### 3.1 Smart Model Router Feature
-**Location:** `packages/shared/features/chat/smart-model-router/`
+### Current Achievements ✅
+1. **8 Models Categorized:** Text/Vision separation working
+2. **Smart Filtering:** Capability-based model selection
+3. **State Management:** Selection persistence implemented
+4. **Content Analysis:** Image detection for routing decisions
+5. **Architecture Compliance:** All files follow AI-native principles
 
-**Contract:** `contract.ts`
-```typescript
-export interface SmartModelRouterContract {
-  // Route message to appropriate model based on content and user selection
-  routeMessage(input: MessageInput, userSelections: ModelSelections): Promise<ModelRoutingDecision>;
-  
-  // Validate routing decision against registry
-  validateRouting(decision: ModelRoutingDecision): Promise<ValidationResult>;
-  
-  // Get fallback model if primary selection fails
-  getFallbackModel(failedModel: string, inputType: 'text' | 'vision'): Promise<string>;
-}
-```
+### Next Milestones 🎯
+1. **Content-Aware Routing:** Messages routed to appropriate models
+2. **User Selection Integration:** Respect user model preferences  
+3. **Graceful Fallbacks:** Handle model unavailability
+4. **UI Implementation:** User-facing model selection interface
 
-**Dependencies:**
-- Services: `model-registry-service`, `text-model-selector-service`, `vision-model-selector-service`
-- Adapters: `content-analyzer-adapter`, `model-availability-adapter`
-- Events: `model-routed`, `routing-failed`, `fallback-triggered`
+---
 
-**Implementation:** `index.ts`
-- Analyze input content for images/vision requirements
-- Route to vision model if images detected AND vision model selected
-- Route to text model for text-only content
-- Validate selected model exists in registry and is available on Ollama
-- Handle fallback scenarios
-
-#### 3.2 Content Analyzer Adapter
-**Location:** `packages/shared/adapters/features/chat/smart-model-router/`
-
-**Content Analyzer Adapter:** `content-analyzer-adapter.ts`
-```typescript
-export function createContentAnalyzerAdapter(): ContentAnalyzerAdapter {
-  return {
-    detectImages(input: MessageInput): boolean {
-      return input.attachments?.some(att => att.type.startsWith('image/')) || false;
-    },
-    
-    requiresVision(input: MessageInput): boolean {
-      return this.detectImages(input);
-    },
-    
-    getContentType(input: MessageInput): 'text' | 'vision' | 'mixed' {
-      const hasImages = this.detectImages(input);
-      const hasText = input.content?.trim().length > 0;
-      
-      if (hasImages && hasText) return 'mixed';
-      if (hasImages) return 'vision';
-      return 'text';
-    }
-  };
-}
-```
-
-### Phase 4: UI Component Implementation 🎨
-
-#### 4.1 React Model Selector Components
-**Location:** `packages/client/src/components/model-selectors/`
-
-**TextModelSelector.tsx**
-```typescript
-export function TextModelSelector() {
-  const { availableModels, selectedModel, selectModel } = useTextModelSelector();
-  
-  return (
-    <select 
-      value={selectedModel || ''} 
-      onChange={(e) => selectModel(e.target.value)}
-      className="model-selector text-model-selector"
-    >
-      <option value="">Select Text Model...</option>
-      {availableModels.map(model => (
-        <option key={model.modelName} value={model.modelName}>
-          {model.modelName} ({model.capabilities.join(', ')})
-        </option>
-      ))}
-    </select>
-  );
-}
-```
-
-**VisionModelSelector.tsx**
-```typescript
-export function VisionModelSelector() {
-  const { availableModels, selectedModel, selectModel } = useVisionModelSelector();
-  
-  return (
-    <select 
-      value={selectedModel || ''} 
-      onChange={(e) => selectModel(e.target.value)}
-      className="model-selector vision-model-selector"
-    >
-      <option value="">Select Vision Model...</option>
-      {availableModels.map(model => (
-        <option key={model.modelName} value={model.modelName}>
-          {model.modelName} (Vision + {model.capabilities.filter(c => c !== 'vision').join(', ')})
-        </option>
-      ))}
-    </select>
-  );
-}
-```
-
-#### 4.2 Custom Hooks for Model Selection
-**Location:** `packages/client/src/hooks/`
-
-**useTextModelSelector.ts**
-```typescript
-export function useTextModelSelector() {
-  const [availableModels, setAvailableModels] = useState<ModelCapabilityDefinition[]>([]);
-  const [selectedModel, setSelectedModel] = useState<string | null>(null);
-  
-  const selectModel = useCallback(async (modelName: string) => {
-    await textModelSelectorManager.setTextModel(modelName);
-    setSelectedModel(modelName);
-  }, []);
-  
-  // Load available models and current selection on mount
-  // Subscribe to model selection events
-  
-  return { availableModels, selectedModel, selectModel };
-}
-```
-
-### Phase 5: WebSocket Integration Updates 🔌
-
-#### 5.1 Enhanced Chat Message Handler
-**Location:** `packages/server/src/websocket/websocket-handler.ts`
-
-**Updated handleChatMessage method:**
-```typescript
-async handleChatMessage(socket: Socket, data: any) {
-  try {
-    // Get user's model selections
-    const modelSelections = await this.getModelSelections(socket.userId);
-    
-    // Route message to appropriate model
-    const routingDecision = await this.smartModelRouter.routeMessage(data, modelSelections);
-    
-    // Validate against registry
-    const validation = await this.smartModelRouter.validateRouting(routingDecision);
-    
-    if (!validation.allowed) {
-      // Try fallback model
-      const fallbackModel = await this.smartModelRouter.getFallbackModel(
-        routingDecision.selectedModel, 
-        routingDecision.inputType
-      );
-      routingDecision.selectedModel = fallbackModel;
-    }
-    
-    // Stream chat with selected model
-    await this.ollamaService.streamChat(routingDecision.selectedModel, data.messages, socket);
-    
-  } catch (error) {
-    socket.emit('chat-error', { error: error.message });
-  }
-}
-```
-
-## 🎯 Expected Registry Models After Integration
-
-### Text-Only Models (Text Selector)
-- `phi4:14b` (text-generation)
-- `llama3.2:3b` (text-generation) 
-- `phi4-mini:3.8b` (text-generation, tool-use) 
-- `deepseek-r1:14b` (text-generation, tool-use, reasoning)
-- `qwen3:4b` (text-generation, tool-use, reasoning)
-- `gemma3:4b` (text-generation)
-
-### Vision Models (Vision Selector)  
-- `llama3.2-vision:11b` (vision, text-generation)
-- `granite3.2-vision:2b` (vision, text-generation)
-
-## 📊 Implementation Timeline
-
-### Week 1: Foundation
-- **Days 1-2:** Model selector features (contracts + implementations)
-- **Days 3-4:** Registry integration adapters
-- **Day 5:** Smart model router feature
-
-### Week 2: UI & Integration
-- **Days 1-2:** React components and hooks
-- **Days 3-4:** WebSocket integration updates
-- **Day 5:** Testing and debugging
-
-### Week 3: Polish & Deployment
-- **Days 1-2:** Error handling and fallback scenarios
-- **Days 3-4:** UI/UX improvements and validation
-- **Day 5:** Documentation and deployment
-
-## 🔧 Technical Validation
-
-### Registry Validation
-- ✅ 8 predefined models in `PREDEFINED_MODEL_REGISTRY`
-- ✅ Clear capability distinctions (text vs vision)
-- ✅ Proper metadata for routing decisions
-
-### Architecture Validation
-- ✅ Contract-first design maintains AI-native principles
-- ✅ Adapter pattern isolates UI from registry complexity
-- ✅ Event-driven communication for real-time updates
-- ✅ Service boundaries preserved
-
-### Integration Points
-- ✅ Existing ModelRegistryManager ready for UI integration
-- ✅ WebSocket infrastructure supports enhanced routing
-- ✅ Ollama service can handle dynamic model selection
-
-## 🎉 Success Criteria
-
-1. **User Experience:** Two distinct, functional model selectors in UI
-2. **Registry Integration:** All 8 registry models properly categorized and available
-3. **Smart Routing:** Messages automatically routed to appropriate selected models
-4. **Error Handling:** Graceful fallbacks when models unavailable
-5. **Persistence:** User selections persist across sessions
-6. **Real-time Updates:** Model availability updates reflected immediately in UI
-
-## 🚀 Next Steps
-
-1. **Initialize Phase 1:** Create model selector feature contracts
-2. **Implement Registry Filters:** Build text/vision model filtering adapters  
-3. **Smart Router Development:** Implement content-aware model routing
-4. **UI Component Creation:** Build React model selector components
-5. **WebSocket Enhancement:** Update chat handlers for dynamic model routing
-
-This plan transforms the existing fixed registry into a dynamic, user-controlled model selection system while preserving the AI-native architecture principles and ensuring seamless integration with the current chat infrastructure.
+**STATUS: Ready for Phase 3 - Smart Model Router Implementation**

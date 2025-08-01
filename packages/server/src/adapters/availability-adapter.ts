@@ -1,0 +1,58 @@
+/**
+ * Availability Adapter - Server Implementation
+ */
+
+import { AvailabilityAdapter } from '@olympian/shared/features/chat/smart-model-router/contract';
+import { OllamaService } from '../services/ollama-service';
+
+export class AvailabilityAdapterImpl implements AvailabilityAdapter {
+  constructor(private ollamaService: OllamaService) {}
+
+  async checkModelHealth(modelName: string) {
+    try {
+      const startTime = Date.now();
+      
+      // Check if Ollama service is connected
+      if (!this.ollamaService.isConnected()) {
+        return { available: false, healthy: false };
+      }
+      
+      // Try to ping the model
+      const responseTime = await this.pingModel(modelName);
+      
+      return {
+        available: true,
+        healthy: responseTime < 10000,
+        responseTime
+      };
+    } catch (error) {
+      return { available: false, healthy: false };
+    }
+  }
+
+  async pingModel(modelName: string): Promise<number> {
+    try {
+      const startTime = Date.now();
+      
+      // Use a minimal request to test model availability
+      const testRequest = {
+        model: modelName,
+        messages: [{ role: 'user' as const, content: 'ping' }],
+        stream: false,
+        options: { 
+          max_tokens: 1,
+          temperature: 0
+        }
+      };
+      
+      // Try to get a response from the model
+      const generator = this.ollamaService.streamChat(testRequest);
+      const firstChunk = await generator.next();
+      
+      const endTime = Date.now();
+      return endTime - startTime;
+    } catch (error) {
+      throw new Error(`Failed to ping model ${modelName}: ${error}`);
+    }
+  }
+}

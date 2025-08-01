@@ -12,6 +12,7 @@ import { MessageServiceImpl } from "./services/message-service-impl";
 import { ArtifactServiceImpl } from "./services/artifact-service-impl";
 import { McpServiceImpl } from "./services/mcp-service-impl";
 import { ModelRegistryServiceImpl } from "./services/model-registry-service-impl";
+import { SmartModelRouterService } from "./services/smart-model-router-service-impl";
 
 // Infrastructure
 import { MCPManager } from "./mcp/mcp-manager-stub";

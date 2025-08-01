@@ -27,7 +27,7 @@ export class TextModelSelector implements TextModelSelectorContract {
     try {
       this.currentTextModel = await this.selectionPersistenceAdapter.getTextModelSelection();
     } catch (error) {
-      console.warn(Failed to load text model selection:, error);
+      console.warn(`Failed to load text model selection:`, error);
     }
   }
 
@@ -36,7 +36,7 @@ export class TextModelSelector implements TextModelSelectorContract {
       const allModels = await this.modelRegistryService.getAllRegisteredModels();
       return this.textModelFilterAdapter.filterTextModels(allModels);
     } catch (error) {
-      console.error(Failed to get available text models:, error);
+      console.error(`Failed to get available text models:`, error);
       return [];
     }
   }
@@ -50,7 +50,7 @@ export class TextModelSelector implements TextModelSelectorContract {
       // Validate selection first
       const validation = await this.validateTextModelSelection(modelName);
       if (!validation.allowed) {
-        throw new Error(validation.reason || Invalid model selection);
+        throw new Error(validation.reason || `Invalid model selection`);
       }
 
       // Save selection
@@ -58,9 +58,9 @@ export class TextModelSelector implements TextModelSelectorContract {
       this.currentTextModel = modelName;
 
       // Emit event (to be implemented with event system)
-      console.log(Text model selected:, modelName);
+      console.log(`Text model selected:`, modelName);
     } catch (error) {
-      console.error(Failed to set text model:, error);
+      console.error(`Failed to set text model:`, error);
       throw error;
     }
   }
@@ -72,7 +72,7 @@ export class TextModelSelector implements TextModelSelectorContract {
       if (!modelCapability) {
         return {
           allowed: false,
-          reason: Model not found in registry
+          reason: `Model not found in registry`
         };
       }
 
@@ -80,7 +80,7 @@ export class TextModelSelector implements TextModelSelectorContract {
       if (!modelCapability.capabilities.includes(text-generation)) {
         return {
           allowed: false,
-          reason: Model does not support text generation
+          reason: `Model does not support text generation`
         };
       }
 
@@ -88,7 +88,7 @@ export class TextModelSelector implements TextModelSelectorContract {
       if (modelCapability.hasVision === true && modelCapability.capabilities.length === 1) {
         return {
           allowed: false,
-          reason: Model is vision-only, not suitable for text generation
+          reason: `Model is vision-only, not suitable for text generation`
         };
       }
 
@@ -96,7 +96,7 @@ export class TextModelSelector implements TextModelSelectorContract {
     } catch (error) {
       return {
         allowed: false,
-        reason: Failed to validate model selection
+        reason: `Failed to validate model selection`
       };
     }
   }
@@ -108,7 +108,7 @@ export class TextModelSelector implements TextModelSelectorContract {
       const modelCapability = await this.modelRegistryService.getModelCapability(modelName);
       return modelCapability !== null;
     } catch (error) {
-      console.error(Failed to check model availability:, error);
+      console.error(`Failed to check model availability:`, error);
       return false;
     }
   }

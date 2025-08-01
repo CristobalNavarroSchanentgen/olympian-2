@@ -6,6 +6,8 @@ import { MCPManager } from '../mcp/mcp-manager-stub';
 import { OllamaService } from '../services/ollama-service';
 import { SmartModelRouter } from "@olympian/shared/features/chat/smart-model-router";
 import { ModelRegistryService } from "@olympian/shared/services/model-registry-service";
+import { TextModelSelectorContract } from "../features/ui/text-model-selector/contract";
+import { VisionModelSelectorContract } from "../features/ui/vision-model-selector/contract";
 
 export class WebSocketHandler {
   private io: SocketIOServer;
@@ -15,6 +17,10 @@ export class WebSocketHandler {
   private ollamaService: OllamaService;
   private smartModelRouter: SmartModelRouter;
   private modelRegistryService: ModelRegistryService;
+    textModelSelector: TextModelSelectorContract,
+    visionModelSelector: VisionModelSelectorContract
+  private textModelSelector: TextModelSelectorContract;
+  private visionModelSelector: VisionModelSelectorContract;
 
   constructor(
     io: SocketIOServer,
@@ -24,6 +30,8 @@ export class WebSocketHandler {
     ollamaService: OllamaService,
     smartModelRouter: SmartModelRouter,
     modelRegistryService: ModelRegistryService
+    textModelSelector: TextModelSelectorContract,
+    visionModelSelector: VisionModelSelectorContract
   ) {
     this.io = io;
     this.conversationService = conversationService;
@@ -32,6 +40,8 @@ export class WebSocketHandler {
     this.ollamaService = ollamaService;
     this.smartModelRouter = smartModelRouter;
     this.modelRegistryService = modelRegistryService;
+    this.textModelSelector = textModelSelector;
+    this.visionModelSelector = visionModelSelector;
     
     this.setupHandlers();
   }

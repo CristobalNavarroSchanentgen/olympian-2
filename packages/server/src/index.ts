@@ -14,6 +14,14 @@ import { McpServiceImpl } from "./services/mcp-service-impl";
 import { ModelRegistryServiceImpl } from "./services/model-registry-service-impl";
 import { SmartModelRouterService } from "./services/smart-model-router-service-impl";
 
+// Model Selector Features
+import { createTextModelSelector } from "./features/ui/text-model-selector";
+import { createVisionModelSelector } from "./features/ui/vision-model-selector";
+import { createTextModelFilterAdapter } from "./adapters/features/ui/text-model-selector/text-model-filter-adapter";
+import { createSelectionPersistenceAdapter } from "./adapters/features/ui/model-selector/selection-persistence-adapter";
+import { createVisionModelFilterAdapter } from "./adapters/features/ui/vision-model-selector/vision-model-filter-adapter";
+import { createImageDetectionAdapter } from "./adapters/features/ui/vision-model-selector/image-detection-adapter";
+
 // Infrastructure
 import { MCPManager } from "./mcp/mcp-manager-stub";
 import { WebSocketHandler } from "./websocket/websocket-handler";
@@ -58,6 +66,26 @@ async function startServer() {
     console.log("🦙 Ollama service initialized");
     const modelRegistryService = new ModelRegistryServiceImpl();
 
+    // Initialize model selector adapters
+    const textModelFilterAdapter = createTextModelFilterAdapter();
+    const visionModelFilterAdapter = createVisionModelFilterAdapter();
+    const selectionPersistenceAdapter = createSelectionPersistenceAdapter();
+    const imageDetectionAdapter = createImageDetectionAdapter();
+
+    // Initialize model selector features
+    const textModelSelector = createTextModelSelector(
+      modelRegistryService,
+      textModelFilterAdapter,
+      selectionPersistenceAdapter
+    );
+
+    const visionModelSelector = createVisionModelSelector(
+      modelRegistryService,
+      visionModelFilterAdapter,
+      selectionPersistenceAdapter,
+      imageDetectionAdapter
+    );
+
     // Initialize Smart Model Router Service
     const smartModelRouterService = new SmartModelRouterService(modelRegistryService, ollamaService);
     const smartModelRouter = smartModelRouterService.getRouter();
@@ -71,7 +99,7 @@ async function startServer() {
 
 
     // Setup WebSocket handling
-    const wsHandler = new WebSocketHandler(io, conversationService, messageService, mcpManager, ollamaService, smartModelRouter, modelRegistryService);
+    const wsHandler = new WebSocketHandler(io, conversationService, messageService, mcpManager, ollamaService, smartModelRouter, modelRegistryService, textModelSelector, visionModelSelector);
     console.log("🔌 WebSocket handler initialized");
 
     // Setup all API routes with service injection

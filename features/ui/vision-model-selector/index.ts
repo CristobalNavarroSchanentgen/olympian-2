@@ -4,7 +4,7 @@
  */
 
 import { ModelCapabilityDefinition } from ../../../packages/shared/models/connection;
-import { VisionModelSelectorContract, MessageInput, ValidationResult } from ./contract;
+import { VisionModelSelectorContract, MessageInput, ValidationResult } from "./contract";
 
 export class VisionModelSelector implements VisionModelSelectorContract {
   private modelRegistryService: any;
@@ -30,7 +30,7 @@ export class VisionModelSelector implements VisionModelSelectorContract {
     try {
       this.currentVisionModel = await this.selectionPersistenceAdapter.getVisionModelSelection();
     } catch (error) {
-      console.warn(Failed to load vision model selection:, error);
+      console.warn(`Failed to load vision model selection:`, error);
     }
   }
 
@@ -39,7 +39,7 @@ export class VisionModelSelector implements VisionModelSelectorContract {
       const allModels = await this.modelRegistryService.getAllRegisteredModels();
       return this.visionModelFilterAdapter.filterVisionModels(allModels);
     } catch (error) {
-      console.error(Failed to get available vision models:, error);
+      console.error(`Failed to get available vision models:`, error);
       return [];
     }
   }
@@ -53,7 +53,7 @@ export class VisionModelSelector implements VisionModelSelectorContract {
       // Validate selection first
       const validation = await this.validateVisionModelSelection(modelName);
       if (!validation.allowed) {
-        throw new Error(validation.reason || Invalid vision model selection);
+        throw new Error(validation.reason || `Invalid vision model selection`);
       }
 
       // Save selection
@@ -61,9 +61,9 @@ export class VisionModelSelector implements VisionModelSelectorContract {
       this.currentVisionModel = modelName;
 
       // Emit event (to be implemented with event system)
-      console.log(Vision model selected:, modelName);
+      console.log(`Vision model selected:`, modelName);
     } catch (error) {
-      console.error(Failed to set vision model:, error);
+      console.error(`Failed to set vision model:`, error);
       throw error;
     }
   }
@@ -72,7 +72,7 @@ export class VisionModelSelector implements VisionModelSelectorContract {
     try {
       return this.imageDetectionAdapter.detectImages(input);
     } catch (error) {
-      console.error(Failed to detect images in input:, error);
+      console.error(`Failed to detect images in input:`, error);
       return false;
     }
   }
@@ -92,7 +92,7 @@ export class VisionModelSelector implements VisionModelSelectorContract {
       if (!modelCapability.hasVision) {
         return {
           allowed: false,
-          reason: Model does not support vision processing
+          reason: `Model does not support vision processing`
         };
       }
 
@@ -100,7 +100,7 @@ export class VisionModelSelector implements VisionModelSelectorContract {
     } catch (error) {
       return {
         allowed: false,
-        reason: Failed to validate vision model selection
+        reason: `Failed to validate vision model selection`
       };
     }
   }

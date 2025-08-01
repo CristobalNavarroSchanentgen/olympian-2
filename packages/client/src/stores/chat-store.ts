@@ -35,10 +35,27 @@ interface ChatState {
   inputValue: string;
   setInputValue: (value: string) => void;
   selectedImages: string[];
-  setSelectedImages: (images: string[]) => void;
+
+  // Model Selection
+  selectedModel: string | null;
+  modelPreferences: {
+    preferredTextModel?: string;
+    preferredVisionModel?: string;
+    autoSelect?: boolean;
+  };
+  modelRecommendation: {
+    model: string;
+    reason: string;
+    confidence: number;
+  } | null;  setSelectedImages: (images: string[]) => void;
   addImage: (image: string) => void;
   removeImage: (index: number) => void;
-}
+
+  // Model Selection Actions
+  setSelectedModel: (model: string | null) => void;
+  setModelPreferences: (preferences: Partial<ChatState["modelPreferences"]>) => void;
+  setModelRecommendation: (recommendation: ChatState["modelRecommendation"]) => void;
+  clearModelRecommendation: () => void;}
 
 export const useChatStore = create<ChatState>()((set, get) => ({
   // Conversations
@@ -112,7 +129,13 @@ export const useChatStore = create<ChatState>()((set, get) => ({
   inputValue: '',
   setInputValue: (value) => set({ inputValue: value }),
   selectedImages: [],
-  setSelectedImages: (images) => set({ selectedImages: images }),
+
+  // Model Selection
+  selectedModel: null,
+  modelPreferences: {
+    autoSelect: true
+  },
+  modelRecommendation: null,  setSelectedImages: (images) => set({ selectedImages: images }),
   addImage: (image) => set({ 
     selectedImages: [...get().selectedImages, image] 
   }),

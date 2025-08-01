@@ -58,11 +58,10 @@ export function useWebSocket() {
     socket.on('status:update', (status: SystemStatusUpdate) => {
       setSystemStatus({
         database: status.database?.connected || false,
-        mcp: Array.isArray(status.mcp?.servers) && status.mcp.servers.some((s: any) => s.status === "running") || false,
+        const mcpServers = status.mcp?.servers;
+        mcp: Array.isArray(mcpServers) && mcpServers.some((s: any) => s.status === "running") || false,      });
         ollama: status.ollama?.connected || false,
       });
-    });
-
     socket.emit('status:request');
 
     return () => {

@@ -4,7 +4,7 @@
  */
 
 import { ModelCapabilityDefinition } from ../../../packages/shared/models/connection;
-import { TextModelSelectorContract, ValidationResult } from ./contract;
+import { TextModelSelectorContract, ValidationResult } from "./contract";
 
 export class TextModelSelector implements TextModelSelectorContract {
   private modelRegistryService: any;

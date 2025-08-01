@@ -16,6 +16,7 @@ class ModelRegistryServiceImpl {
         const defaultModels = [
             {
                 modelName: 'llama3.2',
+                name: 'llama3.2',
                 provider: 'ollama',
                 capabilities: ['text-generation', 'conversation'],
                 contextLength: 8192,
@@ -25,6 +26,7 @@ class ModelRegistryServiceImpl {
             },
             {
                 modelName: 'codellama',
+                name: 'codellama',
                 provider: 'ollama',
                 capabilities: ['code-generation', 'text-generation'],
                 contextLength: 16384,
@@ -42,6 +44,9 @@ class ModelRegistryServiceImpl {
     }
     async getAllRegisteredModels() {
         return Array.from(this.models.values());
+    }
+    async getAllModels() {
+        return this.getAllRegisteredModels();
     }
     async validateModelAccess(modelName) {
         const hasModel = this.models.has(modelName);

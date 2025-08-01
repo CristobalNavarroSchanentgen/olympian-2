@@ -180,6 +180,38 @@ domains:
     
   - name: log-aggregation-requested
     schema: events/log-aggregation-requested.ts        config: config/features/ui/reasoning-panel/schema.ts
+  - name: text-model-selected
+    schema: events/text-model-selected.ts
+    
+  - name: vision-model-selected
+    schema: events/vision-model-selected.ts
+    
+  - name: model-selection-failed
+    schema: events/model-selection-failed.ts
+
+      - name: text-model-selector
+        contract: features/ui/text-model-selector/contract.ts
+        adapters:
+          - text-model-filter-adapter
+          - selection-persistence-adapter
+        services:
+          - model-registry-service
+        events:
+          - text-model-selected
+          - model-selection-failed
+        config: config/features/ui/text-model-selector/schema.ts
+
+      - name: vision-model-selector
+        contract: features/ui/vision-model-selector/contract.ts
+        adapters:
+          - vision-model-filter-adapter
+          - selection-persistence-adapter
+        services:
+          - model-registry-service
+        events:
+          - vision-model-selected
+          - model-selection-failed
+        config: config/features/ui/vision-model-selector/schema.ts
 
   
   observability:
@@ -345,6 +377,14 @@ events:
     
   - name: log-aggregation-requested
     schema: events/log-aggregation-requested.ts    schema: events/reasoning-collapsed.ts
+  - name: text-model-selected
+    schema: events/text-model-selected.ts
+    
+  - name: vision-model-selected
+    schema: events/vision-model-selected.ts
+    
+  - name: model-selection-failed
+    schema: events/model-selection-failed.ts
 
 # Models (Pure Types)
 models:
@@ -366,6 +406,11 @@ models:
   vision:
     - image-data.ts
     - processing-result.ts
+  ui:
+    - layout-config.ts
+    - theme-config.ts
+    - model-selection.ts
+    - reasoning-data.ts
     
   artifacts:
     - artifact.ts
@@ -490,3 +535,27 @@ model-registry:
           - reasoning-panel-toggled
           - reasoning-exported
         config: config/features/ui/reasoning-panel/schema.ts
+
+      - name: text-model-selector
+        contract: features/ui/text-model-selector/contract.ts
+        adapters:
+          - text-model-filter-adapter
+          - selection-persistence-adapter
+        services:
+          - model-registry-service
+        events:
+          - text-model-selected
+          - model-selection-failed
+        config: config/features/ui/text-model-selector/schema.ts
+
+      - name: vision-model-selector
+        contract: features/ui/vision-model-selector/contract.ts
+        adapters:
+          - vision-model-filter-adapter
+          - selection-persistence-adapter
+        services:
+          - model-registry-service
+        events:
+          - vision-model-selected
+          - model-selection-failed
+        config: config/features/ui/vision-model-selector/schema.ts

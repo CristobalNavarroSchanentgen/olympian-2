@@ -11,6 +11,7 @@ export declare class ModelRegistryServiceImpl implements ModelRegistryService {
     private initializeDefaultModels;
     getModelCapability(modelName: string): Promise<ModelCapabilityDefinition | null>;
     getAllRegisteredModels(): Promise<ModelCapabilityDefinition[]>;
+    getAllModels(): Promise<ModelCapabilityDefinition[]>;
     validateModelAccess(modelName: string): Promise<{
         allowed: boolean;
         reason?: string;

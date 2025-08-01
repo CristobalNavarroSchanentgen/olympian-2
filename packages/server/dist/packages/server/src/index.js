@@ -16,6 +16,7 @@ const message_service_impl_1 = require("./services/message-service-impl");
 const artifact_service_impl_1 = require("./services/artifact-service-impl");
 const mcp_service_impl_1 = require("./services/mcp-service-impl");
 const model_registry_service_impl_1 = require("./services/model-registry-service-impl");
+const smart_model_router_service_impl_1 = require("./services/smart-model-router-service-impl");
 // Infrastructure
 const mcp_manager_stub_1 = require("./mcp/mcp-manager-stub");
 const websocket_handler_1 = require("./websocket/websocket-handler");
@@ -48,16 +49,20 @@ async function startServer() {
         const messageService = new message_service_impl_1.MessageServiceImpl();
         const artifactService = new artifact_service_impl_1.ArtifactServiceImpl();
         const mcpService = new mcp_service_impl_1.McpServiceImpl();
+        // Initialize Ollama service first (required by Smart Model Router)
+        const ollamaService = new ollama_service_1.OllamaService();
+        console.log("🦙 Ollama service initialized");
         const modelRegistryService = new model_registry_service_impl_1.ModelRegistryServiceImpl();
+        // Initialize Smart Model Router Service
+        const smartModelRouterService = new smart_model_router_service_impl_1.SmartModelRouterService(modelRegistryService, ollamaService);
+        const smartModelRouter = smartModelRouterService.getRouter();
         console.log("💼 Business services initialized");
         // Initialize infrastructure services
         const mcpManager = new mcp_manager_stub_1.MCPManager();
         await mcpManager.initialize();
         console.log("🔧 MCP Manager initialized");
-        const ollamaService = new ollama_service_1.OllamaService();
-        console.log("🦙 Ollama service initialized");
         // Setup WebSocket handling
-        const wsHandler = new websocket_handler_1.WebSocketHandler(io, conversationService, messageService, mcpManager, ollamaService);
+        const wsHandler = new websocket_handler_1.WebSocketHandler(io, conversationService, messageService, mcpManager, ollamaService, smartModelRouter, modelRegistryService);
         console.log("🔌 WebSocket handler initialized");
         // Setup all API routes with service injection
         const apiServices = {

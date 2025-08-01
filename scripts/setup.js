@@ -19,14 +19,6 @@ async function setup() {
 
   const ollamaUrl = await question('🔗 Enter Ollama URL (default: http://localhost:11434): ') || 'http://localhost:11434';
   
-  // Normalize URL format
-  let normalizedUrl = ollamaUrl;
-  if (!normalizedUrl.startsWith("http://") && !normalizedUrl.startsWith("https://")) {
-    normalizedUrl = "http://" + normalizedUrl;
-  }
-  if (!normalizedUrl.includes(":", 8)) { // Skip protocol part
-    normalizedUrl += ":11434";
-  }  
   console.log('');
   console.log('🔍 Model Capability Detection:');
   console.log('1. Auto-scan (recommended)');
@@ -57,7 +49,7 @@ async function setup() {
     'PORT=3001',
     'MONGODB_URI=mongodb://root:olympian123@mongodb:27017/olympian?authSource=admin',
     'CLIENT_URL=http://localhost:3000',
-    'OLLAMA_URL=' + normalizedUrl,
+    'OLLAMA_URL=' + ollamaUrl,
     'AUTO_SCAN_MODELS=' + (detectionChoice === "2" ? "false" : "true"),
     'NASA_API_KEY=' + nasaApiKey,
     'GITHUB_TOKEN=' + githubToken

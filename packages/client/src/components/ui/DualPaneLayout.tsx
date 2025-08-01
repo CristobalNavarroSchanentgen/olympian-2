@@ -25,7 +25,8 @@ export function DualPaneLayout() {
         const conversations = await chatService.getConversations();
         setConversations(Array.isArray(conversations) ? conversations : []);
       } catch (error) {
-        console.error("Failed to load conversations:", error); setConversations([]);
+        console.error("Failed to load conversations:", error);
+        setConversations([]);
       }
     };
 

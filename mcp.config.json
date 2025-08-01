@@ -1,0 +1,36 @@
+{
+  "servers": {
+    "met-museum": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "metmuseum-mcp"
+      ],
+      "env": {}
+    },
+    "nasa-mcp": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@programcomputer/nasa-mcp-server@latest"
+      ],
+      "env": {}
+    },
+    "github": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-github"
+      ],
+      "env": {}
+    },
+    "context7": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@upstash/context7-mcp"
+      ],
+      "env": {}
+    }
+  }
+}

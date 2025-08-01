@@ -69,3 +69,434 @@ Error: Transform failed with 1 error:
 }
 
 Node.js v23.11.0
+11:49:22 PM [tsx] change in ./src/index.ts Rerunning...
+c
+node:internal/modules/run_main:104
+    triggerUncaughtException(
+    ^
+Error: Transform failed with 1 error:
+/Users/cristobalnavarro/Desktop/olympian-2/packages/server/src/index.ts:71:4: ERROR: Unexpected "const"
+    at failureErrorWithLog (/Users/cristobalnavarro/Desktop/olympian-2/node_modules/esbuild/lib/main.js:1467:15)
+    at /Users/cristobalnavarro/Desktop/olympian-2/node_modules/esbuild/lib/main.js:736:50
+    at responseCallbacks.<computed> (/Users/cristobalnavarro/Desktop/olympian-2/node_modules/esbuild/lib/main.js:603:9)
+    at handleIncomingPacket (/Users/cristobalnavarro/Desktop/olympian-2/node_modules/esbuild/lib/main.js:658:12)
+    at Socket.readFromStdout (/Users/cristobalnavarro/Desktop/olympian-2/node_modules/esbuild/lib/main.js:581:7)
+    at Socket.emit (node:events:507:28)
+    at addChunk (node:internal/streams/readable:559:12)
+    at readableAddChunkPushByteMode (node:internal/streams/readable:510:3)
+    at Readable.push (node:internal/streams/readable:390:5)
+    at Pipe.onStreamRead (node:internal/stream_base_commons:189:23) {
+  name: 'TransformError'
+}
+
+Node.js v23.11.0
+11:49:53 PM [tsx] change in ./src/index.ts Rerunning...
+c
+node:internal/modules/run_main:104
+    triggerUncaughtException(
+    ^
+Error: Transform failed with 1 error:
+/Users/cristobalnavarro/Desktop/olympian-2/packages/server/src/index.ts:72:4: ERROR: Unexpected "const"
+    at failureErrorWithLog (/Users/cristobalnavarro/Desktop/olympian-2/node_modules/esbuild/lib/main.js:1467:15)
+    at /Users/cristobalnavarro/Desktop/olympian-2/node_modules/esbuild/lib/main.js:736:50
+    at responseCallbacks.<computed> (/Users/cristobalnavarro/Desktop/olympian-2/node_modules/esbuild/lib/main.js:603:9)
+    at handleIncomingPacket (/Users/cristobalnavarro/Desktop/olympian-2/node_modules/esbuild/lib/main.js:658:12)
+    at Socket.readFromStdout (/Users/cristobalnavarro/Desktop/olympian-2/node_modules/esbuild/lib/main.js:581:7)
+    at Socket.emit (node:events:507:28)
+    at addChunk (node:internal/streams/readable:559:12)
+    at readableAddChunkPushByteMode (node:internal/streams/readable:510:3)
+    at Readable.push (node:internal/streams/readable:390:5)
+    at Pipe.onStreamRead (node:internal/stream_base_commons:189:23) {
+  name: 'TransformError'
+}
+
+Node.js v23.11.0
+11:49:57 PM [tsx] change in ./src/index.ts Rerunning...
+c
+node:internal/modules/run_main:104
+    triggerUncaughtException(
+    ^
+Error: Transform failed with 1 error:
+/Users/cristobalnavarro/Desktop/olympian-2/packages/server/src/index.ts:70:4: ERROR: Unexpected ")"
+    at failureErrorWithLog (/Users/cristobalnavarro/Desktop/olympian-2/node_modules/esbuild/lib/main.js:1467:15)
+    at /Users/cristobalnavarro/Desktop/olympian-2/node_modules/esbuild/lib/main.js:736:50
+    at responseCallbacks.<computed> (/Users/cristobalnavarro/Desktop/olympian-2/node_modules/esbuild/lib/main.js:603:9)
+    at handleIncomingPacket (/Users/cristobalnavarro/Desktop/olympian-2/node_modules/esbuild/lib/main.js:658:12)
+    at Socket.readFromStdout (/Users/cristobalnavarro/Desktop/olympian-2/node_modules/esbuild/lib/main.js:581:7)
+    at Socket.emit (node:events:507:28)
+    at addChunk (node:internal/streams/readable:559:12)
+    at readableAddChunkPushByteMode (node:internal/streams/readable:510:3)
+    at Readable.push (node:internal/streams/readable:390:5)
+    at Pipe.onStreamRead (node:internal/stream_base_commons:189:23) {
+  name: 'TransformError'
+}
+
+Node.js v23.11.0
+11:50:06 PM [tsx] change in ./src/index.ts Rerunning...
+c
+node:internal/modules/run_main:104
+    triggerUncaughtException(
+    ^
+Error: Transform failed with 1 error:
+/Users/cristobalnavarro/Desktop/olympian-2/packages/server/src/index.ts:83:4: ERROR: Unexpected ")"
+    at failureErrorWithLog (/Users/cristobalnavarro/Desktop/olympian-2/node_modules/esbuild/lib/main.js:1467:15)
+    at /Users/cristobalnavarro/Desktop/olympian-2/node_modules/esbuild/lib/main.js:736:50
+    at responseCallbacks.<computed> (/Users/cristobalnavarro/Desktop/olympian-2/node_modules/esbuild/lib/main.js:603:9)
+    at handleIncomingPacket (/Users/cristobalnavarro/Desktop/olympian-2/node_modules/esbuild/lib/main.js:658:12)
+    at Socket.readFromStdout (/Users/cristobalnavarro/Desktop/olympian-2/node_modules/esbuild/lib/main.js:581:7)
+    at Socket.emit (node:events:507:28)
+    at addChunk (node:internal/streams/readable:559:12)
+    at readableAddChunkPushByteMode (node:internal/streams/readable:510:3)
+    at Readable.push (node:internal/streams/readable:390:5)
+    at Pipe.onStreamRead (node:internal/stream_base_commons:189:23) {
+  name: 'TransformError'
+}
+
+Node.js v23.11.0
+11:50:09 PM [tsx] change in ./src/index.ts Rerunning...
+c
+node:internal/modules/run_main:104
+    triggerUncaughtException(
+    ^
+Error: Transform failed with 1 error:
+/Users/cristobalnavarro/Desktop/olympian-2/packages/server/src/index.ts:76:4: ERROR: Expected ")" but found "const"
+    at failureErrorWithLog (/Users/cristobalnavarro/Desktop/olympian-2/node_modules/esbuild/lib/main.js:1467:15)
+    at /Users/cristobalnavarro/Desktop/olympian-2/node_modules/esbuild/lib/main.js:736:50
+    at responseCallbacks.<computed> (/Users/cristobalnavarro/Desktop/olympian-2/node_modules/esbuild/lib/main.js:603:9)
+    at handleIncomingPacket (/Users/cristobalnavarro/Desktop/olympian-2/node_modules/esbuild/lib/main.js:658:12)
+    at Socket.readFromStdout (/Users/cristobalnavarro/Desktop/olympian-2/node_modules/esbuild/lib/main.js:581:7)
+    at Socket.emit (node:events:507:28)
+    at addChunk (node:internal/streams/readable:559:12)
+    at readableAddChunkPushByteMode (node:internal/streams/readable:510:3)
+    at Readable.push (node:internal/streams/readable:390:5)
+    at Pipe.onStreamRead (node:internal/stream_base_commons:189:23) {
+  name: 'TransformError'
+}
+
+Node.js v23.11.0
+11:50:17 PM [tsx] change in ./src/index.ts Rerunning...
+c
+node:internal/modules/run_main:104
+    triggerUncaughtException(
+    ^
+Error: Transform failed with 1 error:
+/Users/cristobalnavarro/Desktop/olympian-2/packages/server/src/index.ts:84:4: ERROR: Expected ")" but found "console"
+    at failureErrorWithLog (/Users/cristobalnavarro/Desktop/olympian-2/node_modules/esbuild/lib/main.js:1467:15)
+    at /Users/cristobalnavarro/Desktop/olympian-2/node_modules/esbuild/lib/main.js:736:50
+    at responseCallbacks.<computed> (/Users/cristobalnavarro/Desktop/olympian-2/node_modules/esbuild/lib/main.js:603:9)
+    at handleIncomingPacket (/Users/cristobalnavarro/Desktop/olympian-2/node_modules/esbuild/lib/main.js:658:12)
+    at Socket.readFromStdout (/Users/cristobalnavarro/Desktop/olympian-2/node_modules/esbuild/lib/main.js:581:7)
+    at Socket.emit (node:events:507:28)
+    at addChunk (node:internal/streams/readable:559:12)
+    at readableAddChunkPushByteMode (node:internal/streams/readable:510:3)
+    at Readable.push (node:internal/streams/readable:390:5)
+    at Pipe.onStreamRead (node:internal/stream_base_commons:189:23) {
+  name: 'TransformError'
+}
+
+Node.js v23.11.0
+11:50:28 PM [tsx] change in ./src/index.ts Rerunning...
+cnode:internal/modules/run_main:104
+    triggerUncaughtException(
+    ^
+
+Error: Transform failed with 1 error:
+/Users/cristobalnavarro/Desktop/olympian-2/features/ui/text-model-selector/index.ts:6:42: ERROR: Expected string but found "."
+    at failureErrorWithLog (/Users/cristobalnavarro/Desktop/olympian-2/node_modules/esbuild/lib/main.js:1467:15)
+    at /Users/cristobalnavarro/Desktop/olympian-2/node_modules/esbuild/lib/main.js:736:50
+    at responseCallbacks.<computed> (/Users/cristobalnavarro/Desktop/olympian-2/node_modules/esbuild/lib/main.js:603:9)
+    at handleIncomingPacket (/Users/cristobalnavarro/Desktop/olympian-2/node_modules/esbuild/lib/main.js:658:12)
+    at Socket.readFromStdout (/Users/cristobalnavarro/Desktop/olympian-2/node_modules/esbuild/lib/main.js:581:7)
+    at Socket.emit (node:events:507:28)
+    at addChunk (node:internal/streams/readable:559:12)
+    at readableAddChunkPushByteMode (node:internal/streams/readable:510:3)
+    at Readable.push (node:internal/streams/readable:390:5)
+    at Pipe.onStreamRead (node:internal/stream_base_commons:189:23) {
+  name: 'TransformError'
+}
+
+Node.js v23.11.0
+11:51:07 PM [tsx] change in ./../../features/ui/text-model-selector/index.ts Rerunning...
+cnode:internal/modules/run_main:104
+    triggerUncaughtException(
+    ^
+
+Error: Transform failed with 1 error:
+/Users/cristobalnavarro/Desktop/olympian-2/features/ui/text-model-selector/index.ts:6:32: ERROR: Expected string but found "."
+    at failureErrorWithLog (/Users/cristobalnavarro/Desktop/olympian-2/node_modules/esbuild/lib/main.js:1467:15)
+    at /Users/cristobalnavarro/Desktop/olympian-2/node_modules/esbuild/lib/main.js:736:50
+    at responseCallbacks.<computed> (/Users/cristobalnavarro/Desktop/olympian-2/node_modules/esbuild/lib/main.js:603:9)
+    at handleIncomingPacket (/Users/cristobalnavarro/Desktop/olympian-2/node_modules/esbuild/lib/main.js:658:12)
+    at Socket.readFromStdout (/Users/cristobalnavarro/Desktop/olympian-2/node_modules/esbuild/lib/main.js:581:7)
+    at Socket.emit (node:events:507:28)
+    at addChunk (node:internal/streams/readable:559:12)
+    at readableAddChunkPushByteMode (node:internal/streams/readable:510:3)
+    at Readable.push (node:internal/streams/readable:390:5)
+    at Pipe.onStreamRead (node:internal/stream_base_commons:189:23) {
+  name: 'TransformError'
+}
+
+Node.js v23.11.0
+11:51:59 PM [tsx] change in ./../../features/ui/text-model-selector/index.ts Rerunning...
+cnode:internal/modules/run_main:104
+    triggerUncaughtException(
+    ^
+
+Error: Transform failed with 1 error:
+/Users/cristobalnavarro/Desktop/olympian-2/features/ui/vision-model-selector/index.ts:6:32: ERROR: Expected string but found "."
+    at failureErrorWithLog (/Users/cristobalnavarro/Desktop/olympian-2/node_modules/esbuild/lib/main.js:1467:15)
+    at /Users/cristobalnavarro/Desktop/olympian-2/node_modules/esbuild/lib/main.js:736:50
+    at responseCallbacks.<computed> (/Users/cristobalnavarro/Desktop/olympian-2/node_modules/esbuild/lib/main.js:603:9)
+    at handleIncomingPacket (/Users/cristobalnavarro/Desktop/olympian-2/node_modules/esbuild/lib/main.js:658:12)
+    at Socket.readFromStdout (/Users/cristobalnavarro/Desktop/olympian-2/node_modules/esbuild/lib/main.js:581:7)
+    at Socket.emit (node:events:507:28)
+    at addChunk (node:internal/streams/readable:559:12)
+    at readableAddChunkPushByteMode (node:internal/streams/readable:510:3)
+    at Readable.push (node:internal/streams/readable:390:5)
+    at Pipe.onStreamRead (node:internal/stream_base_commons:189:23) {
+  name: 'TransformError'
+}
+
+Node.js v23.11.0
+11:52:07 PM [tsx] change in ./../../features/ui/vision-model-selector/index.ts Rerunning...
+cnode:internal/modules/run_main:104
+    triggerUncaughtException(
+    ^
+
+Error: Transform failed with 1 error:
+/Users/cristobalnavarro/Desktop/olympian-2/features/ui/vision-model-selector/index.ts:87:24: ERROR: Expected "}" but found "not"
+    at failureErrorWithLog (/Users/cristobalnavarro/Desktop/olympian-2/node_modules/esbuild/lib/main.js:1467:15)
+    at /Users/cristobalnavarro/Desktop/olympian-2/node_modules/esbuild/lib/main.js:736:50
+    at responseCallbacks.<computed> (/Users/cristobalnavarro/Desktop/olympian-2/node_modules/esbuild/lib/main.js:603:9)
+    at handleIncomingPacket (/Users/cristobalnavarro/Desktop/olympian-2/node_modules/esbuild/lib/main.js:658:12)
+    at Socket.readFromStdout (/Users/cristobalnavarro/Desktop/olympian-2/node_modules/esbuild/lib/main.js:581:7)
+    at Socket.emit (node:events:507:28)
+    at addChunk (node:internal/streams/readable:559:12)
+    at readableAddChunkPushByteMode (node:internal/streams/readable:510:3)
+    at Readable.push (node:internal/streams/readable:390:5)
+    at Pipe.onStreamRead (node:internal/stream_base_commons:189:23) {
+  name: 'TransformError'
+}
+
+Node.js v23.11.0
+11:52:21 PM [tsx] change in ./../../features/ui/vision-model-selector/index.ts Rerunning...
+cnode:internal/modules/cjs/loader:1405
+  const err = new Error(message);
+              ^
+
+Error: Cannot find module './adapters/features/ui/model-selector/selection-persistence-adapter'
+Require stack:
+- /Users/cristobalnavarro/Desktop/olympian-2/packages/server/src/index.ts
+    at node:internal/modules/cjs/loader:1405:15
+    at nextResolveSimple (/Users/cristobalnavarro/Desktop/olympian-2/node_modules/tsx/dist/register-D46fvsV_.cjs:4:1004)
+    at /Users/cristobalnavarro/Desktop/olympian-2/node_modules/tsx/dist/register-D46fvsV_.cjs:3:2630
+    at /Users/cristobalnavarro/Desktop/olympian-2/node_modules/tsx/dist/register-D46fvsV_.cjs:3:1542
+    at resolveTsPaths (/Users/cristobalnavarro/Desktop/olympian-2/node_modules/tsx/dist/register-D46fvsV_.cjs:4:760)
+    at /Users/cristobalnavarro/Desktop/olympian-2/node_modules/tsx/dist/register-D46fvsV_.cjs:4:1102
+    at m._resolveFilename (file:///Users/cristobalnavarro/Desktop/olympian-2/node_modules/tsx/dist/register-B7jrtLTO.mjs:1:789)
+    at defaultResolveImpl (node:internal/modules/cjs/loader:1061:19)
+    at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1066:22)
+    at Function._load (node:internal/modules/cjs/loader:1215:37) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [
+    '/Users/cristobalnavarro/Desktop/olympian-2/packages/server/src/index.ts'
+  ]
+}
+
+Node.js v23.11.0
+11:52:49 PM [tsx] change in ./../../features/ui/text-model-selector/index.ts Rerunning...
+cnode:internal/modules/cjs/loader:1405
+  const err = new Error(message);
+              ^
+
+Error: Cannot find module './adapters/features/ui/model-selector/selection-persistence-adapter'
+Require stack:
+- /Users/cristobalnavarro/Desktop/olympian-2/packages/server/src/index.ts
+    at node:internal/modules/cjs/loader:1405:15
+    at nextResolveSimple (/Users/cristobalnavarro/Desktop/olympian-2/node_modules/tsx/dist/register-D46fvsV_.cjs:4:1004)
+    at /Users/cristobalnavarro/Desktop/olympian-2/node_modules/tsx/dist/register-D46fvsV_.cjs:3:2630
+    at /Users/cristobalnavarro/Desktop/olympian-2/node_modules/tsx/dist/register-D46fvsV_.cjs:3:1542
+    at resolveTsPaths (/Users/cristobalnavarro/Desktop/olympian-2/node_modules/tsx/dist/register-D46fvsV_.cjs:4:760)
+    at /Users/cristobalnavarro/Desktop/olympian-2/node_modules/tsx/dist/register-D46fvsV_.cjs:4:1102
+    at m._resolveFilename (file:///Users/cristobalnavarro/Desktop/olympian-2/node_modules/tsx/dist/register-B7jrtLTO.mjs:1:789)
+    at defaultResolveImpl (node:internal/modules/cjs/loader:1061:19)
+    at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1066:22)
+    at Function._load (node:internal/modules/cjs/loader:1215:37) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [
+    '/Users/cristobalnavarro/Desktop/olympian-2/packages/server/src/index.ts'
+  ]
+}
+
+Node.js v23.11.0
+11:53:24 PM [tsx] change in ./src/index.ts Rerunning...
+c
+node:internal/modules/run_main:104
+    triggerUncaughtException(
+    ^
+Error: Transform failed with 1 error:
+/Users/cristobalnavarro/Desktop/olympian-2/packages/server/src/index.ts:84:7: ERROR: Expected "(" but found "{"
+    at failureErrorWithLog (/Users/cristobalnavarro/Desktop/olympian-2/node_modules/esbuild/lib/main.js:1467:15)
+    at /Users/cristobalnavarro/Desktop/olympian-2/node_modules/esbuild/lib/main.js:736:50
+    at responseCallbacks.<computed> (/Users/cristobalnavarro/Desktop/olympian-2/node_modules/esbuild/lib/main.js:603:9)
+    at handleIncomingPacket (/Users/cristobalnavarro/Desktop/olympian-2/node_modules/esbuild/lib/main.js:658:12)
+    at Socket.readFromStdout (/Users/cristobalnavarro/Desktop/olympian-2/node_modules/esbuild/lib/main.js:581:7)
+    at Socket.emit (node:events:507:28)
+    at addChunk (node:internal/streams/readable:559:12)
+    at readableAddChunkPushByteMode (node:internal/streams/readable:510:3)
+    at Readable.push (node:internal/streams/readable:390:5)
+    at Pipe.onStreamRead (node:internal/stream_base_commons:189:23) {
+  name: 'TransformError'
+}
+
+Node.js v23.11.0
+11:53:41 PM [tsx] change in ./src/index.ts Rerunning...
+c
+node:internal/modules/run_main:104
+    triggerUncaughtException(
+    ^
+Error: Transform failed with 1 error:
+/Users/cristobalnavarro/Desktop/olympian-2/packages/server/src/index.ts:83:7: ERROR: Expected "(" but found "{"
+    at failureErrorWithLog (/Users/cristobalnavarro/Desktop/olympian-2/node_modules/esbuild/lib/main.js:1467:15)
+    at /Users/cristobalnavarro/Desktop/olympian-2/node_modules/esbuild/lib/main.js:736:50
+    at responseCallbacks.<computed> (/Users/cristobalnavarro/Desktop/olympian-2/node_modules/esbuild/lib/main.js:603:9)
+    at handleIncomingPacket (/Users/cristobalnavarro/Desktop/olympian-2/node_modules/esbuild/lib/main.js:658:12)
+    at Socket.readFromStdout (/Users/cristobalnavarro/Desktop/olympian-2/node_modules/esbuild/lib/main.js:581:7)
+    at Socket.emit (node:events:507:28)
+    at addChunk (node:internal/streams/readable:559:12)
+    at readableAddChunkPushByteMode (node:internal/streams/readable:510:3)
+    at Readable.push (node:internal/streams/readable:390:5)
+    at Pipe.onStreamRead (node:internal/stream_base_commons:189:23) {
+  name: 'TransformError'
+}
+
+Node.js v23.11.0
+11:53:44 PM [tsx] change in ./src/index.ts Rerunning...
+c
+node:internal/modules/run_main:104
+    triggerUncaughtException(
+    ^
+Error: Transform failed with 1 error:
+/Users/cristobalnavarro/Desktop/olympian-2/packages/server/src/index.ts:83:7: ERROR: Expected "(" but found "{"
+    at failureErrorWithLog (/Users/cristobalnavarro/Desktop/olympian-2/node_modules/esbuild/lib/main.js:1467:15)
+    at /Users/cristobalnavarro/Desktop/olympian-2/node_modules/esbuild/lib/main.js:736:50
+    at responseCallbacks.<computed> (/Users/cristobalnavarro/Desktop/olympian-2/node_modules/esbuild/lib/main.js:603:9)
+    at handleIncomingPacket (/Users/cristobalnavarro/Desktop/olympian-2/node_modules/esbuild/lib/main.js:658:12)
+    at Socket.readFromStdout (/Users/cristobalnavarro/Desktop/olympian-2/node_modules/esbuild/lib/main.js:581:7)
+    at Socket.emit (node:events:507:28)
+    at addChunk (node:internal/streams/readable:559:12)
+    at readableAddChunkPushByteMode (node:internal/streams/readable:510:3)
+    at Readable.push (node:internal/streams/readable:390:5)
+    at Pipe.onStreamRead (node:internal/stream_base_commons:189:23) {
+  name: 'TransformError'
+}
+
+Node.js v23.11.0
+11:53:59 PM [tsx] change in ./src/index.ts Rerunning...
+c11:54:04 PM [tsx] change in ./src/index.ts Restarting...
+c
+node:internal/modules/run_main:104
+    triggerUncaughtException(
+    ^
+Error: Transform failed with 1 error:
+/Users/cristobalnavarro/Desktop/olympian-2/packages/server/src/index.ts:88:7: ERROR: Expected "(" but found "{"
+    at failureErrorWithLog (/Users/cristobalnavarro/Desktop/olympian-2/node_modules/esbuild/lib/main.js:1467:15)
+    at /Users/cristobalnavarro/Desktop/olympian-2/node_modules/esbuild/lib/main.js:736:50
+    at responseCallbacks.<computed> (/Users/cristobalnavarro/Desktop/olympian-2/node_modules/esbuild/lib/main.js:603:9)
+    at handleIncomingPacket (/Users/cristobalnavarro/Desktop/olympian-2/node_modules/esbuild/lib/main.js:658:12)
+    at Socket.readFromStdout (/Users/cristobalnavarro/Desktop/olympian-2/node_modules/esbuild/lib/main.js:581:7)
+    at Socket.emit (node:events:507:28)
+    at addChunk (node:internal/streams/readable:559:12)
+    at readableAddChunkPushByteMode (node:internal/streams/readable:510:3)
+    at Readable.push (node:internal/streams/readable:390:5)
+    at Pipe.onStreamRead (node:internal/stream_base_commons:189:23) {
+  name: 'TransformError'
+}
+
+Node.js v23.11.0
+11:54:17 PM [tsx] change in ./src/index.ts Rerunning...
+c11:54:29 PM [tsx] change in ./src/index.ts Restarting...
+c11:54:33 PM [tsx] change in ./src/index.ts Restarting...
+c11:54:52 PM [tsx] change in ./src/index.ts Restarting...
+c❌ MongoDB connection failed: MongoServerSelectionError: connect ECONNREFUSED ::1:27017, connect ECONNREFUSED 127.0.0.1:27017
+    at Topology.selectServer (/Users/cristobalnavarro/Desktop/olympian-2/node_modules/mongodb/src/sdam/topology.ts:634:30)
+    at async Topology._connect (/Users/cristobalnavarro/Desktop/olympian-2/node_modules/mongodb/src/sdam/topology.ts:468:22)
+    at async Topology.connect (/Users/cristobalnavarro/Desktop/olympian-2/node_modules/mongodb/src/sdam/topology.ts:405:7)
+    at async topologyConnect (/Users/cristobalnavarro/Desktop/olympian-2/node_modules/mongodb/src/mongo_client.ts:680:9)
+    at async MongoClient._connect (/Users/cristobalnavarro/Desktop/olympian-2/node_modules/mongodb/src/mongo_client.ts:692:7)
+    at async MongoClient.connect (/Users/cristobalnavarro/Desktop/olympian-2/node_modules/mongodb/src/mongo_client.ts:604:7)
+    at async DatabaseService.connect (/Users/cristobalnavarro/Desktop/olympian-2/packages/server/src/database/database-service.ts:31:7)
+    at async startServer (/Users/cristobalnavarro/Desktop/olympian-2/packages/server/src/index.ts:54:5) {
+  errorLabelSet: Set(0) {},
+  reason: TopologyDescription {
+    type: 'Unknown',
+    servers: Map(1) { 'localhost:27017' => [ServerDescription] },
+    stale: false,
+    compatible: true,
+    heartbeatFrequencyMS: 10000,
+    localThresholdMS: 15,
+    setName: null,
+    maxElectionId: null,
+    maxSetVersion: null,
+    commonWireVersion: 0,
+    logicalSessionTimeoutMinutes: null
+  },
+  code: undefined,
+  [cause]: MongoNetworkError: connect ECONNREFUSED ::1:27017, connect ECONNREFUSED 127.0.0.1:27017
+      at Socket.<anonymous> (/Users/cristobalnavarro/Desktop/olympian-2/node_modules/mongodb/src/cmap/connect.ts:395:16)
+      at Object.onceWrapper (node:events:622:26)
+      at Socket.emit (node:events:507:28)
+      at emitErrorNT (node:internal/streams/destroy:170:8)
+      at emitErrorCloseNT (node:internal/streams/destroy:129:3)
+      at process.processTicksAndRejections (node:internal/process/task_queues:90:21) {
+    errorLabelSet: Set(1) { 'ResetPool' },
+    beforeHandshake: false,
+    [cause]: AggregateError [ECONNREFUSED]: 
+        at internalConnectMultiple (node:net:1139:18)
+        at afterConnectMultiple (node:net:1714:7) {
+      code: 'ECONNREFUSED',
+      [errors]: [Array]
+    }
+  }
+}
+❌ Failed to start server: MongoServerSelectionError: connect ECONNREFUSED ::1:27017, connect ECONNREFUSED 127.0.0.1:27017
+    at Topology.selectServer (/Users/cristobalnavarro/Desktop/olympian-2/node_modules/mongodb/src/sdam/topology.ts:634:30)
+    at async Topology._connect (/Users/cristobalnavarro/Desktop/olympian-2/node_modules/mongodb/src/sdam/topology.ts:468:22)
+    at async Topology.connect (/Users/cristobalnavarro/Desktop/olympian-2/node_modules/mongodb/src/sdam/topology.ts:405:7)
+    at async topologyConnect (/Users/cristobalnavarro/Desktop/olympian-2/node_modules/mongodb/src/mongo_client.ts:680:9)
+    at async MongoClient._connect (/Users/cristobalnavarro/Desktop/olympian-2/node_modules/mongodb/src/mongo_client.ts:692:7)
+    at async MongoClient.connect (/Users/cristobalnavarro/Desktop/olympian-2/node_modules/mongodb/src/mongo_client.ts:604:7)
+    at async DatabaseService.connect (/Users/cristobalnavarro/Desktop/olympian-2/packages/server/src/database/database-service.ts:31:7)
+    at async startServer (/Users/cristobalnavarro/Desktop/olympian-2/packages/server/src/index.ts:54:5) {
+  errorLabelSet: Set(0) {},
+  reason: TopologyDescription {
+    type: 'Unknown',
+    servers: Map(1) { 'localhost:27017' => [ServerDescription] },
+    stale: false,
+    compatible: true,
+    heartbeatFrequencyMS: 10000,
+    localThresholdMS: 15,
+    setName: null,
+    maxElectionId: null,
+    maxSetVersion: null,
+    commonWireVersion: 0,
+    logicalSessionTimeoutMinutes: null
+  },
+  code: undefined,
+  [cause]: MongoNetworkError: connect ECONNREFUSED ::1:27017, connect ECONNREFUSED 127.0.0.1:27017
+      at Socket.<anonymous> (/Users/cristobalnavarro/Desktop/olympian-2/node_modules/mongodb/src/cmap/connect.ts:395:16)
+      at Object.onceWrapper (node:events:622:26)
+      at Socket.emit (node:events:507:28)
+      at emitErrorNT (node:internal/streams/destroy:170:8)
+      at emitErrorCloseNT (node:internal/streams/destroy:129:3)
+      at process.processTicksAndRejections (node:internal/process/task_queues:90:21) {
+    errorLabelSet: Set(1) { 'ResetPool' },
+    beforeHandshake: false,
+    [cause]: AggregateError [ECONNREFUSED]: 
+        at internalConnectMultiple (node:net:1139:18)
+        at afterConnectMultiple (node:net:1714:7) {
+      code: 'ECONNREFUSED',
+      [errors]: [Array]
+    }
+  }
+}

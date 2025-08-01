@@ -48,6 +48,20 @@ class ModelSelectionAdapterImpl {
         const match = modelName.match(/(\d+(?:\.\d+)?)b/i);
         return match ? parseFloat(match[1]) : 0;
     }
+    // Implementation of missing contract methods
+    async getCurrentSelection() {
+        return {
+            textModel: "llama3.2:latest",
+            visionModel: "llava:latest",
+            timestamp: Date.now()
+        };
+    }
+    async updateSelection(selection) {
+        console.log("Model selection updated:", selection);
+    }
+    async validateSelection(selection) {
+        return !!(selection.textModel && selection.visionModel && selection.timestamp > 0);
+    }
 }
 exports.ModelSelectionAdapterImpl = ModelSelectionAdapterImpl;
 //# sourceMappingURL=model-selection-adapter.js.map

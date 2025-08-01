@@ -3,7 +3,7 @@
  * Provides interface for selecting and managing text-generation models
  */
 
-import { ModelCapabilityDefinition } from ../../../packages/shared/models/connection;
+import { ModelCapability } from "@olympian/shared/models/connection";
 
 export interface ValidationResult {
   allowed: boolean;
@@ -15,7 +15,7 @@ export interface TextModelSelectorContract {
   /**
    * Get available text-generation models from registry
    */
-  getAvailableTextModels(): Promise<ModelCapabilityDefinition[]>;
+  getAvailableTextModels(): Promise<ModelCapability[]>;
   
   /**
    * Get currently selected text model

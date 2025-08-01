@@ -41,6 +41,36 @@ class ContentAnalysisAdapterImpl {
             requiresProcessing: images.length > 0 && images.some(img => img.length > 100)
         };
     }
+    // Implementation of missing contract methods
+    async analyzeContent(content) {
+        const complexity = await this.analyzeTextComplexity(content);
+        const hasImages = content.includes("[image]") || content.includes("<img");
+        let suggestedModel = "llama3.2:latest";
+        if (hasImages) {
+            suggestedModel = "llava:latest";
+        }
+        else if (complexity.complexity === "complex") {
+            suggestedModel = "llama3.1:70b";
+        }
+        return {
+            hasImages,
+            complexity: complexity.complexity,
+            suggestedModel
+        };
+    }
+    async detectMediaType(content) {
+        const hasImages = content.includes("[image]") || content.includes("<img");
+        const hasText = content.replace(/\[image\]/g, "").trim().length > 0;
+        if (hasImages && hasText) {
+            return "mixed";
+        }
+        else if (hasImages) {
+            return "image";
+        }
+        else {
+            return "text";
+        }
+    }
 }
 exports.ContentAnalysisAdapterImpl = ContentAnalysisAdapterImpl;
 //# sourceMappingURL=content-analysis-adapter.js.map

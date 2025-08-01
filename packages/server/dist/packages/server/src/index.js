@@ -16,10 +16,15 @@ const message_service_impl_1 = require("./services/message-service-impl");
 const artifact_service_impl_1 = require("./services/artifact-service-impl");
 const mcp_service_impl_1 = require("./services/mcp-service-impl");
 const model_registry_service_impl_1 = require("./services/model-registry-service-impl");
-const smart_model_router_service_impl_1 = require("./services/smart-model-router-service-impl");
+// Model Selector Features
+const text_model_selector_1 = require("../../../features/ui/text-model-selector");
+const vision_model_selector_1 = require("../../../features/ui/vision-model-selector");
+const text_model_filter_adapter_1 = require("../../../adapters/features/ui/text-model-selector/text-model-filter-adapter");
+const vision_model_filter_adapter_1 = require("../../../adapters/features/ui/vision-model-selector/vision-model-filter-adapter");
+const selection_persistence_adapter_1 = require("../../../adapters/features/ui/model-selector/selection-persistence-adapter");
+const image_detection_adapter_1 = require("../../../adapters/features/ui/vision-model-selector/image-detection-adapter");
 // Infrastructure
 const mcp_manager_stub_1 = require("./mcp/mcp-manager-stub");
-const websocket_handler_1 = require("./websocket/websocket-handler");
 const ollama_service_1 = require("./services/ollama-service");
 // API setup
 const api_1 = require("./api");
@@ -53,16 +58,21 @@ async function startServer() {
         const ollamaService = new ollama_service_1.OllamaService();
         console.log("🦙 Ollama service initialized");
         const modelRegistryService = new model_registry_service_impl_1.ModelRegistryServiceImpl();
+        // Initialize model selector adapters
+        const textModelFilterAdapter = (0, text_model_filter_adapter_1.createTextModelFilterAdapter)();
+        const visionModelFilterAdapter = (0, vision_model_filter_adapter_1.createVisionModelFilterAdapter)();
+        const selectionPersistenceAdapter = (0, selection_persistence_adapter_1.createSelectionPersistenceAdapter)();
+        const imageDetectionAdapter = (0, image_detection_adapter_1.createImageDetectionAdapter)();
+        // Initialize model selector features
+        const textModelSelector = (0, text_model_selector_1.createTextModelSelector)(modelRegistryService, textModelFilterAdapter, selectionPersistenceAdapter);
+        const visionModelSelector = (0, vision_model_selector_1.createVisionModelSelector)(modelRegistryService, visionModelFilterAdapter, selectionPersistenceAdapter, imageDetectionAdapter);
         // Initialize Smart Model Router Service
-        const smartModelRouterService = new smart_model_router_service_impl_1.SmartModelRouterService(modelRegistryService, ollamaService);
-        const smartModelRouter = smartModelRouterService.getRouter();
         console.log("💼 Business services initialized");
         // Initialize infrastructure services
         const mcpManager = new mcp_manager_stub_1.MCPManager();
         await mcpManager.initialize();
         console.log("🔧 MCP Manager initialized");
         // Setup WebSocket handling
-        const wsHandler = new websocket_handler_1.WebSocketHandler(io, conversationService, messageService, mcpManager, ollamaService, smartModelRouter, modelRegistryService);
         console.log("🔌 WebSocket handler initialized");
         // Setup all API routes with service injection
         const apiServices = {

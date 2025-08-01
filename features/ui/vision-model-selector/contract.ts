@@ -3,7 +3,7 @@
  * Provides interface for selecting and managing vision-capable models
  */
 
-import { ModelCapabilityDefinition } from ../../../packages/shared/models/connection;
+import { ModelCapability } from "@olympian/shared/models/connection";
 
 export interface MessageInput {
   content: string;
@@ -23,7 +23,7 @@ export interface VisionModelSelectorContract {
   /**
    * Get available vision models from registry
    */
-  getAvailableVisionModels(): Promise<ModelCapabilityDefinition[]>;
+  getAvailableVisionModels(): Promise<ModelCapability[]>;
   
   /**
    * Get currently selected vision model

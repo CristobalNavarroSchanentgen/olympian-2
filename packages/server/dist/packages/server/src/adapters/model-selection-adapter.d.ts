@@ -12,4 +12,7 @@ export declare class ModelSelectionAdapterImpl implements ModelSelectionAdapter 
         reliability?: number;
     }): ModelCapabilityDefinition[];
     extractModelSize(modelName: string): number;
+    getCurrentSelection(): Promise<any>;
+    updateSelection(selection: any): Promise<void>;
+    validateSelection(selection: any): Promise<boolean>;
 }

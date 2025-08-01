@@ -55,4 +55,30 @@ export class AvailabilityAdapterImpl implements AvailabilityAdapter {
       throw new Error(`Failed to ping model ${modelName}: ${error}`);
     }
   }
-}
+
+  // Implementation of missing contract methods
+  async checkModelAvailability(modelId: string): Promise<boolean> {
+    try {
+      const health = await this.checkModelHealth(modelId);
+      return health.available;
+    } catch (error) {
+      console.error(`Error checking availability for ${modelId}:`, error);
+      return false;
+    }
+  }
+
+  async getAvailableModels(): Promise<string[]> {
+    try {
+      if (!this.ollamaService.isConnected()) {
+        console.warn("Ollama service not connected");
+        return [];
+      }
+      
+      // Get list of models from Ollama
+      const models = await this.ollamaService.getModels();
+      return models.map(model => model.name);
+    } catch (error) {
+      console.error("Error getting available models:", error);
+      return [];
+    }
+  }}

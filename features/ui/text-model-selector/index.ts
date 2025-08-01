@@ -1,9 +1,9 @@
 /**
  * Text Model Selector Implementation
- * Manages text-generation model selection using registry
+ * Manages "text-generation" model selection using registry
  */
 
-import { ModelCapabilityDefinition } from ../../../packages/shared/models/connection;
+import { ModelCapability } from "@olympian/shared/models/connection";
 import { TextModelSelectorContract, ValidationResult } from "./contract";
 
 export class TextModelSelector implements TextModelSelectorContract {
@@ -31,7 +31,7 @@ export class TextModelSelector implements TextModelSelectorContract {
     }
   }
 
-  async getAvailableTextModels(): Promise<ModelCapabilityDefinition[]> {
+  async getAvailableTextModels(): Promise<ModelCapability[]> {
     try {
       const allModels = await this.modelRegistryService.getAllRegisteredModels();
       return this.textModelFilterAdapter.filterTextModels(allModels);
@@ -76,8 +76,8 @@ export class TextModelSelector implements TextModelSelectorContract {
         };
       }
 
-      // Check if model has text-generation capability
-      if (!modelCapability.capabilities.includes(text-generation)) {
+      // Check if model has "text-generation" capability
+      if (!modelCapability.capabilities.includes("text-generation")) {
         return {
           allowed: false,
           reason: `Model does not support text generation`

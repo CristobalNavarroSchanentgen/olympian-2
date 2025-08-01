@@ -26,6 +26,25 @@ class RouterEventPublisherImpl {
         // TODO: Integrate with proper event system when available
         // For now, just log to console
     }
+    // Implementation of missing contract methods
+    publishRouterEvent(event) {
+        console.log("📡 Router Event:", {
+            type: event.type,
+            payload: event.payload,
+            timestamp: event.timestamp
+        });
+        // TODO: Integrate with proper event system when available
+    }
+    publishModelSwitched(from, to) {
+        const event = {
+            type: "model-switched",
+            payload: { from, to },
+            timestamp: Date.now()
+        };
+        console.log("🔄 Model Switched:", { from, to, timestamp: event.timestamp });
+        // Publish as a router event
+        this.publishRouterEvent(event);
+    }
 }
 exports.RouterEventPublisherImpl = RouterEventPublisherImpl;
 //# sourceMappingURL=router-event-publisher.js.map

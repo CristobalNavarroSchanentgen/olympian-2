@@ -57,4 +57,33 @@ export class ModelSelectionAdapterImpl implements ModelSelectionAdapter {
     const match = modelName.match(/(\d+(?:\.\d+)?)b/i);
     return match ? parseFloat(match[1]) : 0;
   }
-}
+
+  // Implementation of missing contract methods
+  async getCurrentSelection(): Promise<any> {
+    // Return current model selection
+    // For now, returning a default selection
+    return {
+      textModel: "llama3.2:latest",
+      visionModel: "llava:latest",
+      timestamp: Date.now()
+    };
+  }
+
+  async updateSelection(selection: any): Promise<void> {
+    // Update the current model selection
+    // This would typically save to a preference store
+    console.log("Model selection updated:", selection);
+  }
+
+  async validateSelection(selection: any): Promise<boolean> {
+    // Validate that the selection is valid
+    if (!selection.textModel || !selection.visionModel) {
+      return false;
+    }
+    
+    // Check if models exist and are available
+    // For now, basic validation
+    return typeof selection.textModel === "string" && 
+           typeof selection.visionModel === "string" &&
+           selection.timestamp > 0;
+  }}

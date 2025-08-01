@@ -13,8 +13,10 @@ import { ModelSelectionAdapterImpl } from '../adapters/model-selection-adapter';
 import { AvailabilityAdapterImpl } from '../adapters/availability-adapter';
 import { RouterEventPublisherImpl } from '../adapters/router-event-publisher';
 
-export class SmartModelRouterService {
-  private smartModelRouter: SmartModelRouter;
+export class SmartModelRouterService implements SmartModelRouter {
+  private contentAnalysisAdapter: any;
+  private modelSelectionAdapter: any;
+  private eventPublisher: any;
 
   constructor(
     modelRegistryService: ModelRegistryService,
@@ -26,19 +28,34 @@ export class SmartModelRouterService {
     const availabilityAdapter = new AvailabilityAdapterImpl(ollamaService);
     const eventPublisher = new RouterEventPublisherImpl();
 
+    // Store adapters as instance properties
+    this.contentAnalysisAdapter = contentAnalysisAdapter;
+    this.modelSelectionAdapter = modelSelectionAdapter;
+    this.eventPublisher = eventPublisher;
     // Create SmartModelRouter with all dependencies
-    this.smartModelRouter = new SmartModelRouter({
-      modelRegistryService,
-      contentAnalysisAdapter,
-      modelSelectionAdapter,
-      availabilityAdapter,
-      eventPublisher
-    });
 
-    console.log('🧠 Smart Model Router initialized with all adapters');
+    console.log("🧠 Smart Model Router initialized with all adapters");
   }
 
-  getRouter(): SmartModelRouter {
-    return this.smartModelRouter;
+  // SmartModelRouter interface implementation
+  async selectOptimalModel(content: string): Promise<string> {
+    const analysis = await this.contentAnalysisAdapter.analyzeContent(content);
+    return analysis.suggestedModel;
+  }
+
+  async getCurrentSelection(): Promise<any> {
+    return await this.modelSelectionAdapter.getCurrentSelection();
+  }
+
+  async updateModelSelection(selection: any): Promise<void> {
+    await this.modelSelectionAdapter.updateSelection(selection);
+  }
+
+  async analyzeAndRoute(content: string): Promise<string> {
+    const optimalModel = await this.selectOptimalModel(content);
+    this.eventPublisher.publishModelSwitched("previous", optimalModel);
+    return optimalModel;
+  }  getRouter(): SmartModelRouter {
+    return this;
   }
 }

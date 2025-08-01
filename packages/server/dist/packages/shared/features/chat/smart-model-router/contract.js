@@ -1,9 +1,7 @@
 "use strict";
 /**
- * Feature Contract: Smart Model Router
- *
- * Intelligently routes messages to appropriate models based on content analysis,
- * user preferences, and model availability.
+ * Smart Model Router Feature Contract
+ * Defines interfaces for intelligent model selection and routing
  */
 Object.defineProperty(exports, "__esModule", { value: true });
 //# sourceMappingURL=contract.js.map

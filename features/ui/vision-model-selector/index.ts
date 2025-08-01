@@ -3,7 +3,7 @@
  * Manages vision-capable model selection using registry
  */
 
-import { ModelCapabilityDefinition } from ../../../packages/shared/models/connection;
+import { ModelCapability } from "@olympian/shared/models/connection";
 import { VisionModelSelectorContract, MessageInput, ValidationResult } from "./contract";
 
 export class VisionModelSelector implements VisionModelSelectorContract {
@@ -34,7 +34,7 @@ export class VisionModelSelector implements VisionModelSelectorContract {
     }
   }
 
-  async getAvailableVisionModels(): Promise<ModelCapabilityDefinition[]> {
+  async getAvailableVisionModels(): Promise<ModelCapability[]> {
     try {
       const allModels = await this.modelRegistryService.getAllRegisteredModels();
       return this.visionModelFilterAdapter.filterVisionModels(allModels);
@@ -84,7 +84,7 @@ export class VisionModelSelector implements VisionModelSelectorContract {
       if (!modelCapability) {
         return {
           allowed: false,
-          reason: Model not found in registry
+          reason: "Model not found in registry"
         };
       }
 

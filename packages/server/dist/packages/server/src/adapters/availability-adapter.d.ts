@@ -16,4 +16,6 @@ export declare class AvailabilityAdapterImpl implements AvailabilityAdapter {
         responseTime: number;
     }>;
     pingModel(modelName: string): Promise<number>;
+    checkModelAvailability(modelId: string): Promise<boolean>;
+    getAvailableModels(): Promise<string[]>;
 }

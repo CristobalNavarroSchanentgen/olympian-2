@@ -53,7 +53,7 @@ export class ModelSelectionAdapterImpl implements ModelSelectionAdapter {
       .map(item => item.model);
   }
 
-  private extractModelSize(modelName: string): number {
+  extractModelSize(modelName: string): number {
     const match = modelName.match(/(\d+(?:\.\d+)?)b/i);
     return match ? parseFloat(match[1]) : 0;
   }

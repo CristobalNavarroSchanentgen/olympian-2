@@ -5,6 +5,7 @@
 export const PREDEFINED_MODEL_REGISTRY = [
     {
         modelName: 'llama3.2-vision:11b',
+        name: 'llama3.2-vision:11b',
         provider: 'ollama',
         capabilities: ['vision', 'text-generation'],
         contextLength: 8192,
@@ -16,6 +17,7 @@ export const PREDEFINED_MODEL_REGISTRY = [
     },
     {
         modelName: 'granite3.2-vision:2b',
+        name: 'granite3.2-vision:2b',
         provider: 'ollama',
         capabilities: ['vision', 'text-generation'],
         contextLength: 4096,
@@ -27,6 +29,7 @@ export const PREDEFINED_MODEL_REGISTRY = [
     },
     {
         modelName: 'phi4:14b',
+        name: 'phi4:14b',
         provider: 'ollama',
         capabilities: ['text-generation'],
         contextLength: 16384,
@@ -38,6 +41,7 @@ export const PREDEFINED_MODEL_REGISTRY = [
     },
     {
         modelName: 'llama3.2:3b',
+        name: 'llama3.2:3b',
         provider: 'ollama',
         capabilities: ['text-generation'],
         contextLength: 8192,
@@ -49,6 +53,7 @@ export const PREDEFINED_MODEL_REGISTRY = [
     },
     {
         modelName: 'phi4-mini:3.8b',
+        name: 'phi4-mini:3.8b',
         provider: 'ollama',
         capabilities: ['text-generation', 'tool-use'],
         contextLength: 8192,
@@ -60,6 +65,7 @@ export const PREDEFINED_MODEL_REGISTRY = [
     },
     {
         modelName: 'deepseek-r1:14b',
+        name: 'deepseek-r1:14b',
         provider: 'ollama',
         capabilities: ['text-generation', 'tool-use', 'reasoning'],
         contextLength: 16384,
@@ -71,6 +77,7 @@ export const PREDEFINED_MODEL_REGISTRY = [
     },
     {
         modelName: 'qwen3:4b',
+        name: 'qwen3:4b',
         provider: 'ollama',
         capabilities: ['text-generation', 'tool-use', 'reasoning'],
         contextLength: 8192,
@@ -82,6 +89,7 @@ export const PREDEFINED_MODEL_REGISTRY = [
     },
     {
         modelName: 'gemma3:4b',
+        name: 'gemma3:4b',
         provider: 'ollama',
         capabilities: ['text-generation'],
         contextLength: 8192,

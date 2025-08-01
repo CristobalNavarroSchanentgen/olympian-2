@@ -3,7 +3,7 @@
  * Filters models for text-generation capability
  */
 
-import { ModelCapabilityDefinition } from '../../../../../packages/shared/models/connection';
+import { ModelCapabilityDefinition } from '../../../../packages/shared/models/connection';
 
 export interface ModelFilterAdapter {
   filterTextModels(models: ModelCapabilityDefinition[]): ModelCapabilityDefinition[];

@@ -1,16 +1,8 @@
 /**
- * Smart Model Router Implementation
- * Intelligent message routing based on content analysis and model capabilities
+ * Smart Model Router - Core Implementation
  */
 
-import {
-  SmartModelRouterContract,
-  SmartModelRouterDependencies,
-  ContentAnalysisAdapter,
-  ModelSelectionAdapter,
-  AvailabilityAdapter,
-  RouterEventPublisher
-} from './contract';
+import { SmartModelRouterContract, SmartModelRouterDependencies } from './contract';
 import { ModelCapabilityDefinition } from '../../../models/connection';
 
 export class SmartModelRouter implements SmartModelRouterContract {
@@ -28,49 +20,30 @@ export class SmartModelRouter implements SmartModelRouterContract {
       capabilities?: string[];
     };
   }) {
-    // 1. Analyze content requirements
     const analysis = await this.analyzeContent({
       content: params.content,
       images: params.images
     });
 
-    // 2. Get available models
     const availableModels = await this.getAvailableModels();
-
-    // 3. Determine routing strategy
-    let selectedModel: string;
+    
+    let candidates: ModelCapabilityDefinition[];
     let routingReason: 'vision-required' | 'user-preference' | 'capability-match' | 'default';
-    let candidates: ModelCapabilityDefinition[] = [];
+    let selectedModel: string;
 
     if (analysis.requiresVision) {
-      // Vision required - choose from vision models
       candidates = availableModels.visionModels;
-      selectedModel = params.userPreferences?.preferredVisionModel || 
-                    this.selectBestModel(candidates, analysis.suggestedCapabilities);
-      routingReason = params.userPreferences?.preferredVisionModel ? 'user-preference' : 'vision-required';
+      routingReason = 'vision-required';
+      selectedModel = this.selectBestModel(candidates, analysis.suggestedCapabilities);
     } else {
-      // Text-only - choose from text models
       candidates = availableModels.textModels;
-      
-      if (params.userPreferences?.preferredTextModel) {
-        const preferredAvailable = candidates.find(m => m.name === params.userPreferences?.preferredTextModel);
-        if (preferredAvailable) {
-          selectedModel = params.userPreferences.preferredTextModel;
-          routingReason = 'user-preference';
-        } else {
-          selectedModel = this.selectBestModel(candidates, analysis.suggestedCapabilities);
-          routingReason = 'capability-match';
-        }
-      } else {
-        selectedModel = this.selectBestModel(candidates, analysis.suggestedCapabilities);
-        routingReason = analysis.suggestedCapabilities.length > 0 ? 'capability-match' : 'default';
-      }
+      selectedModel = this.selectBestModel(candidates, analysis.suggestedCapabilities);
+      routingReason = analysis.suggestedCapabilities.length > 0 ? 'capability-match' : 'default';
     }
 
-    // 4. Get model capabilities and fallbacks
     const modelCapabilities = candidates.find(m => m.name === selectedModel);
     if (!modelCapabilities) {
-      throw new Error(`Selected model ${selectedModel} not found in available models`);
+      throw new Error('Selected model not found in available models');
     }
 
     const fallbacks = await this.getFallbackModels({
@@ -79,17 +52,15 @@ export class SmartModelRouter implements SmartModelRouterContract {
       failureReason: 'unavailable'
     });
 
-    // 5. Publish routing event
     this.deps.eventPublisher.publishModelRouted({
       selectedModel: selectedModel,
-      conversationId: "",
-      modelCapabilities: selectedModelCapability.capabilities,
+      conversationId: '',
+      modelCapabilities: modelCapabilities.capabilities,
       routingReason: routingReason,
       timestamp: new Date().toISOString()
     });
 
     return {
-      fallbackModel: fallbacks[0] || "llama3.2:3b",
       selectedModel,
       routingReason,
       modelCapabilities,
@@ -104,23 +75,20 @@ export class SmartModelRouter implements SmartModelRouterContract {
   }) {
     const availableModels = await this.getAvailableModels();
     
-    let candidates = params.contentType === 'multimodal' 
-      ? availableModels.visionModels 
-      : availableModels.textModels;
-    
-    // Filter by required capabilities
-    candidates = candidates.filter(model => 
-      params.requiredCapabilities.every(cap => 
-        cap === 'vision' ? model.hasVision : model.capabilities.includes(cap)
-      )
-    );
+    let candidates = availableModels.allModels.filter(model => {
+      return params.requiredCapabilities.every(cap => {
+        if (cap === 'vision') return model.hasVision;
+        if (cap === 'tools') return model.capabilities.includes('tool-use');
+        if (cap === 'reasoning') return model.capabilities.includes('reasoning');
+        return false;
+      });
+    });
 
     if (candidates.length === 0) {
-      // Fallback to any available model
-      candidates = availableModels.allModels;
+      candidates = params.contentType === 'multimodal' ? 
+        availableModels.visionModels : availableModels.textModels;
     }
 
-    // Rank models
     const ranked = this.deps.modelSelectionAdapter.rankModelsByPreference(candidates, {
       speed: params.prioritizeSpeed ? 0.8 : 0.3,
       capability: 0.7,
@@ -128,8 +96,7 @@ export class SmartModelRouter implements SmartModelRouterContract {
     });
 
     return {
-      fallbackModel: fallbacks[0] || "llama3.2:3b",
-      model: ranked[0]?.name || 'llama3.2:3b', // fallback
+      model: ranked[0]?.name || 'llama3.2:3b',
       confidence: ranked.length > 0 ? 0.8 : 0.3,
       alternatives: ranked.slice(1, 4).map(m => m.name)
     };
@@ -140,11 +107,9 @@ export class SmartModelRouter implements SmartModelRouterContract {
     images?: string[];
   }) {
     const requiresVision = await this.detectVisionRequirement(params.images || []);
-    
     const textAnalysis = await this.deps.contentAnalysisAdapter.analyzeTextComplexity(params.content);
     
     return {
-      fallbackModel: fallbacks[0] || "llama3.2:3b",
       requiresVision,
       suggestedCapabilities: textAnalysis.suggestedCapabilities as ('tools' | 'reasoning')[],
       complexity: textAnalysis.complexity,
@@ -154,20 +119,18 @@ export class SmartModelRouter implements SmartModelRouterContract {
 
   async detectVisionRequirement(images: string[]): Promise<boolean> {
     if (!images || images.length === 0) return false;
-    
-    const imageAnalysis = await this.deps.contentAnalysisAdapter.detectImageContent(images);
-    return imageAnalysis.requiresProcessing;
+    const analysis = await this.deps.contentAnalysisAdapter.detectImageContent(images);
+    return analysis.requiresProcessing;
   }
 
   async checkModelAvailability(modelName: string) {
-    return await this.deps.availabilityAdapter.checkModelHealth(modelName);
+    return this.deps.availabilityAdapter.checkModelHealth(modelName);
   }
 
   async getAvailableModels() {
     const allModels = await this.deps.modelRegistryService.getAllRegisteredModels();
     
     return {
-      fallbackModel: fallbacks[0] || "llama3.2:3b",
       textModels: this.deps.modelSelectionAdapter.filterTextModels(allModels),
       visionModels: this.deps.modelSelectionAdapter.filterVisionModels(allModels),
       allModels
@@ -181,7 +144,6 @@ export class SmartModelRouter implements SmartModelRouterContract {
   }): Promise<string[]> {
     const availableModels = await this.getAvailableModels();
     
-    // Filter models that meet the requirements
     let candidates = availableModels.allModels.filter(model => {
       return params.requiredCapabilities.every(cap => {
         if (cap === 'vision') return model.hasVision;
@@ -189,13 +151,10 @@ export class SmartModelRouter implements SmartModelRouterContract {
       });
     });
 
-    // Remove the failed model
     candidates = candidates.filter(m => m.name !== params.originalModel);
     
-    // Sort by preference (simpler models first for fallback)
     const fallbacks = candidates
       .sort((a, b) => {
-        // Prefer smaller, more reliable models for fallback
         const aSize = parseInt(a.name.split(':')[1]?.replace('b', '') || '0');
         const bSize = parseInt(b.name.split(':')[1]?.replace('b', '') || '0');
         return aSize - bSize;
@@ -203,12 +162,15 @@ export class SmartModelRouter implements SmartModelRouterContract {
       .slice(0, 3)
       .map(m => m.name);
 
-    return fallbacks.length > 0 ? fallbacks : ['llama3.2:3b']; // ultimate fallback
+    return fallbacks.length > 0 ? fallbacks : ['llama3.2:3b'];
   }
 
   async handleRoutingFailure(params: {
     failedModel: string;
-    originalRequest: { content: string; images?: string[]; };
+    originalRequest: {
+      content: string;
+      images?: string[];
+    };
     error: Error;
   }) {
     const fallbacks = await this.getFallbackModels({
@@ -218,43 +180,34 @@ export class SmartModelRouter implements SmartModelRouterContract {
     });
 
     this.deps.eventPublisher.publishRoutingFailed({
-      conversationId: "",
-      requestedCapabilities: params.originalRequest.images ? ["vision"] : ["text-generation"],
+      conversationId: '',
+      requestedCapabilities: params.originalRequest.images ? ['vision'] : ['text-generation'],
       error: params.error.message,
       timestamp: new Date().toISOString()
     });
 
     return {
-      fallbackModel: fallbacks[0] || "llama3.2:3b",
+      fallbackModel: fallbacks[0] || 'llama3.2:3b',
       strategy: fallbacks.length > 0 ? 'capability-match' as const : 'simple-fallback' as const
     };
   }
 
   private selectBestModel(candidates: ModelCapabilityDefinition[], suggestedCapabilities: string[]): string {
-    if (candidates.length === 0) return 'llama3.2:3b'; // fallback
+    if (candidates.length === 0) return 'llama3.2:3b';
     
-    // Score models based on capability match
     const scored = candidates.map(model => {
-      let score = 1; // base score
+      let score = 1;
       
-      // Bonus for matching suggested capabilities
       suggestedCapabilities.forEach(cap => {
         if (model.capabilities.includes(cap)) score += 2;
       });
       
-      // Preference for reasoning models
       if (model.capabilities.includes('reasoning')) score += 1;
       
-      return {
-      fallbackModel: fallbacks[0] || "llama3.2:3b", model, score };
+      return { model, score };
     });
     
-    // Sort by score (descending) and return the best
     scored.sort((a, b) => b.score - a.score);
     return scored[0].model.name;
   }
-}
-
-export function createSmartModelRouter(deps: SmartModelRouterDependencies): SmartModelRouterContract {
-  return new SmartModelRouter(deps);
 }

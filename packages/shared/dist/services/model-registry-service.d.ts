@@ -11,7 +11,7 @@ export interface ModelRegistryService {
      * Get all registered models
      */
     getAllRegisteredModels(): Promise<ModelCapabilityDefinition[]>;
-    getAllModels(): Promise<ModelCapabilityDefinition[]>;    /**
+    /**
      * Validate if model access is allowed
      */
     validateModelAccess(modelName: string): Promise<{
@@ -20,7 +20,11 @@ export interface ModelRegistryService {
         suggestedAlternatives?: string[];
     }>;
     /**
-     * Check if using registry mode
+    /**
+     * Get all available models
+     */
+    getAllModels(): Promise<ModelCapabilityDefinition[]>;
+    /**   * Check if using registry mode
      */
     isRegistryMode(): Promise<boolean>;
 }

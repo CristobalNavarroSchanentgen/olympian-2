@@ -3,7 +3,7 @@
  * Filters models for vision capability
  */
 
-import { ModelCapabilityDefinition } from '../../../../../packages/shared/models/connection';
+import { ModelCapabilityDefinition } from '../../../../packages/shared/models/connection';
 
 export interface VisionModelFilterAdapter {
   filterVisionModels(models: ModelCapabilityDefinition[]): ModelCapabilityDefinition[];

@@ -8,9 +8,10 @@ import { ModelRouted, RoutingFailed } from '@olympian/shared/events';
 export class RouterEventPublisherImpl implements RouterEventPublisher {
   publishModelRouted(event: ModelRouted): void {
     console.log('📡 Model Routed:', {
-      model: event.model,
-      reason: event.reason,
-      contentType: event.analysisResult.contentType,
+      selectedModel: event.selectedModel,
+      routingReason: event.routingReason,
+      modelCapabilities: event.modelCapabilities,
+      conversationId: event.conversationId,
       timestamp: event.timestamp
     });
     
@@ -20,9 +21,9 @@ export class RouterEventPublisherImpl implements RouterEventPublisher {
 
   publishRoutingFailed(event: RoutingFailed): void {
     console.error('❌ Routing Failed:', {
-      failedModel: event.failedModel,
+      conversationId: event.conversationId,
+      requestedCapabilities: event.requestedCapabilities,
       error: event.error,
-      fallbackModel: event.fallbackModel,
       timestamp: event.timestamp
     });
     

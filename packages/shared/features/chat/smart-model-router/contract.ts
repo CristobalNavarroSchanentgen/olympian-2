@@ -135,7 +135,7 @@ export interface ModelSelectionAdapter {
     capability?: number;
     reliability?: number;
   }): ModelCapabilityDefinition[];
-}
+  extractModelSize(modelName: string): number;}
 
 export interface AvailabilityAdapter {
   checkModelHealth(modelName: string): Promise<{

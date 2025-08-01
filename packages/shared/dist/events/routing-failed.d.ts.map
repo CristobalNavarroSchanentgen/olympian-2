@@ -1,0 +1,1 @@
+{"version":3,"file":"routing-failed.d.ts","sourceRoot":"","sources":["../../events/routing-failed.ts"],"names":[],"mappings":"AAAA;;;GAGG;AAEH,MAAM,WAAW,aAAa;IAC5B,WAAW,EAAE,MAAM,CAAC;IACpB,KAAK,EAAE,MAAM,CAAC;IACd,aAAa,EAAE,MAAM,CAAC;IACtB,SAAS,EAAE,IAAI,CAAC;CACjB;AAED,MAAM,MAAM,sBAAsB,GAAG,gBAAgB,CAAC;AACtD,eAAO,MAAM,oBAAoB,EAAE,sBAAyC,CAAC"}

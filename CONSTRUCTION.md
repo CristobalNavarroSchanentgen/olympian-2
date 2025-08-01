@@ -37,7 +37,7 @@ Build feature-by-feature, leveraging contracts to minimize context switching.
 
 ### 🔄 Phase 3: Integration & Testing (IN PROGRESS)
 
-**Current Milestone: UI Integration**
+**Current Milestone: Event Flow Validation**
 - ✅ Application structure analyzed (App.tsx → DualPaneLayout → Sidebar)
 - ✅ ModelSelectorPanel integration point identified (Sidebar component)
 - ✅ Sidebar.tsx backup created for safe modification

@@ -1,9 +1,9 @@
 import React from 'react';
-import { Plus, MessageSquare, Trash2, Circle } from 'lucide-react';
+import { Plus, MessageSquare, Trash2, Circle, Settings, ChevronDown, ChevronRight } from "lucide-react";
 import { useChatStore } from '../../stores/chat-store';
 import { useNavigate } from 'react-router-dom';
 import { chatService } from '../../services/chat-service';
-
+import { ModelSelectorPanel } from "../model-selector/ModelSelectorPanel";
 interface SidebarProps {
   connected?: boolean; isOpen?: boolean; onToggle?: () => void;
   onNewConversation: () => void;
@@ -13,6 +13,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ connected = true, onNewConvers
   const navigate = useNavigate();
   const { conversations, currentConversationId, setConversations } = useChatStore();
 
+  const [isModelsExpanded, setIsModelsExpanded] = React.useState(false);
   const handleNewConversation = async () => {
     try {
       const conversation = await chatService.createConversation({
@@ -65,7 +66,37 @@ export const Sidebar: React.FC<SidebarProps> = ({ connected = true, onNewConvers
           <Plus className="w-5 h-5" />
           New Chat
         </button>
+
       </div>
+
+      {/* Models Section */}
+      <div className="px-4 py-2 border-b border-border/50">
+        <button
+          onClick={() => setIsModelsExpanded(!isModelsExpanded)}
+          className="w-full flex items-center justify-between py-2 px-2 text-sm font-medium text-muted hover:text-primary transition-colors duration-200 rounded-lg hover:bg-accent/10"
+        >
+          <div className="flex items-center gap-2">
+            <Settings className="w-4 h-4" />
+            Models
+          </div>
+          {isModelsExpanded ? (
+            <ChevronDown className="w-4 h-4" />
+          ) : (
+            <ChevronRight className="w-4 h-4" />
+          )}
+        </button>
+        
+        {isModelsExpanded && (
+          <div className="mt-2">
+            <ModelSelectorPanel
+              className="bg-transparent border-none shadow-none p-0"
+              onTextModelChange={(model) => console.log("Text model selected:", model)}
+              onVisionModelChange={(model, enableImageDetection) => 
+                console.log("Vision model selected:", model, "Image detection:", enableImageDetection)
+              }
+            />
+          </div>
+        )}      </div>
 
       <div className="flex-1 overflow-y-auto custom-scrollbar p-2">
         <div className="space-y-1">
@@ -93,7 +124,37 @@ export const Sidebar: React.FC<SidebarProps> = ({ connected = true, onNewConvers
                 >
                   <Trash2 className="w-4 h-4 text-red-400" />
                 </button>
-              </div>
+
+      </div>
+
+      {/* Models Section */}
+      <div className="px-4 py-2 border-b border-border/50">
+        <button
+          onClick={() => setIsModelsExpanded(!isModelsExpanded)}
+          className="w-full flex items-center justify-between py-2 px-2 text-sm font-medium text-muted hover:text-primary transition-colors duration-200 rounded-lg hover:bg-accent/10"
+        >
+          <div className="flex items-center gap-2">
+            <Settings className="w-4 h-4" />
+            Models
+          </div>
+          {isModelsExpanded ? (
+            <ChevronDown className="w-4 h-4" />
+          ) : (
+            <ChevronRight className="w-4 h-4" />
+          )}
+        </button>
+        
+        {isModelsExpanded && (
+          <div className="mt-2">
+            <ModelSelectorPanel
+              className="bg-transparent border-none shadow-none p-0"
+              onTextModelChange={(model) => console.log("Text model selected:", model)}
+              onVisionModelChange={(model, enableImageDetection) => 
+                console.log("Vision model selected:", model, "Image detection:", enableImageDetection)
+              }
+            />
+          </div>
+        )}              </div>
             </div>
           ))}
         </div>

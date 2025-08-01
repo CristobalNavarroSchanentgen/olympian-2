@@ -346,7 +346,7 @@ export class WebSocketHandler {
       });
     }
   }
-    const mcpStatus = this.mcpManager.getServerStatus();
+  private sendStatusUpdate(socket: Socket): void {    const mcpStatus = this.mcpManager.getServerStatus();
     const tools = this.mcpManager.getAllTools();
 
     socket.emit('status:update', {

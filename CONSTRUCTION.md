@@ -1,152 +1,107 @@
-# Model Registry UI Integration
+# Olympian AI-Native Architecture: Model Selector Implementation Plan
 
-## 🎯 Objective
-Integrate model registry with UI to provide intelligent model routing and selection for text and vision models, enabling smart communication with Ollama models.
+## 🎯 Current Status
+**✅ FOUNDATION COMPLETE:** Model selector features are properly registered in manifest.yaml with full contract definitions, adapters, events, and config schemas.
 
-## 🏗️ Architecture Status
+**🔄 NEXT PHASE:** Wire the backend features to frontend components using AI-native architecture patterns.
 
-### ✅ Foundation (Complete)
-- **Model Registry:** 8 predefined models with capabilities
-- **Registry Service:** Interface and implementation complete  
-- **WebSocket Infrastructure:** Chat handling with smart routing active
-- **Ollama Integration:** Model connection service active
+## 🏗️ AI-Native Architecture Approach
 
-## 📋 Implementation Progress
+### Core Principle
+Every component follows the contract-first, adapter-based pattern:
+- **Features** define business logic through contracts
+- **Adapters** transform between utilities and feature expectations  
+- **Services** provide interface-only communication between features
+- **Events** enable async feature communication
 
-### ✅ Phase 1-2: Model Infrastructure (COMPLETED)
-- **Model Registry Contract & Implementation:** `packages/shared/features/connection/model-registry/`
-- **Model Selector Infrastructure:** Basic filtering and selection adapters
-- **Registry Service Integration:** Full model capability access
+### Implementation Strategy
+Work feature-by-feature, leveraging contracts to minimize context switching.
 
-### ✅ Phase 3: Smart Model Router (COMPLETED)
-**Location:** `packages/shared/features/chat/smart-model-router/`
+## 📋 Implementation Roadmap
 
-**Key Features:**
-- **Intelligent Content Analysis:** Detects text complexity and capability requirements
-- **Vision Detection:** Automatically routes multimodal content to vision models
-- **User Preference Support:** Respects preferred text/vision model selections
-- **Availability Monitoring:** Real-time model health checking and fallback handling
-- **Event-Driven Architecture:** Publishes routing success/failure events
+### Phase 1: Service Registration & Dependency Injection
+**Objective:** Register model selector services in the application bootstrap
 
-**Components:**
-- Contract, implementation, adapters, events, and comprehensive tests
+**Tasks:**
+1. **Update Service Registry** (`packages/server/src/services/`)
+   - Register `TextModelSelectorService` implementation
+   - Register `VisionModelSelectorService` implementation
+   - Wire to existing `ModelRegistryService`
 
-### ✅ Phase 4: UI Components (COMPLETED)
-**Location:** `packages/client/src/features/ui/model-selector/` & `packages/client/src/components/`
+2. **Bootstrap Integration** (`packages/server/src/server.ts`)
+   - Add model selector services to DI container
+   - Initialize with proper adapter dependencies
 
-**Key Features:**
-- **React Components:** Model dropdowns, recommendations, and integrated selectors
-- **State Management:** Extended Zustand store with model selection and preferences
-- **Custom Hooks:** `useModelSelector()` and `useModelRecommendation()`
-- **Real-time Updates:** Model availability monitoring and status indicators
+**Architecture Benefit:** Services remain interface-only, implementations stay isolated
 
-### ✅ Phase 5: WebSocket Integration (COMPLETED)
-**Location:** `packages/server/src/websocket/websocket-handler.ts`
+### Phase 2: Frontend Integration
+**Objective:** Create React components that consume the model selector contracts
 
-**Key Features:**
-- **Smart Routing Integration:** WebSocket handler uses intelligent content analysis
-- **Real-time Model Availability:** Live monitoring and health checking of all models
-- **Enhanced Error Handling:** Automatic fallback routing when models fail
-- **New WebSocket Events:** Model availability, recommendations, and routing results
+**Tasks:**
+1. **Create UI Components** (`packages/client/src/components/model-selector/`)
+   - `TextModelDropdown.tsx` - Consumes TextModelSelectorContract
+   - `VisionModelDropdown.tsx` - Consumes VisionModelSelectorContract
+   - `ModelSelectorPanel.tsx` - Combines both selectors
 
-**WebSocket Events Added:**
-- `models:availability` - Real-time model health status
-- `models:list` - Complete model registry access
-- `model:recommend` - Content-based model suggestions  
-- `model:selected` - Smart routing results with reasoning
-- `chat:fallback` - Automatic fallback notifications
+2. **WebSocket Event Handlers** (`packages/client/src/hooks/`)
+   - `useTextModelSelector.ts` - Handles text-model events
+   - `useVisionModelSelector.ts` - Handles vision-model events
+   - Subscribe to: `text-model-selected`, `vision-model-selected`, `model-selection-failed`
 
-### 🚀 Phase 6: Server Integration & Dependency Injection (COMPLETED)
-**Location:** `packages/server/src/main.ts` & service initialization
+**Architecture Benefit:** Components only know about contracts, not implementations
 
-**⚠️ CRITICAL: Existing Server Architecture Analysis Required**
-Before implementing dependency injection, we must carefully analyze:
-- **Current Service Registration:** How existing services are initialized and injected
-- **Dependency Graph:** Existing service interdependencies and initialization order
-- **Configuration Patterns:** How current services load config and adapters
-- **Error Handling:** Existing patterns for service startup failures
-- **Testing Infrastructure:** Current service mocking and testing patterns
+### Phase 3: Integration Testing
+**Objective:** Verify end-to-end model selection workflow
 
-**Goals:**
-- Initialize SmartModelRouter with proper dependencies and adapters
-- Update server startup to inject smart router into WebSocket handler  
-- Implement missing service dependencies (ensure adapters are available)
-- Configure event publishing for routing events
-- Test end-to-end smart routing functionality with live Ollama models
+**Tasks:**
+1. **Contract Testing** 
+   - Test each feature contract independently
+   - Verify adapter transformations work correctly
 
-**Required Investigation:**
-1. **Analyze Current Server Main:** Review existing dependency injection patterns
-2. **Service Factory Pattern:** Understand how services are currently instantiated
-3. **Adapter Availability:** Verify all smart router adapters are implemented
-4. **Event System Setup:** Configure routing event publishers
-5. **Integration Testing:** Ensure compatibility with existing Ollama service
+2. **Integration Testing**
+   - Test service-to-service communication
+   - Verify event flow: selection → validation → persistence → UI update
 
-## 🎯 Registry Models (8 Available)
+3. **User Flow Testing**
+   - Model dropdown population from registry
+   - Model selection persistence
+   - Smart routing integration
 
-### Text Models (6 available)
-- `phi4:14b` - Standard text generation
-- `llama3.2:3b` - Lightweight text generation  
-- `phi4-mini:3.8b` - Text + tool use
-- `deepseek-r1:14b` - Text + tools + reasoning
-- `qwen3:4b` - Text + tools + reasoning
-- `gemma3:4b` - Standard text generation
+## 🔧 Technical Implementation Notes
 
-### Vision Models (2 available)  
-- `llama3.2-vision:11b` - Vision + text (large)
-- `granite3.2-vision:2b` - Vision + text (compact)
+### Working with Existing Infrastructure
+- **Model Registry:** Already provides `getAllRegisteredModels()` and `getModelCapability()`
+- **Smart Router:** Already consumes model selections for routing decisions
+- **WebSocket Handler:** Already set up for real-time model communication
 
-## 🔧 Architecture Principles
+### Adapter Requirements
+- `text-model-filter-adapter.ts` - Filter registry models for text generation
+- `vision-model-filter-adapter.ts` - Filter registry models for vision capabilities  
+- `selection-persistence-adapter.ts` - Save/load user model preferences
 
-- **AI-Native Design:** All files under 200 lines with minimal context
-- **Contract-First:** Clear interfaces before implementation  
-- **Adapter Pattern:** Clean separation between features and utilities
-- **Event-Driven:** Asynchronous communication via events
-- **Zero Cross-Dependencies:** Features communicate only via services/events
+### Event Flow
+```
+User selects model → Validation → Persistence → Event emission → UI update → Smart router uses selection
+```
 
-## ✅ Current Achievements
+## 🎯 Success Criteria
+1. **Model dropdowns populate** from registry data
+2. **User selections persist** across sessions
+3. **Smart routing uses** selected models for appropriate content
+4. **Real-time updates** when model availability changes
+5. **Error handling** with fallback suggestions
 
-1. **Smart Routing Engine:** Content-aware model selection implemented
-2. **8 Models Categorized:** Proper text/vision separation with capabilities
-3. **Intelligent Analysis:** Capability and complexity detection working
-4. **Fallback Handling:** Graceful degradation when models unavailable
-5. **Health Monitoring:** Real-time availability checking
-6. **Event System:** Complete routing event publishing  
-7. **React UI Components:** Model selector dropdowns with real-time availability
-8. **Smart Recommendations:** Content-aware model suggestions with confidence scoring
-9. **State Management:** Extended Zustand store with model selection and preferences
-10. **WebSocket Integration:** Smart routing active in chat handler with new events
-11. **Enhanced Error Handling:** Automatic fallback routing and recovery
-12. **Architecture Compliance:** All components follow AI-native principles
+## 📁 Key Files to Modify
+- `packages/server/src/server.ts` - Service registration
+- `packages/client/src/components/` - React components
+- `packages/client/src/hooks/` - WebSocket event handling
+- `packages/client/src/stores/` - State management integration
 
-## 🎯 Next Milestone
+## 🚀 Next Actions
+1. Start with Phase 1: Service registration
+2. Test contracts work in isolation  
+3. Build UI components incrementally
+4. Test integration end-to-end
 
-**Phase 6: Server Integration & Dependency Injection** - Carefully analyze existing server architecture, initialize SmartModelRouter with proper dependencies, and ensure seamless integration with current service patterns.
+**Architecture Advantage:** Each phase can be developed and tested independently, with clear contracts defining boundaries between components.
 
----
-
-**STATUS: ✅ Phase 5 Complete - WebSocket integration with smart model router operational. Real-time model availability, intelligent routing, and fallback handling active. Phase 6 complete - Smart Model Router fully integrated.**
-
-### 🎯 Phase 7: End-to-End Testing & Validation (NEXT)
-**Location:** Test the complete smart routing system
-
-**Key Testing Areas:**
-- **Server Startup:** Ensure server starts without errors and all services initialize
-- **Model Availability:** Test real-time model health checking with Ollama
-- **Content Analysis:** Verify text complexity and vision detection work correctly
-- **Smart Routing:** Test intelligent model selection based on content
-- **WebSocket Events:** Confirm all new events (models:availability, model:recommend, etc.) work
-- **Fallback Handling:** Test automatic fallback when models fail
-- **UI Integration:** Ensure React components receive and display smart routing results
-
-**Success Criteria:**
-- Server starts successfully with Smart Model Router
-- Chat messages are intelligently routed to appropriate models
-- Vision content automatically selects vision models
-- Complex text selects reasoning-capable models
-- Real-time model availability updates work
-- Fallback routing activates on model failures
-- UI shows routing decisions and model recommendations
-
----
-
-**STATUS: ✅ Phase 6 Complete - Smart Model Router fully integrated with server infrastructure. All adapters implemented, dependency injection complete, ready for end-to-end testing.**

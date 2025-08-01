@@ -12,10 +12,9 @@ export function createInteractionCapture(): InteractionCaptureHandler {
   let interactionCallback: ((type: string, element?: string, data?: any) => void) | null = null;
 
   const getElementIdentifier = (element: Element): string => {
-    if (element.id) return '#' + element.id;
-    if (element.className) return '.' + element.className.split(' ')[0];
+    if (element.className && typeof element.className === "string") return "." + element.className.split(" ")[0];
+    if (element.className && element.className.baseVal) return "." + element.className.baseVal.split(" ")[0];    return element.tagName.toLowerCase();
     return element.tagName.toLowerCase();
-  };
 
   const handleClick = (event: MouseEvent) => {
     if (isActive && interactionCallback && event.target instanceof Element) {

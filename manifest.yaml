@@ -38,7 +38,19 @@ domains:
         config: config/features/chat/message-processor/schema.ts
         
       - name: memory-manager
-        contract: features/chat/memory-manager/contract.ts
+
+      - name: smart-model-router
+        contract: features/chat/smart-model-router/contract.ts
+        adapters:
+          - content-analysis-adapter
+          - model-selection-adapter
+          - availability-adapter
+        services:
+          - model-registry-service
+        events:
+          - model-routed
+          - routing-failed
+        config: config/features/chat/smart-model-router/schema.ts        contract: features/chat/memory-manager/contract.ts
         adapters:
           - context-adapter
           - token-budget-adapter
@@ -262,7 +274,12 @@ events:
     schema: events/context-updated.ts
     
   - name: memory-cleaned
-    schema: events/memory-cleaned.ts
+
+  - name: model-routed
+    schema: events/model-routed.ts
+
+  - name: routing-failed
+    schema: events/routing-failed.ts    schema: events/memory-cleaned.ts
     
   - name: server-started
     schema: events/server-started.ts

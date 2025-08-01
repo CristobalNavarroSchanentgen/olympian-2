@@ -33,6 +33,7 @@ export const chatService = {
 
   // Messages
   async getMessages(conversationId: string): Promise<Message[]> {
+    if (!conversationId || conversationId === "undefined" || conversationId === "null") return [];
     const { data } = await api.get(`/messages/conversation/${conversationId}`);
         return Array.isArray(data) ? data : [];
   },
@@ -50,6 +51,7 @@ export const chatService = {
 
   // Artifacts
   async getArtifacts(conversationId: string): Promise<Artifact[]> {
+    if (!conversationId || conversationId === "undefined" || conversationId === "null") return [];
     const { data } = await api.get(`/artifacts/conversation/${conversationId}`);
         return Array.isArray(data) ? data : [];
   },

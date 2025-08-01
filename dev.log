@@ -48,3 +48,24 @@ AggregateError [ECONNREFUSED]:
 AggregateError [ECONNREFUSED]: 
     at internalConnectMultiple (node:net:1139:18)
     at afterConnectMultiple (node:net:1714:7)
+11:33:55 PM [tsx] change in ./src/index.ts Rerunning...
+c
+node:internal/modules/run_main:104
+    triggerUncaughtException(
+    ^
+Error: Transform failed with 1 error:
+/Users/cristobalnavarro/Desktop/olympian-2/packages/server/src/index.ts:80:4: ERROR: Unexpected ")"
+    at failureErrorWithLog (/Users/cristobalnavarro/Desktop/olympian-2/node_modules/esbuild/lib/main.js:1467:15)
+    at /Users/cristobalnavarro/Desktop/olympian-2/node_modules/esbuild/lib/main.js:736:50
+    at responseCallbacks.<computed> (/Users/cristobalnavarro/Desktop/olympian-2/node_modules/esbuild/lib/main.js:603:9)
+    at handleIncomingPacket (/Users/cristobalnavarro/Desktop/olympian-2/node_modules/esbuild/lib/main.js:658:12)
+    at Socket.readFromStdout (/Users/cristobalnavarro/Desktop/olympian-2/node_modules/esbuild/lib/main.js:581:7)
+    at Socket.emit (node:events:507:28)
+    at addChunk (node:internal/streams/readable:559:12)
+    at readableAddChunkPushByteMode (node:internal/streams/readable:510:3)
+    at Readable.push (node:internal/streams/readable:390:5)
+    at Pipe.onStreamRead (node:internal/stream_base_commons:189:23) {
+  name: 'TransformError'
+}
+
+Node.js v23.11.0

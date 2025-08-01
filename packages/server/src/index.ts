@@ -12,15 +12,9 @@ import { MessageServiceImpl } from "./services/message-service-impl";
 import { ArtifactServiceImpl } from "./services/artifact-service-impl";
 import { McpServiceImpl } from "./services/mcp-service-impl";
 import { ModelRegistryServiceImpl } from "./services/model-registry-service-impl";
-// import { SmartModelRouterService } from "./services/smart-model-router-service-impl";
 
 // Model Selector Features
-import { createTextModelSelector } from "./features/ui/text-model-selector";
-import { createVisionModelSelector } from "./features/ui/vision-model-selector";
-import { createTextModelFilterAdapter } from "./adapters/features/ui/text-model-selector/text-model-filter-adapter";
 import { createSelectionPersistenceAdapter } from "./adapters/features/ui/model-selector/selection-persistence-adapter";
-import { createVisionModelFilterAdapter } from "./adapters/features/ui/vision-model-selector/vision-model-filter-adapter";
-import { createImageDetectionAdapter } from "./adapters/features/ui/vision-model-selector/image-detection-adapter";
 
 // Infrastructure
 import { MCPManager } from "./mcp/mcp-manager-stub";
@@ -79,7 +73,6 @@ async function startServer() {
       selectionPersistenceAdapter
     );
 
-    const visionModelSelector = createVisionModelSelector(
       modelRegistryService,
       visionModelFilterAdapter,
       selectionPersistenceAdapter,
@@ -87,8 +80,6 @@ async function startServer() {
     );
 
     // Initialize Smart Model Router Service
-//     const smartModelRouterService = new SmartModelRouterService(modelRegistryService, ollamaService);
-    const smartModelRouter = smartModelRouterService.getRouter();
     
     console.log("💼 Business services initialized");
 
@@ -99,7 +90,6 @@ async function startServer() {
 
 
     // Setup WebSocket handling
-    const wsHandler = new WebSocketHandler(io, conversationService, messageService, mcpManager, ollamaService, smartModelRouter, modelRegistryService, textModelSelector, visionModelSelector);
     console.log("🔌 WebSocket handler initialized");
 
     // Setup all API routes with service injection

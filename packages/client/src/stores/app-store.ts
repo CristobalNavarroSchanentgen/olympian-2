@@ -33,7 +33,7 @@ export const useAppStore = create<AppState>()(
       setTheme: (theme) => set({ theme }),
       
       // Model settings
-      textModel: 'llama3.2:latest',
+      textModel: 'llama3.2:1b',
       visionModel: 'llava:latest',
       autoDetectModel: false,
       setTextModel: (model) => set({ textModel: model }),

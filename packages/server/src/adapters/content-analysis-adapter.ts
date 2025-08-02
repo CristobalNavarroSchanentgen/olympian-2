@@ -52,7 +52,7 @@ export class ContentAnalysisAdapterImpl implements ContentAnalysisAdapter {
     const complexity = await this.analyzeTextComplexity(content);
     const hasImages = content.includes("[image]") || content.includes("<img");
     
-    let suggestedModel = "llama3.2:latest";
+    let suggestedModel = "llama3.2:1b";
     if (hasImages) {
       suggestedModel = "llava:latest";
     } else if (complexity.complexity === "complex") {

@@ -13,5 +13,9 @@ export declare class WebSocketHandler {
     private modelRegistryService;
     constructor(io: SocketIOServer, conversationService: ConversationService, messageService: MessageService, mcpManager: MCPManager, ollamaService: OllamaService, modelRegistryService: ModelRegistryService);
     private setupHandlers;
+    private handleTextModelsRequest;
+    private handleTextModelSelect;
+    private handleVisionModelsRequest;
+    private handleVisionModelSelect;
     private handleChatMessage;
 }

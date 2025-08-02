@@ -61,7 +61,7 @@ export class ModelSelectionAdapterImpl implements ModelSelectionAdapter {
   // Implementation of missing contract methods
   async getCurrentSelection(): Promise<any> {
     return {
-      textModel: "llama3.2:latest",
+      textModel: "llama3.2:1b",
       visionModel: "llava:latest",
       timestamp: Date.now()
     };

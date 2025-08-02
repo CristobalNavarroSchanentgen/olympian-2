@@ -140,6 +140,14 @@ export const useChatStore = create<ChatState>()((set, get) => ({
     selectedImages: [...get().selectedImages, image] 
   }),
   removeImage: (index) => set({
+
+  // Model Selection Actions Implementation
+  setSelectedModel: (model) => set({ selectedModel: model }),
+  setModelPreferences: (preferences) => set({ 
+    modelPreferences: { ...get().modelPreferences, ...preferences } 
+  }),
+  setModelRecommendation: (recommendation) => set({ modelRecommendation: recommendation }),
+  clearModelRecommendation: () => set({ modelRecommendation: null }),
     selectedImages: get().selectedImages.filter((_, i) => i !== index)
   }),
 }));

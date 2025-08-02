@@ -63,7 +63,7 @@ export class ModelSelectionAdapterImpl implements ModelSelectionAdapter {
     // Return current model selection
     // For now, returning a default selection
     return {
-      textModel: "llama3.2:latest",
+      textModel: "llama3.2:1b",
       visionModel: "llava:latest",
       timestamp: Date.now()
     };

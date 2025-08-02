@@ -13,13 +13,13 @@ interface SidebarProps {
 
 export function Sidebar({ connected, onNewConversation, isOpen, onToggle }: SidebarProps) {
   const navigate = useNavigate();
-  const { conversations, currentConversationId, setConversations } = useChatStore();
+  const { conversations, currentConversationId, setConversations, selectedModel } = useChatStore();
   
   const handleNewConversation = async () => {
     try {
       const conversation = await chatService.createConversation({
         title: 'New Chat',
-        model: 'llama3.2:latest'
+        model: selectedModel || 'llama3.2:1b'
       });
       
       const updatedConversations = await chatService.getConversations();

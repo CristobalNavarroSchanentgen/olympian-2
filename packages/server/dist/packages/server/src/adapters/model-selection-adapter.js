@@ -51,7 +51,7 @@ class ModelSelectionAdapterImpl {
     // Implementation of missing contract methods
     async getCurrentSelection() {
         return {
-            textModel: "llama3.2:latest",
+            textModel: "llama3.2:1b",
             visionModel: "llava:latest",
             timestamp: Date.now()
         };

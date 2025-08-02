@@ -9,6 +9,7 @@ const helmet_1 = __importDefault(require("helmet"));
 const http_1 = require("http");
 const socket_io_1 = require("socket.io");
 const dotenv_1 = __importDefault(require("dotenv"));
+console.log("🔧 Loading modified index.ts with registry logic");
 // Service implementations  
 const database_1 = require("./database");
 const conversation_service_impl_1 = require("./services/conversation-service-impl");

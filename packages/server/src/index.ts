@@ -4,7 +4,7 @@ import helmet from "helmet";
 import { createServer } from "http";
 import { Server as SocketIOServer } from "socket.io";
 import dotenv from "dotenv";
-
+console.log("🔧 Loading modified index.ts with registry logic");
 // Service implementations  
 import { getDatabaseService } from "./database";
 import { ConversationServiceImpl } from "./services/conversation-service-impl";

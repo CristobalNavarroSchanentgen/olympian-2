@@ -1,92 +1,70 @@
 "use strict";
 /**
  * Conversation Service Implementation
- * In-memory storage for Phase 1 - will be replaced with database integration
+ * Database-backed storage using MongoDB
  */
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ConversationServiceImpl = void 0;
+const conversation_repository_1 = require("../database/conversation-repository");
 class ConversationServiceImpl {
-    conversations = new Map();
-    nextId = 1;
+    repository;
+    constructor() {
+        this.repository = new conversation_repository_1.ConversationRepository();
+    }
     async createConversation(title, model, metadata) {
-        const id = `conv_${this.nextId++}`;
         const now = new Date();
-        const conversation = {
-            id,
+        const conversationData = {
             title,
             model,
+            metadata: metadata || {},
             createdAt: now,
             updatedAt: now,
-            messageCount: 0,
-            metadata: metadata || {}
+            messageCount: 0
         };
-        this.conversations.set(id, conversation);
-        return conversation;
+        return await this.repository.create(conversationData);
     }
     async getConversation(id) {
-        return this.conversations.get(id) || null;
+        return await this.repository.findById(id);
     }
     async updateConversation(id, updates) {
-        const conversation = this.conversations.get(id);
-        if (!conversation) {
+        const updated = await this.repository.update(id, updates);
+        if (!updated) {
             throw new Error(`Conversation ${id} not found`);
         }
-        const updated = {
-            ...conversation,
-            ...updates,
-            updatedAt: new Date()
-        };
-        this.conversations.set(id, updated);
         return updated;
     }
     async deleteConversation(id) {
-        if (!this.conversations.has(id)) {
+        const exists = await this.repository.exists(id);
+        if (!exists) {
             throw new Error(`Conversation ${id} not found`);
         }
-        return this.conversations.delete(id);
+        return await this.repository.delete(id);
     }
     async listConversations(filter, limit, offset) {
-        const conversations = Array.from(this.conversations.values());
-        // Apply filtering if provided
-        let filtered = conversations;
-        if (filter?.model) {
-            filtered = filtered.filter(c => c.model === filter.model);
-        }
-        if (filter?.createdAfter) {
-            filtered = filtered.filter(c => c.createdAt >= filter.createdAfter);
-        }
-        if (filter?.createdBefore) {
-            filtered = filtered.filter(c => c.createdAt <= filter.createdBefore);
-        }
-        // Convert to summaries and sort by updatedAt descending
-        const summaries = filtered
-            .map(c => ({
-            id: c.id,
-            title: c.title,
-            messageCount: c.messageCount,
-            lastActivity: c.updatedAt,
-            preview: c.title.length > 50 ? c.title.substring(0, 50) + "..." : undefined
-        }))
-            .sort((a, b) => b.lastActivity.getTime() - a.lastActivity.getTime());
-        // Apply pagination
+        const repoFilter = {
+            model: filter?.model,
+            createdAfter: filter?.createdAfter,
+            limit: limit || 50
+        };
+        const summaries = await this.repository.list(repoFilter);
+        // Apply offset if provided (simple slice for now)
         if (offset !== undefined) {
-            const sliced = summaries.slice(offset);
-            return limit !== undefined ? sliced.slice(0, limit) : sliced;
+            return summaries.slice(offset);
         }
-        return limit !== undefined ? summaries.slice(0, limit) : summaries;
+        return summaries;
     }
-    // Additional required methods
     async searchConversations(query, limit) {
-        const all = await this.listConversations();
+        // Get all conversations and filter by title match
+        const all = await this.repository.list({ limit: 100 });
         const filtered = all.filter(c => c.title.toLowerCase().includes(query.toLowerCase()));
         return limit ? filtered.slice(0, limit) : filtered;
     }
     async getConversationCount(filter) {
-        const conversations = await this.listConversations(filter);
-        return conversations.length;
+        const summaries = await this.listConversations(filter);
+        return summaries.length;
     }
     async conversationExists(id) {
-        return this.conversations.has(id);
+        return await this.repository.exists(id);
     }
 }
 exports.ConversationServiceImpl = ConversationServiceImpl;

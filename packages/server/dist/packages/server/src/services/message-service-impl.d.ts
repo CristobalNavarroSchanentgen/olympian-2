@@ -1,13 +1,13 @@
 /**
  * Message Service Implementation
- * In-memory storage for Phase 1 - will be replaced with database integration
+ * Database-backed storage using MongoDB
  */
 import { MessageService } from '@olympian/shared/services/message-service';
 import { Message, MessageDraft } from '@olympian/shared/models/chat/message';
 export declare class MessageServiceImpl implements MessageService {
-    private messages;
-    private conversationMessages;
-    private nextId;
+    private messageRepository;
+    private conversationRepository;
+    constructor();
     createMessage(conversationId: string, draft: MessageDraft, role: 'user' | 'assistant' | 'system'): Promise<Message>;
     getMessage(id: string): Promise<Message | null>;
     updateMessage(id: string, updates: Partial<Pick<Message, 'content' | 'metadata'>>): Promise<Message>;

@@ -34,8 +34,10 @@ export function setupOllamaRoutes(app: any, modelRegistryService: ModelRegistryS
   router.get('/models', async (req, res) => {
     try {
       const models = await modelRegistryService.getAllRegisteredModels();
-      const ollamaModels = models.filter(model => model.provider === 'ollama');
-      
+      console.log("🔍 API DEBUG: Total models from registry:", models.length);
+      console.log("🔍 API DEBUG: All models:", models.map(m => ({ name: m.modelName, provider: m.provider, capabilities: m.capabilities })));      const ollamaModels = models.filter(model => model.provider === 'ollama');
+      console.log("🔍 API DEBUG: Ollama filtered models:", ollamaModels.length);
+      console.log("🔍 API DEBUG: Ollama models:", ollamaModels.map(m => ({ name: m.modelName, provider: m.provider })));      
       // Transform to match contract ModelInfo format using correct properties
       const formattedModels = ollamaModels.map(model => ({
         name: model.modelName,

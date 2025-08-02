@@ -75,14 +75,18 @@ class WebSocketHandler {
         }
     }
     async handleTextModelsRequest(socket) {
+        console.log("🔍 DEBUG: Text models request received from client", socket.id);
         try {
             // Force refresh models from Ollama to ensure we have the latest
             if (this.modelRegistryService.forceRefresh) {
                 await this.modelRegistryService.forceRefresh();
             }
             const models = await this.modelRegistryService.getAllModels();
+            console.log("🔍 DEBUG: Total models from registry:", models.length);
+            console.log("🔍 DEBUG: All models:", models.map(m => ({ name: m.modelName, capabilities: m.capabilities })));
             const textModels = models.filter(m => m.capabilities.includes("text-generation"));
             console.log(`📋 Sending ${textModels.length} text models to client`);
+            console.log("🔍 DEBUG: Text models being sent:", textModels.map(m => ({ name: m.modelName, capabilities: m.capabilities, displayName: m.displayName })));
             socket.emit("text-models:available", textModels);
         }
         catch (error) {
@@ -124,6 +128,8 @@ class WebSocketHandler {
                 await this.modelRegistryService.forceRefresh();
             }
             const models = await this.modelRegistryService.getAllModels();
+            console.log("🔍 DEBUG: Total models from registry:", models.length);
+            console.log("🔍 DEBUG: All models:", models.map(m => ({ name: m.modelName, capabilities: m.capabilities })));
             const visionModels = models.filter(m => m.capabilities.includes("vision"));
             console.log(`📋 Sending ${visionModels.length} vision models to client`);
             socket.emit("vision-models:available", visionModels);

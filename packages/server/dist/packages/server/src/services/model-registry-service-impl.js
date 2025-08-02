@@ -53,26 +53,35 @@ class ModelRegistryServiceImpl {
     }
     async refreshModelsFromOllama() {
         if (!this.ollamaService?.isConnected()) {
-            console.log('? Ollama not connected, using default models');
+            console.log("? Ollama not connected, using default models");
             return;
         }
         try {
-            console.log('? Refreshing models from Ollama...');
+            console.log("? Refreshing models from Ollama...");
             const ollamaModels = await this.ollamaService.getModels();
+            console.log("🔍 DEBUG: Raw Ollama models:", ollamaModels.map(m => m.name));
             // Clear current models and rebuild from Ollama
             this.models.clear();
             for (const ollamaModel of ollamaModels) {
-                const modelDef = this.createModelDefinitionFromOllama(ollamaModel);
-                this.models.set(modelDef.modelName, modelDef);
+                try {
+                    const modelDef = this.createModelDefinitionFromOllama(ollamaModel);
+                    console.log("🔍 DEBUG: Created model definition:", modelDef.modelName, "-> displayName:", modelDef.displayName);
+                    this.models.set(modelDef.modelName, modelDef);
+                }
+                catch (error) {
+                    console.error("Failed to create model definition for", ollamaModel.name, ":", error);
+                }
             }
             this.lastFetch = new Date();
             console.log(`? Loaded ${this.models.size} models from Ollama`);
             // Log available models for debugging
+            console.log("🔍 DEBUG: Final model map contents:");
+            this.models.forEach((model, key) => console.log(`  ${key}: ${model.displayName} [${model.capabilities.join(", ")}]`));
             const modelNames = Array.from(this.models.keys());
-            console.log('? Available models:', modelNames);
+            console.log("? Available models:", modelNames);
         }
         catch (error) {
-            console.error('? Failed to refresh models from Ollama:', error);
+            console.error("? Failed to refresh models from Ollama:", error);
             this.initializeDefaultModels(); // Fallback to defaults
         }
     }

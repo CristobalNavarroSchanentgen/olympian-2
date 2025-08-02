@@ -89,7 +89,7 @@ export class MessageProcessor implements MessageProcessorContract {
       }
 
       const messages = await this.messageService.getByConversation(conversationId);
-      const userMessages = messages.filter(m => m.role === 'user');
+      const userMessages = messages.filter((m: Message) => m.role === 'user');
       
       if (userMessages.length === 1) {
         setImmediate(async () => {

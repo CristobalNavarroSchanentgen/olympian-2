@@ -1,0 +1,149 @@
+
+> @olympian/server@1.0.0 dev
+> tsx watch src/index.ts
+
+🔧 Loading modified index.ts with registry logic
+❌ MongoDB connection failed: MongoServerError: Command createIndexes requires authentication
+    at Connection.sendCommand (/Users/cristobalnavarro/Desktop/olympian-2/node_modules/mongodb/src/cmap/connection.ts:559:17)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async Connection.command (/Users/cristobalnavarro/Desktop/olympian-2/node_modules/mongodb/src/cmap/connection.ts:633:22)
+    at async Server.command (/Users/cristobalnavarro/Desktop/olympian-2/node_modules/mongodb/src/sdam/server.ts:342:21)
+    at async CreateIndexesOperation.executeCommand (/Users/cristobalnavarro/Desktop/olympian-2/node_modules/mongodb/src/operations/command.ts:183:12)
+    at async CreateIndexesOperation.execute (/Users/cristobalnavarro/Desktop/olympian-2/node_modules/mongodb/src/operations/indexes.ts:324:5)
+    at async tryOperation (/Users/cristobalnavarro/Desktop/olympian-2/node_modules/mongodb/src/operations/execute_operation.ts:283:14)
+    at async executeOperation (/Users/cristobalnavarro/Desktop/olympian-2/node_modules/mongodb/src/operations/execute_operation.ts:115:12)
+    at async Collection.createIndex (/Users/cristobalnavarro/Desktop/olympian-2/node_modules/mongodb/src/collection.ts:610:21)
+    at async DatabaseService.createIndexes (/Users/cristobalnavarro/Desktop/olympian-2/packages/server/src/database/database-service.ts:81:5) {
+  errorLabelSet: Set(0) {},
+  errorResponse: {
+    ok: 0,
+    errmsg: 'Command createIndexes requires authentication',
+    code: 13,
+    codeName: 'Unauthorized'
+  },
+  ok: 0,
+  code: 13,
+  codeName: 'Unauthorized'
+}
+❌ Failed to start server: MongoServerError: Command createIndexes requires authentication
+    at Connection.sendCommand (/Users/cristobalnavarro/Desktop/olympian-2/node_modules/mongodb/src/cmap/connection.ts:559:17)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async Connection.command (/Users/cristobalnavarro/Desktop/olympian-2/node_modules/mongodb/src/cmap/connection.ts:633:22)
+    at async Server.command (/Users/cristobalnavarro/Desktop/olympian-2/node_modules/mongodb/src/sdam/server.ts:342:21)
+    at async CreateIndexesOperation.executeCommand (/Users/cristobalnavarro/Desktop/olympian-2/node_modules/mongodb/src/operations/command.ts:183:12)
+    at async CreateIndexesOperation.execute (/Users/cristobalnavarro/Desktop/olympian-2/node_modules/mongodb/src/operations/indexes.ts:324:5)
+    at async tryOperation (/Users/cristobalnavarro/Desktop/olympian-2/node_modules/mongodb/src/operations/execute_operation.ts:283:14)
+    at async executeOperation (/Users/cristobalnavarro/Desktop/olympian-2/node_modules/mongodb/src/operations/execute_operation.ts:115:12)
+    at async Collection.createIndex (/Users/cristobalnavarro/Desktop/olympian-2/node_modules/mongodb/src/collection.ts:610:21)
+    at async DatabaseService.createIndexes (/Users/cristobalnavarro/Desktop/olympian-2/packages/server/src/database/database-service.ts:81:5) {
+  errorLabelSet: Set(0) {},
+  errorResponse: {
+    ok: 0,
+    errmsg: 'Command createIndexes requires authentication',
+    code: 13,
+    codeName: 'Unauthorized'
+  },
+  ok: 0,
+  code: 13,
+  codeName: 'Unauthorized'
+}
+10:52:21 PM [tsx] change in ./src/services/title-generation-service-impl.ts Rerunning...
+cnode:internal/modules/esm/resolve:314
+  return new ERR_PACKAGE_PATH_NOT_EXPORTED(
+         ^
+
+Error [ERR_PACKAGE_PATH_NOT_EXPORTED]: Package subpath './features/chat/conversation-title-generator' is not defined by "exports" in /Users/cristobalnavarro/Desktop/olympian-2/node_modules/@olympian/shared/package.json
+    at exportsNotFound (node:internal/modules/esm/resolve:314:10)
+    at packageExportsResolve (node:internal/modules/esm/resolve:661:9)
+    at resolveExports (node:internal/modules/cjs/loader:661:36)
+    at Function._findPath (node:internal/modules/cjs/loader:753:31)
+    at node:internal/modules/cjs/loader:1391:27
+    at nextResolveSimple (/Users/cristobalnavarro/Desktop/olympian-2/node_modules/tsx/dist/register-D46fvsV_.cjs:4:1004)
+    at /Users/cristobalnavarro/Desktop/olympian-2/node_modules/tsx/dist/register-D46fvsV_.cjs:3:2630
+    at /Users/cristobalnavarro/Desktop/olympian-2/node_modules/tsx/dist/register-D46fvsV_.cjs:3:1542
+    at resolveTsPaths (/Users/cristobalnavarro/Desktop/olympian-2/node_modules/tsx/dist/register-D46fvsV_.cjs:4:760)
+    at /Users/cristobalnavarro/Desktop/olympian-2/node_modules/tsx/dist/register-D46fvsV_.cjs:4:1102 {
+  code: 'ERR_PACKAGE_PATH_NOT_EXPORTED'
+}
+
+Node.js v23.11.0
+10:52:40 PM [tsx] change in ./src/services/message-service-impl.ts Rerunning...
+cnode:internal/modules/esm/resolve:314
+  return new ERR_PACKAGE_PATH_NOT_EXPORTED(
+         ^
+
+Error [ERR_PACKAGE_PATH_NOT_EXPORTED]: Package subpath './features/chat/conversation-title-generator' is not defined by "exports" in /Users/cristobalnavarro/Desktop/olympian-2/node_modules/@olympian/shared/package.json
+    at exportsNotFound (node:internal/modules/esm/resolve:314:10)
+    at packageExportsResolve (node:internal/modules/esm/resolve:661:9)
+    at resolveExports (node:internal/modules/cjs/loader:661:36)
+    at Function._findPath (node:internal/modules/cjs/loader:753:31)
+    at node:internal/modules/cjs/loader:1391:27
+    at nextResolveSimple (/Users/cristobalnavarro/Desktop/olympian-2/node_modules/tsx/dist/register-D46fvsV_.cjs:4:1004)
+    at /Users/cristobalnavarro/Desktop/olympian-2/node_modules/tsx/dist/register-D46fvsV_.cjs:3:2630
+    at /Users/cristobalnavarro/Desktop/olympian-2/node_modules/tsx/dist/register-D46fvsV_.cjs:3:1542
+    at resolveTsPaths (/Users/cristobalnavarro/Desktop/olympian-2/node_modules/tsx/dist/register-D46fvsV_.cjs:4:760)
+    at /Users/cristobalnavarro/Desktop/olympian-2/node_modules/tsx/dist/register-D46fvsV_.cjs:4:1102 {
+  code: 'ERR_PACKAGE_PATH_NOT_EXPORTED'
+}
+
+Node.js v23.11.0
+10:53:55 PM [tsx] change in ./src/services/title-generation-service-impl.ts Rerunning...
+cnode:internal/modules/esm/resolve:314
+  return new ERR_PACKAGE_PATH_NOT_EXPORTED(
+         ^
+
+Error [ERR_PACKAGE_PATH_NOT_EXPORTED]: Package subpath './features/chat/conversation-title-generator' is not defined by "exports" in /Users/cristobalnavarro/Desktop/olympian-2/node_modules/@olympian/shared/package.json
+    at exportsNotFound (node:internal/modules/esm/resolve:314:10)
+    at packageExportsResolve (node:internal/modules/esm/resolve:661:9)
+    at resolveExports (node:internal/modules/cjs/loader:661:36)
+    at Function._findPath (node:internal/modules/cjs/loader:753:31)
+    at node:internal/modules/cjs/loader:1391:27
+    at nextResolveSimple (/Users/cristobalnavarro/Desktop/olympian-2/node_modules/tsx/dist/register-D46fvsV_.cjs:4:1004)
+    at /Users/cristobalnavarro/Desktop/olympian-2/node_modules/tsx/dist/register-D46fvsV_.cjs:3:2630
+    at /Users/cristobalnavarro/Desktop/olympian-2/node_modules/tsx/dist/register-D46fvsV_.cjs:3:1542
+    at resolveTsPaths (/Users/cristobalnavarro/Desktop/olympian-2/node_modules/tsx/dist/register-D46fvsV_.cjs:4:760)
+    at /Users/cristobalnavarro/Desktop/olympian-2/node_modules/tsx/dist/register-D46fvsV_.cjs:4:1102 {
+  code: 'ERR_PACKAGE_PATH_NOT_EXPORTED'
+}
+
+Node.js v23.11.0
+10:53:59 PM [tsx] change in ./src/services/message-service-impl.ts Rerunning...
+cnode:internal/modules/esm/resolve:314
+  return new ERR_PACKAGE_PATH_NOT_EXPORTED(
+         ^
+
+Error [ERR_PACKAGE_PATH_NOT_EXPORTED]: Package subpath './features/chat/conversation-title-generator' is not defined by "exports" in /Users/cristobalnavarro/Desktop/olympian-2/node_modules/@olympian/shared/package.json
+    at exportsNotFound (node:internal/modules/esm/resolve:314:10)
+    at packageExportsResolve (node:internal/modules/esm/resolve:661:9)
+    at resolveExports (node:internal/modules/cjs/loader:661:36)
+    at Function._findPath (node:internal/modules/cjs/loader:753:31)
+    at node:internal/modules/cjs/loader:1391:27
+    at nextResolveSimple (/Users/cristobalnavarro/Desktop/olympian-2/node_modules/tsx/dist/register-D46fvsV_.cjs:4:1004)
+    at /Users/cristobalnavarro/Desktop/olympian-2/node_modules/tsx/dist/register-D46fvsV_.cjs:3:2630
+    at /Users/cristobalnavarro/Desktop/olympian-2/node_modules/tsx/dist/register-D46fvsV_.cjs:3:1542
+    at resolveTsPaths (/Users/cristobalnavarro/Desktop/olympian-2/node_modules/tsx/dist/register-D46fvsV_.cjs:4:760)
+    at /Users/cristobalnavarro/Desktop/olympian-2/node_modules/tsx/dist/register-D46fvsV_.cjs:4:1102 {
+  code: 'ERR_PACKAGE_PATH_NOT_EXPORTED'
+}
+
+Node.js v23.11.0
+10:55:22 PM [tsx] change in ./src/config/features/chat/conversation-title-generator/schema.ts Rerunning...
+cnode:internal/modules/esm/resolve:314
+  return new ERR_PACKAGE_PATH_NOT_EXPORTED(
+         ^
+
+Error [ERR_PACKAGE_PATH_NOT_EXPORTED]: Package subpath './features/chat/conversation-title-generator' is not defined by "exports" in /Users/cristobalnavarro/Desktop/olympian-2/node_modules/@olympian/shared/package.json
+    at exportsNotFound (node:internal/modules/esm/resolve:314:10)
+    at packageExportsResolve (node:internal/modules/esm/resolve:661:9)
+    at resolveExports (node:internal/modules/cjs/loader:661:36)
+    at Function._findPath (node:internal/modules/cjs/loader:753:31)
+    at node:internal/modules/cjs/loader:1391:27
+    at nextResolveSimple (/Users/cristobalnavarro/Desktop/olympian-2/node_modules/tsx/dist/register-D46fvsV_.cjs:4:1004)
+    at /Users/cristobalnavarro/Desktop/olympian-2/node_modules/tsx/dist/register-D46fvsV_.cjs:3:2630
+    at /Users/cristobalnavarro/Desktop/olympian-2/node_modules/tsx/dist/register-D46fvsV_.cjs:3:1542
+    at resolveTsPaths (/Users/cristobalnavarro/Desktop/olympian-2/node_modules/tsx/dist/register-D46fvsV_.cjs:4:760)
+    at /Users/cristobalnavarro/Desktop/olympian-2/node_modules/tsx/dist/register-D46fvsV_.cjs:4:1102 {
+  code: 'ERR_PACKAGE_PATH_NOT_EXPORTED'
+}
+
+Node.js v23.11.0

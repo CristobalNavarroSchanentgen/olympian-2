@@ -5,7 +5,11 @@ import { useAppStore } from '../../stores/app-store';
 import { useWebSocket } from '../../hooks/useWebSocket';
 import { chatService } from '../../services/chat-service';
 
-export function MessageInput() {
+interface MessageInputProps {
+  disabled?: boolean;
+}
+
+export function MessageInput({ disabled = false }: MessageInputProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const socket = useWebSocket();
@@ -50,7 +54,7 @@ export function MessageInput() {
 
   const handleSubmit = async () => {
     if (!inputValue.trim() && selectedImages.length === 0) return;
-    if (!currentConversationId || !socket) return;
+    if (!currentConversationId || !socket || disabled || !textModel) return;
 
     const messageContent = inputValue.trim();
     const images = [...selectedImages];
@@ -103,6 +107,11 @@ export function MessageInput() {
     );
   }
 
+  const isInputDisabled = disabled || !textModel;
+  const placeholderText = !textModel 
+    ? "Select a model above to start chatting..."
+    : "Type your message... (Shift+Enter for new line)";
+
   return (
     <div className="input-area p-4 bg-gradient-to-t from-panel/50 to-transparent">
       {/* Selected Images Preview */}
@@ -118,6 +127,7 @@ export function MessageInput() {
               <button
                 onClick={() => removeImage(index)}
                 className="absolute -top-3 -right-3 w-6 h-6 shadow-md bg-red-500 text-white rounded-full flex items-center justify-center text-xs hover:bg-red-600"
+                disabled={isInputDisabled}
               >
                 <X className="w-3 h-3" />
               </button>
@@ -126,12 +136,22 @@ export function MessageInput() {
         </div>
       )}
 
+      {/* Model requirement notice */}
+      {!textModel && (
+        <div className="mb-4 p-3 bg-muted/50 border border-border rounded-lg text-center">
+          <p className="text-sm text-muted-foreground">
+            ? Please select an AI model from the header to start chatting
+          </p>
+        </div>
+      )}
+
       {/* Input Area */}
       <div className="flex items-end gap-2">
         {/* Attach Button */}
         <button
           onClick={() => fileInputRef.current?.click()}
-          className="p-3 text-muted hover:text-primary hover:bg-accent/20 rounded-xl transition-all duration-200 hover:scale-110"
+          disabled={isInputDisabled}
+          className="p-3 text-muted hover:text-primary hover:bg-accent/20 rounded-xl transition-all duration-200 hover:scale-110 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
         >
           <Paperclip className="h-6 w-6" />
         </button>
@@ -143,16 +163,18 @@ export function MessageInput() {
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder="Type your message... (Shift+Enter for new line)"
-            className="w-full px-5 py-4 pr-14 rounded-xl bg-panel/80 backdrop-blur-sm border-2 border-border/50 placeholder:text-muted/70 text-primary resize-none min-h-[48px] max-h-32 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all duration-300"
+            placeholder={placeholderText}
+            disabled={isInputDisabled}
+            className="w-full px-5 py-4 pr-14 rounded-xl bg-panel/80 backdrop-blur-sm border-2 border-border/50 placeholder:text-muted/70 text-primary resize-none min-h-[48px] max-h-32 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
             rows={1}
           />
           
           {/* Send Button */}
           <button
             onClick={handleSubmit}
-            disabled={!inputValue.trim() && selectedImages.length === 0}
+            disabled={(!inputValue.trim() && selectedImages.length === 0) || isInputDisabled}
             className="absolute right-3 bottom-3 p-2.5 rounded-lg bg-primary/10 hover:bg-primary/20 text-primary hover:scale-110 transition-all duration-200 disabled:text-muted disabled:cursor-not-allowed disabled:hover:scale-100 disabled:bg-transparent"
+            title={!textModel ? 'Select a model first' : 'Send message'}
           >
             <Send className="h-5 w-5" />
           </button>
@@ -165,6 +187,7 @@ export function MessageInput() {
           accept="image/*"
           multiple
           onChange={handleImageUpload}
+          disabled={isInputDisabled}
           className="hidden"
         />
       </div>

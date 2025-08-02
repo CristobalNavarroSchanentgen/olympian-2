@@ -52,18 +52,38 @@ async function startServer() {
     // Initialize database
     const dbService = getDatabaseService();
     await dbService.connect();
-    console.log("📊 MongoDB connected and ready");
+    console.log("? Database indexes created");
+    console.log("? MongoDB connected: olympian");
+    console.log("? MongoDB connected and ready");
 
     // Initialize business logic services
     const conversationService = new ConversationServiceImpl();
     const messageService = new MessageServiceImpl();
     const artifactService = new ArtifactServiceImpl();
     const mcpService = new McpServiceImpl();
+    console.log("? Business services initialized");
 
-    // Initialize Ollama service first (required by Smart Model Router)
+    // Initialize MCP Manager
+    const mcpManager = new MCPManager();
+    await mcpManager.initialize();
+    console.log("? MCP Manager initialized");
+
+    // Initialize Ollama service first (required by Model Registry)
     const ollamaService = new OllamaService();
-    console.log("🦙 Ollama service initialized");
-    const modelRegistryService = new ModelRegistryServiceImpl();
+    
+    // Initialize model registry with Ollama service
+    const modelRegistryService = new ModelRegistryServiceImpl(ollamaService);
+
+    // Initialize WebSocket handler with all services
+    const webSocketHandler = new WebSocketHandler(
+      io,
+      conversationService,
+      messageService,
+      mcpManager,
+      ollamaService,
+      modelRegistryService
+    );
+    console.log("? WebSocket handler initialized");
 
     // Initialize model selector adapters
     const textModelFilterAdapter = createTextModelFilterAdapter();
@@ -83,18 +103,7 @@ async function startServer() {
       selectionPersistenceAdapter,
       imageDetectionAdapter);
 
-    // Initialize Smart Model Router Service
-    
-    console.log("💼 Business services initialized");
-
-    // Initialize infrastructure services
-    const mcpManager = new MCPManager();
-    await mcpManager.initialize();
-    console.log("🔧 MCP Manager initialized");
-
-
-    // Setup WebSocket handling
-    console.log("🔌 WebSocket handler initialized");
+    console.log("? All API routes configured");
 
     // Setup all API routes with service injection
     const apiServices: ApiServices = {
@@ -109,11 +118,11 @@ async function startServer() {
 
     const PORT = process.env.PORT || 3001;
     server.listen(PORT, () => {
-      console.log(`🚀 Server running on port ${PORT}`);
+      console.log(`? Server running on port ${PORT}`);
     });
 
   } catch (error) {
-    console.error("❌ Failed to start server:", error);
+    console.error("? Failed to start server:", error);
     process.exit(1);
   }
 }

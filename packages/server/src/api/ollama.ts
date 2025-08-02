@@ -36,17 +36,17 @@ export function setupOllamaRoutes(app: any, modelRegistryService: ModelRegistryS
       const models = await modelRegistryService.getAllRegisteredModels();
       const ollamaModels = models.filter(model => model.provider === 'ollama');
       
-      // Transform to match contract ModelInfo format
+      // Transform to match contract ModelInfo format using correct properties
       const formattedModels = ollamaModels.map(model => ({
-        name: model.name,
-        modified_at: model.lastUpdated || new Date().toISOString(),
-        size: parseInt(model.size || '0'),
-        digest: model.id || '',
+        name: model.modelName,
+        modified_at: new Date().toISOString(), // Default since no lastUpdated field
+        size: model.maxTokens || 0, // Use maxTokens as size approximation
+        digest: model.modelName, // Use modelName as digest fallback
         details: {
-          format: model.format || 'unknown',
-          family: model.family || 'unknown',
-          parameter_size: model.parameterCount || 'unknown',
-          quantization_level: model.quantization || 'unknown'
+          format: 'gguf', // Default format for Ollama models
+          family: model.displayName || model.name,
+          parameter_size: model.contextLength ? `${model.contextLength}` : 'unknown',
+          quantization_level: 'unknown' // Not available in current model definition
         }
       }));
       

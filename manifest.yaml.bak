@@ -36,18 +36,6 @@ domains:
           - message-received
           - tokens-processed
         config: config/features/chat/message-processor/schema.ts
-
-      - name: conversation-title-generator
-        contract: features/chat/conversation-title-generator/contract.ts
-        adapters:
-          - ollama-title-adapter
-          - prompt-adapter
-        services:
-          - title-generation-service
-          - conversation-service
-        events:
-          - conversation-title-generated
-        config: config/features/chat/conversation-title-generator/schema.ts
         
       - name: memory-manager
 
@@ -294,9 +282,6 @@ services:
   - name: logging-service
     interface: services/logging-service.ts    interface: services/reasoning-service.ts
 
-
-  - name: title-generation-service
-    interface: services/title-generation-service.ts
 # Event Schema
 events:
   - name: conversation-created
@@ -307,9 +292,6 @@ events:
     
   - name: conversation-deleted
     schema: events/conversation-deleted.ts
-
-  - name: conversation-title-generated
-    schema: events/conversation-title-generated.ts
     
   - name: message-sent
     schema: events/message-sent.ts

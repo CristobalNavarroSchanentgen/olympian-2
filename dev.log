@@ -1291,4 +1291,69 @@ Node.js v23.11.0
   }
 }
 3:52:38 PM [tsx] change in ./src/api/ollama.ts Rerunning...
-c
+c❌ MongoDB connection failed: MongoServerSelectionError: connection <monitor> to [::1]:27017 closed
+    at Topology.selectServer (/Users/cristobalnavarro/Desktop/olympian-2/node_modules/mongodb/src/sdam/topology.ts:634:30)
+    at async Topology._connect (/Users/cristobalnavarro/Desktop/olympian-2/node_modules/mongodb/src/sdam/topology.ts:468:22)
+    at async Topology.connect (/Users/cristobalnavarro/Desktop/olympian-2/node_modules/mongodb/src/sdam/topology.ts:405:7)
+    at async topologyConnect (/Users/cristobalnavarro/Desktop/olympian-2/node_modules/mongodb/src/mongo_client.ts:680:9)
+    at async MongoClient._connect (/Users/cristobalnavarro/Desktop/olympian-2/node_modules/mongodb/src/mongo_client.ts:692:7)
+    at async MongoClient.connect (/Users/cristobalnavarro/Desktop/olympian-2/node_modules/mongodb/src/mongo_client.ts:604:7)
+    at async DatabaseService.connect (/Users/cristobalnavarro/Desktop/olympian-2/packages/server/src/database/database-service.ts:31:7)
+    at async startServer (/Users/cristobalnavarro/Desktop/olympian-2/packages/server/src/index.ts:54:5) {
+  errorLabelSet: Set(0) {},
+  reason: TopologyDescription {
+    type: 'Unknown',
+    servers: Map(1) { 'localhost:27017' => [ServerDescription] },
+    stale: false,
+    compatible: true,
+    heartbeatFrequencyMS: 10000,
+    localThresholdMS: 15,
+    setName: null,
+    maxElectionId: null,
+    maxSetVersion: null,
+    commonWireVersion: 0,
+    logicalSessionTimeoutMinutes: null
+  },
+  code: undefined,
+  [cause]: MongoNetworkError: connection <monitor> to [::1]:27017 closed
+      at Connection.onClose (/Users/cristobalnavarro/Desktop/olympian-2/node_modules/mongodb/src/cmap/connection.ts:321:18)
+      at Socket.emit (node:events:519:35)
+      at TCP.<anonymous> (node:net:351:12) {
+    errorLabelSet: Set(2) { 'HandshakeError', 'ResetPool' },
+    beforeHandshake: false,
+    [cause]: undefined
+  }
+}
+? Failed to start server: MongoServerSelectionError: connection <monitor> to [::1]:27017 closed
+    at Topology.selectServer (/Users/cristobalnavarro/Desktop/olympian-2/node_modules/mongodb/src/sdam/topology.ts:634:30)
+    at async Topology._connect (/Users/cristobalnavarro/Desktop/olympian-2/node_modules/mongodb/src/sdam/topology.ts:468:22)
+    at async Topology.connect (/Users/cristobalnavarro/Desktop/olympian-2/node_modules/mongodb/src/sdam/topology.ts:405:7)
+    at async topologyConnect (/Users/cristobalnavarro/Desktop/olympian-2/node_modules/mongodb/src/mongo_client.ts:680:9)
+    at async MongoClient._connect (/Users/cristobalnavarro/Desktop/olympian-2/node_modules/mongodb/src/mongo_client.ts:692:7)
+    at async MongoClient.connect (/Users/cristobalnavarro/Desktop/olympian-2/node_modules/mongodb/src/mongo_client.ts:604:7)
+    at async DatabaseService.connect (/Users/cristobalnavarro/Desktop/olympian-2/packages/server/src/database/database-service.ts:31:7)
+    at async startServer (/Users/cristobalnavarro/Desktop/olympian-2/packages/server/src/index.ts:54:5) {
+  errorLabelSet: Set(0) {},
+  reason: TopologyDescription {
+    type: 'Unknown',
+    servers: Map(1) { 'localhost:27017' => [ServerDescription] },
+    stale: false,
+    compatible: true,
+    heartbeatFrequencyMS: 10000,
+    localThresholdMS: 15,
+    setName: null,
+    maxElectionId: null,
+    maxSetVersion: null,
+    commonWireVersion: 0,
+    logicalSessionTimeoutMinutes: null
+  },
+  code: undefined,
+  [cause]: MongoNetworkError: connection <monitor> to [::1]:27017 closed
+      at Connection.onClose (/Users/cristobalnavarro/Desktop/olympian-2/node_modules/mongodb/src/cmap/connection.ts:321:18)
+      at Socket.emit (node:events:519:35)
+      at TCP.<anonymous> (node:net:351:12) {
+    errorLabelSet: Set(2) { 'HandshakeError', 'ResetPool' },
+    beforeHandshake: false,
+    [cause]: undefined
+  }
+}

@@ -29,6 +29,7 @@ services:
       DEBUG_OLLAMA: true
       DEBUG_HTTP: true
       NODE_ENV: production
+      MONGODB_URI: mongodb://root:olympian123@mongodb:27017/olympian?authSource=admin
     ports:
       - "3001:3001"
     depends_on:

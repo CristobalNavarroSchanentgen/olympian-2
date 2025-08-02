@@ -40,7 +40,12 @@ class OllamaService {
                 console.log('✅ OLLAMA RESPONSE INTERCEPTOR');
                 console.log('📊 Status:', response.status, response.statusText);
                 console.log('⏱️  Response Time:', response.config?.timeout || 'unknown');
-                console.log('📦 Data Size:', JSON.stringify(response.data).length, 'bytes');
+                if (response.config.responseType === "stream") {
+                    console.log("📦 Data Type: Stream (not serializable)");
+                }
+                else {
+                    console.log("📦 Data Size:", JSON.stringify(response.data).length, "bytes");
+                }
             }
             return response;
         }, (error) => {

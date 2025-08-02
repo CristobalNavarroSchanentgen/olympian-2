@@ -267,28 +267,95 @@ export class OllamaService {
       let buffer = '';
       let tokenCount = 0;
       
-      for await (const chunk of response.data) {
-        buffer += chunk.toString();
-        
-        
-        const lines = buffer.split("\n");        buffer = lines.pop() || '';
-        
-        for (const line of lines) {
-          if (line.trim()) {
-            try {
-              const data = JSON.parse(line);
-              tokenCount++;
-              if (this.shouldLogVerbose()) {
-                console.log(`🔄 Stream token ${tokenCount}:`, data.message?.content?.substring(0, 50) || 'no content');
+      // Handle the stream properly with event listeners
+      const stream = response.data;
+      
+      // Create a promise-based approach for the async generator
+      let resolveChunk: ((value: ChatResponse | null) => void) | null = null;
+      let pendingChunks: (ChatResponse | null)[] = [];
+      let streamEnded = false;
+      let streamError: Error | null = null;
+
+      stream.on('data', (chunk: Buffer) => {
+        try {
+          buffer += chunk.toString();
+          
+          const lines = buffer.split('\n');
+          buffer = lines.pop() || ''; // Keep incomplete line in buffer
+          
+          for (const line of lines) {
+            if (line.trim()) {
+              try {
+                const data = JSON.parse(line) as ChatResponse;
+                tokenCount++;
+                if (this.shouldLogVerbose()) {
+                  console.log(`🔄 Stream token ${tokenCount}:`, data.message?.content?.substring(0, 50) || 'no content');
+                }
+                
+                if (resolveChunk) {
+                  resolveChunk(data);
+                  resolveChunk = null;
+                } else {
+                  pendingChunks.push(data);
+                }
+              } catch (parseError) {
+                console.warn('⚠️  Failed to parse stream chunk:', parseError);
               }
-              yield data as ChatResponse;
-            } catch (parseError) {
-              console.warn('⚠️  Failed to parse stream chunk:', parseError);
             }
           }
+        } catch (error) {
+          console.error('❌ Error processing stream chunk:', error);
+          streamError = error instanceof Error ? error : new Error(String(error));
+          if (resolveChunk) {
+            resolveChunk(null);
+            resolveChunk = null;
+          }
+        }
+      });
+
+      stream.on('end', () => {
+        streamEnded = true;
+        if (resolveChunk) {
+          resolveChunk(null);
+          resolveChunk = null;
+        }
+        console.log(`✅ Stream completed with ${tokenCount} tokens`);
+      });
+
+      stream.on('error', (error: Error) => {
+        streamError = error;
+        streamEnded = true;
+        if (resolveChunk) {
+          resolveChunk(null);
+          resolveChunk = null;
+        }
+        console.error('❌ Stream error:', error.message);
+      });
+
+      // Generator function that yields chunks as they arrive
+      while (!streamEnded || pendingChunks.length > 0) {
+        if (streamError) {
+          throw streamError;
+        }
+
+        if (pendingChunks.length > 0) {
+          const chunk = pendingChunks.shift();
+          if (chunk) {
+            yield chunk;
+          }
+        } else if (!streamEnded) {
+          // Wait for next chunk
+          const chunk = await new Promise<ChatResponse | null>((resolve) => {
+            resolveChunk = resolve;
+          });
+          if (chunk) {
+            yield chunk;
+          }
+        } else {
+          break;
         }
       }
-      console.log(`✅ Stream completed with ${tokenCount} tokens`);
+      
     } catch (error: any) {
       console.log('❌ Stream chat failed:', error.message);
       throw new Error('Chat streaming failed: ' + error.message);

@@ -15,12 +15,12 @@ export const chatService = {
 
   async getConversation(id: string): Promise<Conversation> {
     const { data } = await api.get(`/conversations/${id}`);
-        return Array.isArray(data) ? data : [];
+        return data;
   },
 
   async createConversation(conversation: { title: string; model: string; metadata?: any }): Promise<Conversation> {
     const { data } = await api.post('/conversations', conversation);
-        return Array.isArray(data) ? data : [];
+        return data;
   },
 
   async updateConversation(id: string, updates: Partial<Conversation>): Promise<void> {
@@ -46,7 +46,7 @@ export const chatService = {
     metadata?: any;
   }): Promise<Message> {
     const { data } = await api.post('/messages', message);
-        return Array.isArray(data) ? data : [];
+        return data;
   },
 
   // Artifacts
@@ -59,12 +59,12 @@ export const chatService = {
   // Ollama
   async getOllamaStatus(): Promise<{ connected: boolean; baseUrl: string }> {
     const { data } = await api.get('/ollama/status');
-        return Array.isArray(data) ? data : [];
+        return data;
   },
 
   async getModels(): Promise<any[]> {
     const { data } = await api.get('/ollama/models');
-        return Array.isArray(data) ? data : [];
+        return data.models || [];
   },
 
   // MCP
@@ -84,6 +84,6 @@ export const chatService = {
       toolName,
       arguments: args,
     });
-        return Array.isArray(data) ? data : [];
+        return data;
   },
 };

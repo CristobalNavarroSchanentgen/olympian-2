@@ -6,6 +6,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ModelRegistryServiceImpl = void 0;
 class ModelRegistryServiceImpl {
+    initializationPromise = null;
     models = new Map();
     registryMode = true;
     ollamaService;
@@ -163,6 +164,11 @@ class ModelRegistryServiceImpl {
         return this.models.get(modelName) || null;
     }
     async getAllRegisteredModels() {
+        // Wait for initial load if still pending
+        if (this.initializationPromise) {
+            await this.initializationPromise;
+            this.initializationPromise = null;
+        }
         // Refresh models if stale
         if (this.shouldRefreshModels()) {
             await this.refreshModelsFromOllama();

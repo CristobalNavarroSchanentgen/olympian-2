@@ -6,6 +6,7 @@ import { ModelRegistryService } from '@olympian/shared/services/model-registry-s
 import { ModelCapabilityDefinition } from '@olympian/shared/models/connection';
 import { OllamaService } from './ollama-service';
 export declare class ModelRegistryServiceImpl implements ModelRegistryService {
+    private initializationPromise;
     private models;
     private registryMode;
     private ollamaService?;

@@ -43,7 +43,7 @@ class WebSocketHandler {
                 const baseModel = requestedModel.replace(':latest', '');
                 const exactMatch = modelNames.find(name => name.startsWith(baseModel + ':'));
                 if (exactMatch) {
-                    console.log(`? Model fallback: ${requestedModel} -> ${exactMatch}`);
+                    console.log(`🔁 Model fallback: ${requestedModel} -> ${exactMatch}`);
                     return exactMatch;
                 }
             }
@@ -51,7 +51,7 @@ class WebSocketHandler {
             const baseModelName = requestedModel.split(':')[0];
             const similarModel = modelNames.find(name => name.startsWith(baseModelName));
             if (similarModel) {
-                console.log(`? Model fallback: ${requestedModel} -> ${similarModel}`);
+                console.log(`🔁 Model fallback: ${requestedModel} -> ${similarModel}`);
                 return similarModel;
             }
             // Fall back to any text-capable model
@@ -59,12 +59,12 @@ class WebSocketHandler {
             const availableTextModel = textModels.find(m => m.capabilities.includes("text-generation") &&
                 modelNames.includes(m.name));
             if (availableTextModel) {
-                console.log(`? Model fallback: ${requestedModel} -> ${availableTextModel.name}`);
+                console.log(`🔁 Model fallback: ${requestedModel} -> ${availableTextModel.name}`);
                 return availableTextModel.name;
             }
             // Last resort: use the first available model
             if (modelNames.length > 0) {
-                console.log(`? Model fallback: ${requestedModel} -> ${modelNames[0]}`);
+                console.log(`🔁 Model fallback: ${requestedModel} -> ${modelNames[0]}`);
                 return modelNames[0];
             }
             throw new Error('No models available');
@@ -76,8 +76,13 @@ class WebSocketHandler {
     }
     async handleTextModelsRequest(socket) {
         try {
+            // Force refresh models from Ollama to ensure we have the latest
+            if (this.modelRegistryService.forceRefresh) {
+                await this.modelRegistryService.forceRefresh();
+            }
             const models = await this.modelRegistryService.getAllModels();
             const textModels = models.filter(m => m.capabilities.includes("text-generation"));
+            console.log(`📋 Sending ${textModels.length} text models to client`);
             socket.emit("text-models:available", textModels);
         }
         catch (error) {
@@ -114,8 +119,13 @@ class WebSocketHandler {
     }
     async handleVisionModelsRequest(socket) {
         try {
+            // Force refresh models from Ollama to ensure we have the latest
+            if (this.modelRegistryService.forceRefresh) {
+                await this.modelRegistryService.forceRefresh();
+            }
             const models = await this.modelRegistryService.getAllModels();
             const visionModels = models.filter(m => m.capabilities.includes("vision"));
+            console.log(`📋 Sending ${visionModels.length} vision models to client`);
             socket.emit("vision-models:available", visionModels);
         }
         catch (error) {

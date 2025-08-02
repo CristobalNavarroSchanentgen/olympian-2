@@ -66,6 +66,12 @@ async function startServer() {
         const ollamaService = new ollama_service_1.OllamaService();
         // Initialize model registry with Ollama service
         const modelRegistryService = new model_registry_service_impl_1.ModelRegistryServiceImpl(ollamaService);
+        // Wait for initial model fetch from Ollama
+        if (modelRegistryService.forceRefresh) {
+            console.log("⏳ Loading models from Ollama...");
+            await modelRegistryService.forceRefresh();
+            console.log("✅ Models loaded successfully");
+        }
         // Initialize WebSocket handler with all services
         const webSocketHandler = new websocket_handler_1.WebSocketHandler(io, conversationService, messageService, mcpManager, ollamaService, modelRegistryService);
         console.log("? WebSocket handler initialized");

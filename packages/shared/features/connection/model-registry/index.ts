@@ -51,10 +51,10 @@ export class ModelRegistryManager implements ModelRegistryContract {
     const capabilities: string[] = [];
     const capabilitySet: CapabilitySet = {
       supportsChat: true, // All models support chat
-      supportsVision: definition.hasVision,
+      supportsVision: !!definition.hasVision,
       supportsStreaming: true, // Assume all support streaming
-      supportsTools: definition.hasTools,
-      supportsCode: definition.hasTools, // Tools usually mean code support
+      supportsTools: !!definition.hasTools,
+      supportsCode: !!definition.hasTools, // Tools usually mean code support
       contextLength: 4096 // Default context length
     };
 

@@ -14,7 +14,7 @@ export declare class ModelRegistryServiceImpl implements ModelRegistryService {
     private fetchInterval;
     constructor(ollamaService?: OllamaService);
     private initializeDefaultModels;
-    private refreshModelsFromOllama;
+    refreshModelsFromOllama(): Promise<void>;
     private createModelDefinitionFromOllama;
     private detectVisionCapabilities;
     private detectCodeCapabilities;

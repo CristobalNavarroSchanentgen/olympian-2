@@ -5,6 +5,27 @@ export function setupOllamaRoutes(app: any, modelRegistryService: ModelRegistryS
   const router = Router();
 
   // GET /api/ollama/status - Get Ollama status
+  // GET /api/ollama/refresh - Force refresh models
+  router.get("/refresh", async (req, res) => {
+    try {
+      console.log("🔄 Manual model refresh requested");
+      if (typeof (modelRegistryService as any).refreshModelsFromOllama === "function") {
+        await (modelRegistryService as any).refreshModelsFromOllama();
+        const models = await modelRegistryService.getAllModels();
+        res.json({ 
+          success: true, 
+          message: "Models refreshed successfully", 
+          count: models.length,
+          models: models.map(m => ({ name: m.modelName, displayName: m.displayName, capabilities: m.capabilities }))
+        });
+      } else {
+        res.status(500).json({ error: "Refresh method not available" });
+      }
+    } catch (error) {
+      console.error("Error during manual refresh:", error);
+      res.status(500).json({ error: "Failed to refresh models", details: error instanceof Error ? error.message : String(error) });
+    }
+  });
   router.get('/status', async (req, res) => {
     try {
       // Check if Ollama service is available
@@ -30,6 +51,21 @@ export function setupOllamaRoutes(app: any, modelRegistryService: ModelRegistryS
     }
   });
 
+  // GET /api/ollama/refresh - Force refresh models from Ollama
+  router.get("/refresh", async (req, res) => {
+    try {
+      console.log("🔄 Manual refresh triggered");
+      if (typeof (modelRegistryService as any).refreshModelsFromOllama === "function") {
+        await (modelRegistryService as any).refreshModelsFromOllama();
+        res.json({ success: true, message: "Models refreshed successfully" });
+      } else {
+        res.status(500).json({ error: "Refresh method not available" });
+      }
+    } catch (error) {
+      console.error("Error during manual refresh:", error);
+      res.status(500).json({ error: "Failed to refresh models" });
+    }
+  });
   // GET /api/ollama/models - List available Ollama models
   router.get('/models', async (req, res) => {
     try {

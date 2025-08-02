@@ -832,3 +832,214 @@ Node.js v23.11.0
     }
   }
 }
+3:00:18 PM [tsx] change in ./src/websocket/websocket-handler.ts Rerunning...
+cnode:internal/modules/run_main:104
+    triggerUncaughtException(
+    ^
+
+Error: Transform failed with 1 error:
+/Users/cristobalnavarro/Desktop/olympian-2/packages/server/src/websocket/websocket-handler.ts:104:10: ERROR: Expected ";" but found "async"
+    at failureErrorWithLog (/Users/cristobalnavarro/Desktop/olympian-2/node_modules/esbuild/lib/main.js:1467:15)
+    at /Users/cristobalnavarro/Desktop/olympian-2/node_modules/esbuild/lib/main.js:736:50
+    at responseCallbacks.<computed> (/Users/cristobalnavarro/Desktop/olympian-2/node_modules/esbuild/lib/main.js:603:9)
+    at handleIncomingPacket (/Users/cristobalnavarro/Desktop/olympian-2/node_modules/esbuild/lib/main.js:658:12)
+    at Socket.readFromStdout (/Users/cristobalnavarro/Desktop/olympian-2/node_modules/esbuild/lib/main.js:581:7)
+    at Socket.emit (node:events:507:28)
+    at addChunk (node:internal/streams/readable:559:12)
+    at readableAddChunkPushByteMode (node:internal/streams/readable:510:3)
+    at Readable.push (node:internal/streams/readable:390:5)
+    at Pipe.onStreamRead (node:internal/stream_base_commons:189:23) {
+  name: 'TransformError'
+}
+
+Node.js v23.11.0
+3:00:27 PM [tsx] change in ./src/websocket/websocket-handler.ts Rerunning...
+cnode:internal/modules/run_main:104
+    triggerUncaughtException(
+    ^
+
+Error: Transform failed with 1 error:
+/Users/cristobalnavarro/Desktop/olympian-2/packages/server/src/websocket/websocket-handler.ts:142:6: ERROR: Expected "finally" but found "const"
+    at failureErrorWithLog (/Users/cristobalnavarro/Desktop/olympian-2/node_modules/esbuild/lib/main.js:1467:15)
+    at /Users/cristobalnavarro/Desktop/olympian-2/node_modules/esbuild/lib/main.js:736:50
+    at responseCallbacks.<computed> (/Users/cristobalnavarro/Desktop/olympian-2/node_modules/esbuild/lib/main.js:603:9)
+    at handleIncomingPacket (/Users/cristobalnavarro/Desktop/olympian-2/node_modules/esbuild/lib/main.js:658:12)
+    at Socket.readFromStdout (/Users/cristobalnavarro/Desktop/olympian-2/node_modules/esbuild/lib/main.js:581:7)
+    at Socket.emit (node:events:507:28)
+    at addChunk (node:internal/streams/readable:559:12)
+    at readableAddChunkPushByteMode (node:internal/streams/readable:510:3)
+    at Readable.push (node:internal/streams/readable:390:5)
+    at Pipe.onStreamRead (node:internal/stream_base_commons:189:23) {
+  name: 'TransformError'
+}
+
+Node.js v23.11.0
+3:01:04 PM [tsx] change in ./src/websocket/websocket-handler.ts Rerunning...
+c❌ MongoDB connection failed: MongoServerSelectionError: connect ECONNREFUSED ::1:27017, connect ECONNREFUSED 127.0.0.1:27017
+    at Topology.selectServer (/Users/cristobalnavarro/Desktop/olympian-2/node_modules/mongodb/src/sdam/topology.ts:634:30)
+    at async Topology._connect (/Users/cristobalnavarro/Desktop/olympian-2/node_modules/mongodb/src/sdam/topology.ts:468:22)
+    at async Topology.connect (/Users/cristobalnavarro/Desktop/olympian-2/node_modules/mongodb/src/sdam/topology.ts:405:7)
+    at async topologyConnect (/Users/cristobalnavarro/Desktop/olympian-2/node_modules/mongodb/src/mongo_client.ts:680:9)
+    at async MongoClient._connect (/Users/cristobalnavarro/Desktop/olympian-2/node_modules/mongodb/src/mongo_client.ts:692:7)
+    at async MongoClient.connect (/Users/cristobalnavarro/Desktop/olympian-2/node_modules/mongodb/src/mongo_client.ts:604:7)
+    at async DatabaseService.connect (/Users/cristobalnavarro/Desktop/olympian-2/packages/server/src/database/database-service.ts:31:7)
+    at async startServer (/Users/cristobalnavarro/Desktop/olympian-2/packages/server/src/index.ts:54:5) {
+  errorLabelSet: Set(0) {},
+  reason: TopologyDescription {
+    type: 'Unknown',
+    servers: Map(1) { 'localhost:27017' => [ServerDescription] },
+    stale: false,
+    compatible: true,
+    heartbeatFrequencyMS: 10000,
+    localThresholdMS: 15,
+    setName: null,
+    maxElectionId: null,
+    maxSetVersion: null,
+    commonWireVersion: 0,
+    logicalSessionTimeoutMinutes: null
+  },
+  code: undefined,
+  [cause]: MongoNetworkError: connect ECONNREFUSED ::1:27017, connect ECONNREFUSED 127.0.0.1:27017
+      at Socket.<anonymous> (/Users/cristobalnavarro/Desktop/olympian-2/node_modules/mongodb/src/cmap/connect.ts:395:16)
+      at Object.onceWrapper (node:events:622:26)
+      at Socket.emit (node:events:507:28)
+      at emitErrorNT (node:internal/streams/destroy:170:8)
+      at emitErrorCloseNT (node:internal/streams/destroy:129:3)
+      at process.processTicksAndRejections (node:internal/process/task_queues:90:21) {
+    errorLabelSet: Set(1) { 'ResetPool' },
+    beforeHandshake: false,
+    [cause]: AggregateError [ECONNREFUSED]: 
+        at internalConnectMultiple (node:net:1139:18)
+        at afterConnectMultiple (node:net:1714:7) {
+      code: 'ECONNREFUSED',
+      [errors]: [Array]
+    }
+  }
+}
+? Failed to start server: MongoServerSelectionError: connect ECONNREFUSED ::1:27017, connect ECONNREFUSED 127.0.0.1:27017
+    at Topology.selectServer (/Users/cristobalnavarro/Desktop/olympian-2/node_modules/mongodb/src/sdam/topology.ts:634:30)
+    at async Topology._connect (/Users/cristobalnavarro/Desktop/olympian-2/node_modules/mongodb/src/sdam/topology.ts:468:22)
+    at async Topology.connect (/Users/cristobalnavarro/Desktop/olympian-2/node_modules/mongodb/src/sdam/topology.ts:405:7)
+    at async topologyConnect (/Users/cristobalnavarro/Desktop/olympian-2/node_modules/mongodb/src/mongo_client.ts:680:9)
+    at async MongoClient._connect (/Users/cristobalnavarro/Desktop/olympian-2/node_modules/mongodb/src/mongo_client.ts:692:7)
+    at async MongoClient.connect (/Users/cristobalnavarro/Desktop/olympian-2/node_modules/mongodb/src/mongo_client.ts:604:7)
+    at async DatabaseService.connect (/Users/cristobalnavarro/Desktop/olympian-2/packages/server/src/database/database-service.ts:31:7)
+    at async startServer (/Users/cristobalnavarro/Desktop/olympian-2/packages/server/src/index.ts:54:5) {
+  errorLabelSet: Set(0) {},
+  reason: TopologyDescription {
+    type: 'Unknown',
+    servers: Map(1) { 'localhost:27017' => [ServerDescription] },
+    stale: false,
+    compatible: true,
+    heartbeatFrequencyMS: 10000,
+    localThresholdMS: 15,
+    setName: null,
+    maxElectionId: null,
+    maxSetVersion: null,
+    commonWireVersion: 0,
+    logicalSessionTimeoutMinutes: null
+  },
+  code: undefined,
+  [cause]: MongoNetworkError: connect ECONNREFUSED ::1:27017, connect ECONNREFUSED 127.0.0.1:27017
+      at Socket.<anonymous> (/Users/cristobalnavarro/Desktop/olympian-2/node_modules/mongodb/src/cmap/connect.ts:395:16)
+      at Object.onceWrapper (node:events:622:26)
+      at Socket.emit (node:events:507:28)
+      at emitErrorNT (node:internal/streams/destroy:170:8)
+      at emitErrorCloseNT (node:internal/streams/destroy:129:3)
+      at process.processTicksAndRejections (node:internal/process/task_queues:90:21) {
+    errorLabelSet: Set(1) { 'ResetPool' },
+    beforeHandshake: false,
+    [cause]: AggregateError [ECONNREFUSED]: 
+        at internalConnectMultiple (node:net:1139:18)
+        at afterConnectMultiple (node:net:1714:7) {
+      code: 'ECONNREFUSED',
+      [errors]: [Array]
+    }
+  }
+}
+3:01:35 PM [tsx] change in ./src/websocket/websocket-handler.ts Rerunning...
+c3:01:53 PM [tsx] change in ./src/services/model-registry-service-impl.ts Restarting...
+c❌ MongoDB connection failed: MongoServerSelectionError: connect ECONNREFUSED ::1:27017, connect ECONNREFUSED 127.0.0.1:27017
+    at Topology.selectServer (/Users/cristobalnavarro/Desktop/olympian-2/node_modules/mongodb/src/sdam/topology.ts:634:30)
+    at async Topology._connect (/Users/cristobalnavarro/Desktop/olympian-2/node_modules/mongodb/src/sdam/topology.ts:468:22)
+    at async Topology.connect (/Users/cristobalnavarro/Desktop/olympian-2/node_modules/mongodb/src/sdam/topology.ts:405:7)
+    at async topologyConnect (/Users/cristobalnavarro/Desktop/olympian-2/node_modules/mongodb/src/mongo_client.ts:680:9)
+    at async MongoClient._connect (/Users/cristobalnavarro/Desktop/olympian-2/node_modules/mongodb/src/mongo_client.ts:692:7)
+    at async MongoClient.connect (/Users/cristobalnavarro/Desktop/olympian-2/node_modules/mongodb/src/mongo_client.ts:604:7)
+    at async DatabaseService.connect (/Users/cristobalnavarro/Desktop/olympian-2/packages/server/src/database/database-service.ts:31:7)
+    at async startServer (/Users/cristobalnavarro/Desktop/olympian-2/packages/server/src/index.ts:54:5) {
+  errorLabelSet: Set(0) {},
+  reason: TopologyDescription {
+    type: 'Unknown',
+    servers: Map(1) { 'localhost:27017' => [ServerDescription] },
+    stale: false,
+    compatible: true,
+    heartbeatFrequencyMS: 10000,
+    localThresholdMS: 15,
+    setName: null,
+    maxElectionId: null,
+    maxSetVersion: null,
+    commonWireVersion: 0,
+    logicalSessionTimeoutMinutes: null
+  },
+  code: undefined,
+  [cause]: MongoNetworkError: connect ECONNREFUSED ::1:27017, connect ECONNREFUSED 127.0.0.1:27017
+      at Socket.<anonymous> (/Users/cristobalnavarro/Desktop/olympian-2/node_modules/mongodb/src/cmap/connect.ts:395:16)
+      at Object.onceWrapper (node:events:622:26)
+      at Socket.emit (node:events:507:28)
+      at emitErrorNT (node:internal/streams/destroy:170:8)
+      at emitErrorCloseNT (node:internal/streams/destroy:129:3)
+      at process.processTicksAndRejections (node:internal/process/task_queues:90:21) {
+    errorLabelSet: Set(1) { 'ResetPool' },
+    beforeHandshake: false,
+    [cause]: AggregateError [ECONNREFUSED]: 
+        at internalConnectMultiple (node:net:1139:18)
+        at afterConnectMultiple (node:net:1714:7) {
+      code: 'ECONNREFUSED',
+      [errors]: [Array]
+    }
+  }
+}
+? Failed to start server: MongoServerSelectionError: connect ECONNREFUSED ::1:27017, connect ECONNREFUSED 127.0.0.1:27017
+    at Topology.selectServer (/Users/cristobalnavarro/Desktop/olympian-2/node_modules/mongodb/src/sdam/topology.ts:634:30)
+    at async Topology._connect (/Users/cristobalnavarro/Desktop/olympian-2/node_modules/mongodb/src/sdam/topology.ts:468:22)
+    at async Topology.connect (/Users/cristobalnavarro/Desktop/olympian-2/node_modules/mongodb/src/sdam/topology.ts:405:7)
+    at async topologyConnect (/Users/cristobalnavarro/Desktop/olympian-2/node_modules/mongodb/src/mongo_client.ts:680:9)
+    at async MongoClient._connect (/Users/cristobalnavarro/Desktop/olympian-2/node_modules/mongodb/src/mongo_client.ts:692:7)
+    at async MongoClient.connect (/Users/cristobalnavarro/Desktop/olympian-2/node_modules/mongodb/src/mongo_client.ts:604:7)
+    at async DatabaseService.connect (/Users/cristobalnavarro/Desktop/olympian-2/packages/server/src/database/database-service.ts:31:7)
+    at async startServer (/Users/cristobalnavarro/Desktop/olympian-2/packages/server/src/index.ts:54:5) {
+  errorLabelSet: Set(0) {},
+  reason: TopologyDescription {
+    type: 'Unknown',
+    servers: Map(1) { 'localhost:27017' => [ServerDescription] },
+    stale: false,
+    compatible: true,
+    heartbeatFrequencyMS: 10000,
+    localThresholdMS: 15,
+    setName: null,
+    maxElectionId: null,
+    maxSetVersion: null,
+    commonWireVersion: 0,
+    logicalSessionTimeoutMinutes: null
+  },
+  code: undefined,
+  [cause]: MongoNetworkError: connect ECONNREFUSED ::1:27017, connect ECONNREFUSED 127.0.0.1:27017
+      at Socket.<anonymous> (/Users/cristobalnavarro/Desktop/olympian-2/node_modules/mongodb/src/cmap/connect.ts:395:16)
+      at Object.onceWrapper (node:events:622:26)
+      at Socket.emit (node:events:507:28)
+      at emitErrorNT (node:internal/streams/destroy:170:8)
+      at emitErrorCloseNT (node:internal/streams/destroy:129:3)
+      at process.processTicksAndRejections (node:internal/process/task_queues:90:21) {
+    errorLabelSet: Set(1) { 'ResetPool' },
+    beforeHandshake: false,
+    [cause]: AggregateError [ECONNREFUSED]: 
+        at internalConnectMultiple (node:net:1139:18)
+        at afterConnectMultiple (node:net:1714:7) {
+      code: 'ECONNREFUSED',
+      [errors]: [Array]
+    }
+  }
+}
+3:03:04 PM [tsx] change in ./src/websocket/websocket-handler.ts Rerunning...
+c

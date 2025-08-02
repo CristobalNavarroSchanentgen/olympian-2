@@ -8,7 +8,7 @@ import { ModelCapabilityDefinition } from '@olympian/shared/models/connection';
 import { OllamaService } from './ollama-service';
 
 export class ModelRegistryServiceImpl implements ModelRegistryService {
-  private models: Map<string, ModelCapabilityDefinition> = new Map();
+  private initializationPromise: Promise<void> | null = null;  private models: Map<string, ModelCapabilityDefinition> = new Map();
   private registryMode: boolean = true;
   private ollamaService?: OllamaService;
   private lastFetch: Date | null = null;
@@ -191,6 +191,11 @@ export class ModelRegistryServiceImpl implements ModelRegistryService {
   }
 
   async getAllRegisteredModels(): Promise<ModelCapabilityDefinition[]> {
+    // Wait for initial load if still pending
+    if (this.initializationPromise) {
+      await this.initializationPromise;
+      this.initializationPromise = null;
+    }
     // Refresh models if stale
     if (this.shouldRefreshModels()) {
       await this.refreshModelsFromOllama();

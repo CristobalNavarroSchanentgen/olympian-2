@@ -13,6 +13,7 @@ export declare function getTextModelsWithMetadata(models: ModelCapabilityDefinit
     suitableFor: string[];
     modelName: string;
     name: string;
+    displayName?: string;
     provider: string;
     capabilities: string[];
     contextLength: number;

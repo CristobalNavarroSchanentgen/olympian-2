@@ -25,6 +25,7 @@ const selection_persistence_adapter_1 = require("../../../adapters/features/ui/m
 const image_detection_adapter_1 = require("../../../adapters/features/ui/vision-model-selector/image-detection-adapter");
 // Infrastructure
 const mcp_manager_stub_1 = require("./mcp/mcp-manager-stub");
+const websocket_handler_1 = require("./websocket/websocket-handler");
 const ollama_service_1 = require("./services/ollama-service");
 // API setup
 const api_1 = require("./api");
@@ -48,16 +49,26 @@ async function startServer() {
         // Initialize database
         const dbService = (0, database_1.getDatabaseService)();
         await dbService.connect();
-        console.log("📊 MongoDB connected and ready");
+        console.log("? Database indexes created");
+        console.log("? MongoDB connected: olympian");
+        console.log("? MongoDB connected and ready");
         // Initialize business logic services
         const conversationService = new conversation_service_impl_1.ConversationServiceImpl();
         const messageService = new message_service_impl_1.MessageServiceImpl();
         const artifactService = new artifact_service_impl_1.ArtifactServiceImpl();
         const mcpService = new mcp_service_impl_1.McpServiceImpl();
-        // Initialize Ollama service first (required by Smart Model Router)
+        console.log("? Business services initialized");
+        // Initialize MCP Manager
+        const mcpManager = new mcp_manager_stub_1.MCPManager();
+        await mcpManager.initialize();
+        console.log("? MCP Manager initialized");
+        // Initialize Ollama service first (required by Model Registry)
         const ollamaService = new ollama_service_1.OllamaService();
-        console.log("🦙 Ollama service initialized");
-        const modelRegistryService = new model_registry_service_impl_1.ModelRegistryServiceImpl();
+        // Initialize model registry with Ollama service
+        const modelRegistryService = new model_registry_service_impl_1.ModelRegistryServiceImpl(ollamaService);
+        // Initialize WebSocket handler with all services
+        const webSocketHandler = new websocket_handler_1.WebSocketHandler(io, conversationService, messageService, mcpManager, ollamaService, modelRegistryService);
+        console.log("? WebSocket handler initialized");
         // Initialize model selector adapters
         const textModelFilterAdapter = (0, text_model_filter_adapter_1.createTextModelFilterAdapter)();
         const visionModelFilterAdapter = (0, vision_model_filter_adapter_1.createVisionModelFilterAdapter)();
@@ -66,14 +77,7 @@ async function startServer() {
         // Initialize model selector features
         const textModelSelector = (0, text_model_selector_1.createTextModelSelector)(modelRegistryService, textModelFilterAdapter, selectionPersistenceAdapter);
         const visionModelSelector = (0, vision_model_selector_1.createVisionModelSelector)(modelRegistryService, visionModelFilterAdapter, selectionPersistenceAdapter, imageDetectionAdapter);
-        // Initialize Smart Model Router Service
-        console.log("💼 Business services initialized");
-        // Initialize infrastructure services
-        const mcpManager = new mcp_manager_stub_1.MCPManager();
-        await mcpManager.initialize();
-        console.log("🔧 MCP Manager initialized");
-        // Setup WebSocket handling
-        console.log("🔌 WebSocket handler initialized");
+        console.log("? All API routes configured");
         // Setup all API routes with service injection
         const apiServices = {
             conversationService,
@@ -85,11 +89,11 @@ async function startServer() {
         (0, api_1.setupAllRoutes)(app, apiServices);
         const PORT = process.env.PORT || 3001;
         server.listen(PORT, () => {
-            console.log(`🚀 Server running on port ${PORT}`);
+            console.log(`? Server running on port ${PORT}`);
         });
     }
     catch (error) {
-        console.error("❌ Failed to start server:", error);
+        console.error("? Failed to start server:", error);
         process.exit(1);
     }
 }

@@ -30,6 +30,50 @@ class WebSocketHandler {
             });
         });
     }
+    async selectBestAvailableModel(requestedModel) {
+        try {
+            // First check if the exact model is available
+            const models = await this.ollamaService.getModels();
+            const modelNames = models.map(m => m.name);
+            if (modelNames.includes(requestedModel)) {
+                return requestedModel;
+            }
+            // Try without :latest suffix
+            if (requestedModel.endsWith(':latest')) {
+                const baseModel = requestedModel.replace(':latest', '');
+                const exactMatch = modelNames.find(name => name.startsWith(baseModel + ':'));
+                if (exactMatch) {
+                    console.log(`? Model fallback: ${requestedModel} -> ${exactMatch}`);
+                    return exactMatch;
+                }
+            }
+            // Try to find the base model name in available models
+            const baseModelName = requestedModel.split(':')[0];
+            const similarModel = modelNames.find(name => name.startsWith(baseModelName));
+            if (similarModel) {
+                console.log(`? Model fallback: ${requestedModel} -> ${similarModel}`);
+                return similarModel;
+            }
+            // Fall back to any text-capable model
+            const textModels = await this.modelRegistryService.getAllModels();
+            const availableTextModel = textModels.find(m => m.capabilities.includes("text-generation") &&
+                modelNames.includes(m.name));
+            if (availableTextModel) {
+                console.log(`? Model fallback: ${requestedModel} -> ${availableTextModel.name}`);
+                return availableTextModel.name;
+            }
+            // Last resort: use the first available model
+            if (modelNames.length > 0) {
+                console.log(`? Model fallback: ${requestedModel} -> ${modelNames[0]}`);
+                return modelNames[0];
+            }
+            throw new Error('No models available');
+        }
+        catch (error) {
+            console.error('Error selecting model:', error);
+            throw new Error(`Failed to select model: ${error instanceof Error ? error.message : 'Unknown error'}`);
+        }
+    }
     async handleTextModelsRequest(socket) {
         try {
             const models = await this.modelRegistryService.getAllModels();
@@ -108,11 +152,58 @@ class WebSocketHandler {
     }
     async handleChatMessage(socket, data) {
         try {
+            // Create and store user message
             const userMessage = await this.messageService.createMessage(data.conversationId, { content: data.content, role: "user" }, "user");
             socket.emit('chat:message', userMessage);
-            socket.emit('chat:response', { content: 'Hello from simplified server!' });
+            // Select the best available model
+            const requestedModel = data.model || 'llama3.2:3b';
+            const selectedModel = await this.selectBestAvailableModel(requestedModel);
+            // Prepare chat request
+            const chatRequest = {
+                model: selectedModel,
+                messages: [
+                    {
+                        role: 'user',
+                        content: data.content,
+                        ...(data.images && { images: data.images })
+                    }
+                ],
+                stream: true
+            };
+            // Start streaming response
+            let fullResponse = '';
+            const startTime = Date.now();
+            try {
+                for await (const chunk of this.ollamaService.streamChat(chatRequest)) {
+                    if (chunk.message?.content) {
+                        fullResponse += chunk.message.content;
+                        socket.emit('chat:stream', {
+                            content: chunk.message.content,
+                            done: chunk.done || false
+                        });
+                    }
+                    if (chunk.done) {
+                        break;
+                    }
+                }
+                // Create assistant message
+                const assistantMessage = await this.messageService.createMessage(data.conversationId, { content: fullResponse, role: "assistant" }, "assistant");
+                socket.emit('chat:message', assistantMessage);
+                socket.emit('chat:complete', {
+                    responseTime: Date.now() - startTime,
+                    model: selectedModel,
+                    tokenCount: fullResponse.length // Rough approximation
+                });
+            }
+            catch (streamError) {
+                console.error('Chat message error:', streamError);
+                socket.emit('chat:error', {
+                    error: streamError instanceof Error ? streamError.message : 'Chat streaming failed'
+                });
+            }
         }
         catch (error) {
+            console.error('Chat message error:', error);
             socket.emit('chat:error', {
                 error: error instanceof Error ? error.message : 'Unknown error'
             });

@@ -5,6 +5,7 @@
 export interface ModelCapabilityDefinition {
   modelName: string;
   name: string; // Alias for modelName
+  displayName?: string;
   provider: string;
   capabilities: string[];
   contextLength: number;

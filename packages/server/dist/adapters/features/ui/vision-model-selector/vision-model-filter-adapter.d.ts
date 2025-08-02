@@ -15,6 +15,7 @@ export declare function getVisionModelsWithMetadata(models: ModelCapabilityDefin
     modelSize: string;
     modelName: string;
     name: string;
+    displayName?: string;
     provider: string;
     capabilities: string[];
     contextLength: number;

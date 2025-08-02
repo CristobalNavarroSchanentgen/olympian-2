@@ -255,11 +255,11 @@ Title:
 
 ## Implementation Steps
 
-### Step 1: Backend Foundation
-1. Create conversation-title-generator feature structure
-2. Implement title generation contract and service
-3. Create Ollama adapter for title generation
-4. Add event definitions and handlers
+### Step 1: Backend Foundation ✅ COMPLETE
+1. ✅ Create conversation-title-generator feature structure
+2. ✅ Implement title generation contract and service
+3. ✅ Create Ollama adapter for title generation
+4. ✅ Add event definitions and handlers
 5. Update manifest.yaml
 
 ### Step 2: Basic Title Generation

@@ -1,199 +1,367 @@
-# Olympian AI Construction & Contract Validation Guide
+# Chat History & AI-Generated Conversation Names Implementation Plan
 
 ## Purpose
-This document defines the construction process and contract validation requirements for the Olympian AI system, ensuring end-to-end coherence from user interaction to backend services.
+This document outlines the implementation plan for adding chat history functionality with AI-generated conversation names to the Olympian AI system, following the AI-native architecture principles.
 
-## Current System Issues
+## Current System Analysis
 
-### Critical Contract Violations Found:
+### What Currently Exists (✅ Complete)
 
-1. **Client Service Layer Violations**
-   - packages/client/src/services/chat-service.ts incorrectly transforms ALL responses to arrays
-   - Breaks contract for getOllamaStatus() which should return an object
-   - Breaks data extraction for getModels() which receives {models: [...]} but expects array
+#### 1. Conversation Infrastructure
+- Conversation Manager Feature (features/chat/conversation-manager/)
+  - Contract with full CRUD operations for conversations
+  - Database adapter for persistence
+  - WebSocket adapter for real-time updates
 
-2. **API Response Format Mismatches**
-   - Server: /api/ollama/models returns { models: [...], count: n }
-   - Client: Expects direct array of models
-   - No adapter layer to transform between formats
+- Data Models (packages/shared/models/chat/conversation.ts)
+  - Conversation interface with id, title, createdAt, updatedAt, etc.
+  - ConversationSummary for list views
+  - ConversationFilter for search/filtering
 
-3. **Missing Architecture Components**
-   - No proper contract definitions for ollama-connector feature
-   - Missing HTTP adapters for API response transformation
-   - Service implementations not following defined interfaces
+- Service Layer (packages/shared/services/conversation-service.ts)
+  - Complete interface for conversation operations
+  - Client-side implementation (packages/client/src/services/chat-service.ts)
 
-## Contract Validation Checklist
+#### 2. UI Infrastructure
+- Left Panel (packages/client/src/components/chat/Sidebar.tsx)
+  - Conversation list display
+  - New conversation creation
+  - Conversation deletion
+  - Navigation between conversations
+  - Model selector integration
 
-### 1. Feature Contract Definition
-- [ ] Contract file exists at features/[domain]/[feature]/contract.ts
-- [ ] All external interfaces are defined
-- [ ] Input/output types are explicit
-- [ ] Error cases are documented
+- Dual Pane Layout (features/ui/dual-pane-layout/)
+  - Already includes conversation panel props
+  - Supports conversation history in the interface contract
 
-### 2. Service Interface Compliance
-- [ ] Service interface exists in services/[service-name].ts
-- [ ] All methods have proper TypeScript signatures
-- [ ] Return types match contract expectations
-- [ ] Error handling is consistent
+#### 3. Message System
+- Message models and services for accessing conversation content
+- First message content available for title generation
 
-### 3. Transport Layer Implementation
-- [ ] HTTP endpoints implement ALL service contract methods
-- [ ] WebSocket handlers implement ALL real-time contract methods
-- [ ] Response formats match client expectations
-- [ ] Status codes are consistent
+## Implementation Plan
 
-### 4. Client-Server Data Flow
-- [ ] API client preserves response structure
-- [ ] No incorrect data transformations
-- [ ] Error responses are handled properly
-- [ ] Type safety is maintained
+### Phase 1: AI Title Generation Feature (🚧 New)
 
-### 5. Adapter Layer Verification
-- [ ] Adapters exist for all external dependencies
-- [ ] Input transformation is correct
-- [ ] Output transformation maintains contract
-- [ ] Edge cases are handled
+#### Backend Architecture
+Location: features/chat/conversation-title-generator/
 
-## Build Verification Process
+Required Files:
+```
+features/chat/conversation-title-generator/
+├── contract.ts              # Interface for title generation
+├── index.ts                 # Feature implementation
+└── config/
+    └── schema.ts            # Configuration for title generation
 
-### Pre-Build Checks
-1. Verify all contracts exist
-2. Check service implementations match interfaces
-3. Verify API routes implement service contracts
-4. Validate adapter transformations
+adapters/features/chat/conversation-title-generator/
+├── ollama-title-adapter.ts  # Adapter for Ollama model calls
+├── prompt-adapter.ts        # Adapter for title generation prompts
+└── message-content-adapter.ts # Extract first user message
 
-### Build Process
-1. Clean build: make clean
-2. Build with type checking: npm run build
-3. Run contract validation tests: npm run test:contracts
-4. Verify Docker images: make build-docker
+events/
+└── conversation-title-generated.ts  # Event schema
 
-### Post-Build Validation
-1. Start services: make quick-docker-multi
-2. Test API endpoints manually
-3. Verify WebSocket connections in browser
-4. Monitor logs for contract violations: make logs
+models/chat/
+├── title-generation-request.ts     # Request/response models
+└── title-generation-config.ts      # Configuration models
 
-## Critical Fixes Required
+services/
+└── title-generation-service.ts     # Service interface
+```
 
-### 1. Fix Client Service Layer
-The chat-service.ts file has a systematic bug where ALL methods return arrays:
-
-BROKEN CODE:
-async getOllamaStatus(): Promise<{ connected: boolean; baseUrl: string }> {
-  const { data } = await api.get('/ollama/status');
-  return Array.isArray(data) ? data : [];  // WRONG - always returns array
+#### Contract Definition
+```typescript
+// features/chat/conversation-title-generator/contract.ts
+export interface TitleGenerationRequest {
+  conversationId: string;
+  firstUserMessage: string;
+  preferredModel?: string;
+  maxLength?: number;
 }
 
-CORRECT CODE:
-async getOllamaStatus(): Promise<{ connected: boolean; baseUrl: string }> {
-  const { data } = await api.get('/ollama/status');
-  return data;  // Return object as-is
+export interface TitleGenerationResult {
+  title: string;
+  confidence: number;
+  model: string;
+  tokensUsed: number;
 }
 
-For models endpoint:
-async getModels(): Promise<any[]> {
-  const { data } = await api.get('/ollama/models');
-  return data.models || [];  // Extract models array from response object
+export interface ConversationTitleGeneratorContract {
+  generateTitle(request: TitleGenerationRequest): Promise<TitleGenerationResult>;
+  validateTitle(title: string): boolean;
+  getFallbackTitle(messageContent: string): string;
 }
+```
 
-### 2. Standardize API Response Format
-Either:
-- Option A: Change server to return array directly
-- Option B: Create adapter in client to transform response
+#### Service Integration
+- Add title-generation-service.ts to services/
+- Integrate with existing conversation-service 
+- Connect to message-service for first message content
+- Use existing Ollama connection infrastructure
 
-### 3. Implement Missing Contracts
-Create proper contract definitions for all features listed in manifest.yaml
+### Phase 2: UI Enhancements & User Experience
 
-## Construction Principles
+#### 2.1 Enhanced Sidebar Component
+File: packages/client/src/components/chat/Sidebar.tsx
 
-1. **Contract-First Development**
-   - Define contracts before implementation
-   - All changes must maintain contract compatibility
-   - Breaking changes require version updates
+New Features:
+- Real-time title updates during generation
+- Loading states for title generation
+- Manual title editing capability
+- Visual indicators for AI-generated vs user-set titles
+- Error handling for failed title generation
 
-2. **End-to-End Type Safety**
-   - Use TypeScript strict mode
-   - No any types in contracts
-   - Validate at runtime boundaries
+UI States:
+```typescript
+interface ConversationItemState {
+  conversation: Conversation;
+  titleGenerating: boolean;
+  titleError: boolean;
+  isEditing: boolean;
+  hasCustomTitle: boolean;
+}
+```
 
-3. **Adapter Pattern Enforcement**
-   - All external dependencies through adapters
-   - Transform data at adapter boundaries
-   - Keep business logic pure
+#### 2.2 Enhanced Conversation Display
+New UI Elements:
+- Shimmer effect during title generation
+- Pencil icon for manual editing
+- Tooltip showing "AI-generated" or "Custom title"
+- Error state with retry option
+- Timestamp with relative dates (e.g., "2 hours ago", "Yesterday")
 
-4. **Service Layer Consistency**
-   - One service interface, multiple implementations
-   - Transport layers are just service proxies
-   - No business logic in transport layer
+#### 2.3 Title Edit Component
+New File: packages/client/src/components/chat/ConversationTitleEditor.tsx
 
-5. **Observability Requirements**
-   - Log all contract violations
-   - Monitor service health
-   - Track data transformation errors
+Features:
+- Inline editing with Enter/Escape key handling
+- Auto-save on blur
+- Validation (length limits, special characters)
+- Revert to AI-generated option
 
-## Validation Matrix
+#### 2.4 Loading States & Feedback
+Visual Indicators:
+- Pulsing dot during title generation
+- Success animation when title updates
+- Error icon with retry button
+- Progress indicator for batch operations
 
-| Layer | Component | Validation Method | Success Criteria |
-|-------|-----------|-------------------|------------------|
-| UI | Components | TypeScript + Runtime | Props match contracts |
-| Client Services | API Calls | Response validation | Data structures preserved |
-| API Routes | Endpoints | Integration tests | Status codes correct |
-| Services | Business Logic | Unit tests | Contract compliance |
-| Database | Schemas | Migration tests | Data integrity |
+### Phase 3: Auto-Naming Workflow
 
-## Continuous Validation
+#### 3.1 Event-Driven Title Generation
+Trigger Points:
+1. User creates new conversation → gets "New Chat" title
+2. User sends first message → triggers title generation
+3. AI generates title → updates conversation automatically
+4. Real-time UI update via WebSocket
 
-### Development Time
-- ESLint rules for contract compliance
-- TypeScript strict checks
-- Pre-commit hooks for validation
+Event Flow:
+```
+User sends first message → message-sent event
+→ Title generation triggered → conversation-title-generated event  
+→ UI updates via WebSocket → Sidebar refreshes
+```
 
-### Build Time
-- Contract compatibility tests
-- API response format validation
-- End-to-end type checking
+#### 3.2 Configuration Options
+File: config/features/chat/conversation-title-generator/schema.ts
 
-### Runtime
-- Contract violation logging
-- Health check endpoints
-- Monitoring dashboards
+Settings:
+```typescript
+export interface TitleGenerationConfig {
+  enabled: boolean;
+  model: string;                    // Preferred model for title generation
+  maxTitleLength: number;           // Default: 50 characters
+  fallbackBehavior: "timestamp" | "truncate" | "random";
+  promptTemplate: string;
+  retryAttempts: number;
+  timeoutMs: number;
+  autoUpdateEnabled: boolean;       // Allow auto-updates of existing titles
+}
+```
 
-## Next Steps
+#### 3.3 Prompt Engineering
+Default Prompt Template:
+```
+Generate a concise, descriptive title (max 6 words) for this conversation based on the users first message:
 
-1. **Immediate**: Fix client service data transformations
-2. **Short-term**: Implement missing contract definitions
-3. **Medium-term**: Add contract validation tests
-4. **Long-term**: Automated contract compliance monitoring
+"{firstUserMessage}"
+
+The title should:
+- Capture the main topic/intent
+- Be clear and specific
+- Use title case
+- Avoid generic words like "Question", "Help", "Chat"
+
+Title:
+```
+
+### Phase 4: User Experience Testing Scenarios
+
+#### 4.1 Happy Path Workflow
+1. User clicks "New Chat"
+   - Sidebar shows "New Chat" with shimmer effect
+   - Chat area opens with welcome message
+
+2. User types first message: "How do I set up Docker on Ubuntu?"
+   - Message sends successfully
+   - Title generation starts (loading indicator appears)
+   - Within 2-3 seconds, title updates to "Docker Ubuntu Setup"
+
+3. User continues conversation
+   - Title remains stable
+   - Conversation appears in sidebar with generated title
+   - User can navigate between conversations easily
+
+#### 4.2 Error Handling Scenarios
+1. Title generation fails
+   - Shows error icon with retry button
+   - Falls back to truncated first message: "How do I set up Dock..."
+   - User can manually edit title or retry generation
+
+2. Ollama connection issues
+   - Graceful fallback to timestamp-based naming
+   - Background retry mechanism
+   - User notification of service issues
+
+#### 4.3 Edge Cases
+1. Very long first messages
+   - Prompt truncation handling
+   - Meaningful title extraction from long content
+
+2. Non-English content
+   - Model capability handling
+   - Fallback to content-based truncation
+
+3. Empty or minimal messages
+   - Detection of insufficient content
+   - Fallback naming strategies
+
+### Phase 5: Advanced Features
+
+#### 5.1 Bulk Title Generation
+- "Regenerate all titles" option in settings
+- Progress indication for batch operations
+- Ability to revert changes
+
+#### 5.2 Title History & Versioning
+- Track title change history
+- Show who/what set each title (user vs AI)
+- Ability to revert to previous titles
+
+#### 5.3 Smart Suggestions
+- Suggest alternative titles
+- Learn from user preferences
+- Context-aware improvements
+
+## Implementation Steps
+
+### Step 1: Backend Foundation
+1. Create conversation-title-generator feature structure
+2. Implement title generation contract and service
+3. Create Ollama adapter for title generation
+4. Add event definitions and handlers
+5. Update manifest.yaml
+
+### Step 2: Basic Title Generation
+1. Implement auto-trigger on first message
+2. Basic Ollama integration for title generation
+3. Update conversation service to handle title updates
+4. Test title generation workflow
+
+### Step 3: UI Integration
+1. Enhance Sidebar component with loading states
+2. Add real-time title updates via WebSocket
+3. Implement error handling and retry logic
+4. Add basic manual editing capability
+
+### Step 4: Polish & Testing
+1. Add visual polish (animations, icons, feedback)
+2. Implement comprehensive error handling
+3. Add configuration options
+4. Performance optimization for title generation
+
+### Step 5: Advanced Features
+1. Manual title editing with validation
+2. Title history and versioning
+3. Bulk operations and settings
+4. Analytics and improvement tracking
+
+## Architecture Compliance
+
+### ✅ Respects AI-Native Principles:
+- New feature stays under 500 lines per file
+- Clear contract boundaries with minimal context
+- Pure adapter functions for external dependencies
+- Event-driven communication between features
+- No direct cross-feature dependencies
+
+### ✅ Integration Strategy:
+- Leverages existing conversation infrastructure
+- Uses established Ollama connection for AI calls
+- Follows existing event patterns for real-time updates
+- Maintains service interface consistency
+- Preserves separation of concerns
+
+## Manifest Updates
+
+Add to manifest.yaml:
+```yaml
+chat:
+  features:
+    - name: conversation-title-generator
+      contract: features/chat/conversation-title-generator/contract.ts
+      adapters:
+        - ollama-title-adapter
+        - prompt-adapter
+        - message-content-adapter
+      services:
+        - title-generation-service
+        - conversation-service
+        - message-service
+      events:
+        - conversation-title-generated
+        - title-generation-failed
+      config: config/features/chat/conversation-title-generator/schema.ts
+
+events:
+  - name: conversation-title-generated
+    schema: events/conversation-title-generated.ts
+  - name: title-generation-failed
+    schema: events/title-generation-failed.ts
+
+services:
+  - name: title-generation-service
+    interface: services/title-generation-service.ts
+```
+
+## Success Criteria
+
+### Functional Requirements
+- ✅ Conversations automatically receive meaningful titles based on first user message
+- ✅ Titles generate within 3 seconds of first message
+- ✅ Manual title editing works seamlessly
+- ✅ Error states are handled gracefully with fallbacks
+- ✅ Real-time UI updates work across browser tabs
+
+### Performance Requirements
+- ✅ Title generation does not impact message sending speed
+- ✅ UI remains responsive during title generation
+- ✅ Bulk operations handle 100+ conversations efficiently
+- ✅ Memory usage stays within acceptable limits
+
+### User Experience Requirements
+- ✅ Clear visual feedback during all states
+- ✅ Intuitive manual editing workflow
+- ✅ Graceful degradation when AI services unavailable
+- ✅ Consistent behavior across different conversation types
+
+### Technical Requirements
+- ✅ All contracts properly defined and implemented
+- ✅ Event-driven architecture maintained
+- ✅ No breaking changes to existing functionality
+- ✅ Comprehensive error handling and logging
+- ✅ Configuration flexibility for different use cases
 
 ---
 
-**Remember**: Every data transformation is a potential contract violation. When in doubt, preserve the original structure and transform only at designated adapter boundaries.
-## MILESTONE PROGRESS UPDATE
-
-✅ **MILESTONE 1 COMPLETED** - Client Service Layer Fixed
-- Fixed chat-service.ts data transformation violations
-- getConversation(), createConversation(), createMessage() now return objects  
-- getOllamaStatus() now returns status object
-- getModels() now extracts models array from response object
-- executeTool() now returns response object
-- Commit: ce59a31
-
-✅ **MILESTONE 2 COMPLETED** - API Response Format Fixed  
-- Updated /api/ollama/status to return {connected, baseUrl} contract format
-- Updated /api/ollama/models to return proper ModelInfo array format
-- Created features/connection/ollama-connector/contract.ts with proper interfaces
-- Server API now matches ollama-connector contract definitions
-- Commit: bbe1880
-
-🔄 **MILESTONE 3 IN PROGRESS** - HTTP Adapter Creation
-- Created directory structure for adapters/features/connection/ollama-connector/
-- Need to complete http-adapter.ts implementation
-
-## NEXT PRIORITY TASKS
-1. Complete HTTP adapter implementation
-2. Create remaining missing contracts from manifest.yaml
-3. Implement contract validation tests
-4. Add service interface compliance checks
-
-
+**Next Action:** Begin implementation with Step 1 (Backend Foundation), focusing on the conversation-title-generator feature contract and basic service implementation.

@@ -14,7 +14,9 @@ import { McpServiceImpl } from "./services/mcp-service-impl";
 import { ModelRegistryServiceImpl } from "./services/model-registry-service-impl";
 import { TitleGenerationServiceImpl } from "./services/title-generation-service-impl";
 import { StreamingServiceImpl } from "./services/streaming-service-impl";// Registry-aware model service imports
-import { createModelRegistryManager } from "../../../packages/shared/features/connection/model-registry";
+import { MemoryServiceImpl } from "./services/memory-service-impl";
+import { ToolServiceImpl } from "./services/tool-service-impl";
+import { LayoutServiceImpl } from "./services/layout-service-impl";import { createModelRegistryManager } from "../../../packages/shared/features/connection/model-registry";
 import { createRegistryLoaderAdapter } from "../../../packages/shared/adapters/features/connection/model-registry/registry-loader-adapter";
 
 // Model Selector Features
@@ -67,7 +69,9 @@ async function startServer() {
     const mcpService = new McpServiceImpl();
     const titleGenerationService = new TitleGenerationServiceImpl();    console.log("💼 Business services initialized");
     const streamingService = new StreamingServiceImpl();
-    // Initialize MCP Manager
+    const memoryService = new MemoryServiceImpl();
+    const toolService = new ToolServiceImpl();
+    const layoutService = new LayoutServiceImpl();    // Initialize MCP Manager
     const mcpManager = new MCPManager();
     await mcpManager.initialize();
     console.log("🔧 MCP Manager initialized");
@@ -160,8 +164,12 @@ async function startServer() {
       artifactService,
       mcpService,
       modelRegistryService,
-      titleGenerationService    };
-    
+      titleGenerationService,
+      streamingService,
+      memoryService,
+      toolService,
+      layoutService
+    };    
     setupAllRoutes(app, apiServices);
 
     const PORT = process.env.PORT || 3001;

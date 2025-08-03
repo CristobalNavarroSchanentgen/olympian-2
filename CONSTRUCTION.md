@@ -1,199 +1,99 @@
-# Chat History & AI-Generated Conversation Names Implementation Plan
+# Olympian AI - Architectural Contract Enforcement Plan
 
-## Purpose
-This document outlines the implementation plan for adding chat history functionality with AI-generated conversation names to the Olympian AI system, following the AI-native architecture principles.
+## Critical Contract Breaches to Fix
 
-## ✅ COMPLETED IMPLEMENTATION STATUS
+### 1. API Response Format Mismatch (BLOCKING ISSUE)
+**Breach**: Server wraps responses in objects, client expects raw data
+**Fix**: Standardize on unwrapped responses
+- Server: Change `res.json({ conversation })` to `res.json(conversation)`
+- Server: Change `res.json({ conversations })` to `res.json(conversations)`
+- Apply to ALL routes: conversations, messages, artifacts, mcp, ollama
 
-### Phase 1: Backend Foundation & Auto-Title Generation
-All core components for automatic conversation title generation are now complete and operational.
+### 2. Feature-First Transport Layer
+**Breach**: WebSocket handlers call services directly
+**Fix**: Create and use features as orchestrators
+```typescript
+// Current (WRONG):
+this.conversationService.createConversation()
 
-#### ✅ Step 1: Title Generation Feature (COMPLETE)
-**Location**: `features/chat/conversation-title-generator/`
-- **Contract**: Complete interface definitions
-- **Implementation**: Full AI-powered title generation logic
-- **Adapters**: Ollama and prompt engineering adapters
-- **Models**: Type definitions in `packages/shared/models/chat/title-generation.ts`
-- **Events**: Schema in `events/conversation-title-generated.ts`
-- **Services**: Interface in `services/title-generation-service.ts`
-
-**Capabilities**:
-- AI-powered title generation using Ollama
-- Intelligent fallback for failed generations
-- Configurable parameters (model, temperature, max length)
-- Event-driven architecture compliance
-
-#### ✅ Step 2: Auto-Trigger Integration (COMPLETE)
-**Components Created**:
-
-1. **Message Processor** (`features/chat/message-processor/index.ts`)
-   - Detects first user message in conversations
-   - Triggers title generation asynchronously
-   - Emits proper `conversation-title-generated` events
-   - Maintains performance with non-blocking execution
-
-2. **Conversation Manager** (`features/chat/conversation-manager/index.ts`)
-   - CRUD operations for conversations
-   - Title update capability
-   - Event-driven real-time updates
-
-3. **Service Layer**
-   - `services/conversation-service.ts` - Conversation operations interface
-   - `services/message-service.ts` - Message operations interface
-   - `services/implementations/title-generation-service-impl.ts` - Feature bridge
-
-**Auto-Trigger Workflow**:
-```
-User sends first message → MessageProcessor detects first user message 
-→ Async title generation → Conversation title updated → UI event emitted
+// Fixed (CORRECT):
+this.conversationManager.createConversation()
 ```
 
-#### ✅ Step 3: Database Service Implementation (COMPLETE)
-**Database Services Implemented**:
+### 3. Service Registration
+**Breach**: Manifest services not instantiated
+**Fix**: Only keep services that have implementations
+- Remove from manifest.yaml: streaming-service, process-service, memory-service, tool-service, health-service, code-editor-service, connection-service, detection-service, image-service, layout-service, logging-service, reasoning-service
+- OR create stub implementations if needed later
 
-1. **ConversationServiceImpl** - MongoDB-backed conversation operations
-   - Replaced in-memory storage with ConversationRepository
-   - CRUD operations for conversations
-   - Title update functionality for auto-generated titles
-   - Search and filtering capabilities
+### 4. Integration Function Usage
+**Breach**: title-generation-integration.ts exists but unused
+**Fix**: Import and use in server initialization
+```typescript
+import { createTitleGenerationIntegration } from '../../../integrations/title-generation-integration';
+```
 
-2. **MessageServiceImpl** - MongoDB-backed message operations
-   - Replaced in-memory storage with MessageRepository
-   - CRUD operations for messages
-   - Auto-updating conversation message counts
-   - Efficient conversation message retrieval
+### 5. Feature Instantiation
+**Breach**: Features defined in manifest but not created
+**Fix**: Instantiate all features in server init
+- ConversationManager
+- MessageProcessor
+- TitleGenerator
+- SmartModelRouter
+- MemoryManager
 
-3. **Service Integration** - Seamless server integration
-   - Services wired to existing WebSocket/HTTP handlers
-   - Real-time event propagation operational
-   - No breaking changes to existing API endpoints
+## Implementation Order
 
-**Architecture Compliance**: All database services maintain clean service boundaries and follow AI-native principles.
+### Phase 1: Fix Blocking Issues (Immediate)
+1. **Fix API Response Format** - This unblocks the UI
+   - Update all routes in `/packages/server/src/api/*`
+   - Remove object wrapping from responses
 
-### Existing Infrastructure (Leveraged)
-- **UI Components**: Sidebar with conversation list, dual-pane layout
-- **Database Layer**: MongoDB with proper repositories and indexing
-- **WebSocket Support**: Real-time updates for conversations and messages
-- **Ollama Integration**: AI service connection for title generation
+### Phase 2: Restore Feature Architecture
+1. **Import existing features**
+   ```typescript
+   import { ConversationManager } from '@olympian/shared/features/chat/conversation-manager';
+   import { MessageProcessor } from '@olympian/shared/features/chat/message-processor';
+   ```
 
-## ✅ COMPLETED IMPLEMENTATION: Step 4 - End-to-End Testing & Integration
+2. **Wire features with their adapters**
+   - Each feature gets its required adapters from manifest
+   - Pass service implementations to features
 
-### Objective
-Verify the complete chat history and auto-title generation workflow is working end-to-end with the UI.
+3. **Update WebSocket to use features**
+   - Replace all direct service calls with feature calls
+   - Features orchestrate the business logic
 
-### Required Testing
-1. **Conversation Creation Flow**
-   - Create new conversation via UI
-   - Send first user message
-   - Verify auto-title generation triggers
-   - Confirm conversation appears in sidebar with generated title
+### Phase 3: Complete Contract Compliance
+1. **Use integration functions**
+   - Import title-generation-integration
+   - Let it wire the features together properly
 
-2. **Real-time Updates**
-   - Verify WebSocket events for title updates
-   - Test conversation list refresh
-   - Confirm UI updates without page reload
+2. **Verify event emissions**
+   - Features emit events
+   - WebSocket subscribes and forwards to clients
 
-3. **Persistence Validation**
-   - Restart server, verify conversations persist
-   - Check MongoDB collections contain data
-   - Validate message counts and timestamps
+3. **Clean manifest.yaml**
+   - Remove undefined services
+   - Ensure all listed services exist
 
-4. **Error Handling**
-   - Test with Ollama service unavailable
-   - Verify fallback titles work correctly
-   - Ensure no crashes during title generation failures
+## Validation Checklist
+- [ ] All API responses are unwrapped
+- [ ] WebSocket never calls services directly
+- [ ] All manifest services have implementations
+- [ ] Integration functions are imported and used
+- [ ] Features are instantiated with proper dependencies
+- [ ] Events flow: Feature → Event Bus → WebSocket → Client
 
-### Success Criteria for Step 4
-- ✅ Auto-title generation works end-to-end
-- ✅ Real-time UI updates functional
-- ✅ Data persists across server restarts
-- ✅ No console errors during normal workflow
-- ✅ Graceful degradation when AI services fail
+## Architecture Principles Reminder
+- **Features orchestrate, services execute**
+- **Transport layers call features, not services**
+- **Every manifest entry must have an implementation**
+- **Integration functions wire features together**
+- **Contracts are the source of truth**
 
-## 🔄 FUTURE PHASES: Enhanced Features
-
-### Phase 2: User Experience Enhancements
-- Loading states during title generation
-- Manual title editing capability
-- Error handling with retry options
-- Visual feedback and animations
-
-### Phase 3: Advanced Features
-- Bulk title regeneration
-- Title history and versioning
-- Smart suggestions and preferences
-- Performance analytics
-
-## Architecture Compliance ✅
-
-### AI-Native Principles Maintained
-- **File Isolation**: Each component understands only its contract
-- **Size Limits**: All files under 200 lines (most under 100)
-- **Pure Adapters**: External dependencies isolated through adapters
-- **Event-Driven**: Asynchronous communication via proper event schemas
-- **Service Boundaries**: Clean interfaces between all components
-
-### Integration Benefits
-- Leverages existing conversation/message infrastructure
-- Reuses established Ollama AI service connection
-- Follows existing WebSocket real-time update patterns
-- Maintains backwards compatibility with existing features
-
-## Current Implementation Summary
-
-### ✅ What Works Now (Steps 1-3 Complete)
-- Complete title generation feature with AI integration
-- Auto-trigger detection for first messages
-- Database-backed persistent storage for conversations and messages
-- Proper event emission and schema compliance
-- Service interface definitions with concrete implementations
-- Fallback handling for AI service failures
-- Real-time WebSocket event propagation
-
-### 🚧 What Needs Implementation (Step 4)
-- End-to-end workflow testing and verification
-- UI integration validation
-- Performance and error handling testing
-
----
-
-**CURRENT STATUS**: Steps 1-3 Complete → Ready for Step 4 (End-to-End Testing)
-**NEXT ACTION**: Test complete workflow from UI interaction to database persistence
-**ESTIMATED EFFORT**: 1 session for comprehensive testing and verification
-**ARCHITECTURE**: Fully compliant with AI-native principles, ready for production use
-
-#### ✅ Step 4: End-to-End Testing & Integration (COMPLETE)
-
-**Validation Results**: All core components successfully validated and ready for production.
-
-**Infrastructure Verified** ✅:
-- Docker Compose with MongoDB service configured
-- Environment configuration with correct connection strings  
-- API routes properly defined and mounted
-- Database services wired to server initialization
-
-**Features Validated** ✅:
-- `features/chat/conversation-title-generator/` - Complete with contract & implementation
-- `features/chat/conversation-manager/` - Complete with contract & implementation  
-- `features/chat/message-processor/` - Complete with contract & implementation
-- Service implementations: conversation-service-impl.ts, message-service-impl.ts
-- Event schemas: conversation-title-generated.ts
-
-**Integration Confirmed** ✅:
-- Services properly wired in server/src/index.ts
-- API routes mounted via setupAllRoutes()
-- MongoDB connection configured for local development
-- Event-driven architecture properly implemented
-
-**Architecture Compliance** ✅:
-- All components follow AI-native file isolation principles
-- Clean service boundaries maintained
-- Contract-first approach validated
-- File size limits respected (all under 200 lines)
-
-### 🏁 IMPLEMENTATION COMPLETE
-
-**Final Status**: Steps 1-4 Complete → Production Ready
-**Total Implementation**: Chat history with AI-powered auto-title generation
-**Next Phase**: Optional UX enhancements (Phase 2) or deployment preparation
-
+## Success Criteria
+- Conversations can be created without errors
+- Model selection works properly
+- Messages flow through the feature layer
+- All architectural rules pass validation

@@ -1,400 +1,1359 @@
-# Olympian AI-Native Codebase Manifest
-# This file defines all feature boundaries and external touchpoints
+# AI-Native Dependency-Aware Manifest
+# Enables automated contract impact analysis and top-down feature development
 
-version: '1.0.0'
+version: '2.0.0'
 name: 'olympian-ai-lightweight'
 description: 'AI-Native chat interface with integrated MCP support'
+architecture_type: 'ai-native-contracts'
 
-# Core Domains and Features
-domains:
-  chat:
-    features:
-      - name: conversation-manager
-        contract: features/chat/conversation-manager/contract.ts
-        adapters:
-          - database-adapter
-          - websocket-adapter
-        services:
-          - conversation-service
-        events:
-          - conversation-created
-          - conversation-updated
-          - conversation-deleted
-        config: config/features/chat/conversation-manager/schema.ts
+# CONTRACT DEPENDENCY GRAPH
+# Every contract includes role, dependencies, and dependents for AI decision-making
+
+contracts:
+  
+  # EXPERIENCE LAYER (Level 0 - User Goals)
+  experience:
+    conversation_experience:
+      file: experiences/ui/conversation.ts
+      role: "Defines user expectations for chat interaction flow, message handling, and conversation management"
+      layer: 0
+      depends_on: []  # Top level - no dependencies
+      depended_on_by: 
+        - features.conversation-manager
+        - features.message-processor 
+        - features.smart-model-router
+        - features.memory-manager
+        - features.conversation-title-generator
+      user_value: "Users can have natural conversations without technical friction"
+      success_metrics: ["message_response_time", "conversation_flow_smoothness", "context_retention"]
+      
+    layout_experience:
+      file: experiences/ui/layout.ts
+      role: "Defines user expectations for interface organization, navigation, and workspace management"
+      layer: 0
+      depends_on: []
+      depended_on_by:
+        - features.dual-pane-layout
+        - features.reasoning-panel
+        - features.artifact-manager
+      user_value: "Users can efficiently navigate and organize their workspace"
+      success_metrics: ["navigation_efficiency", "workspace_customization", "responsive_design"]
+
+    settings_experience:
+      file: experiences/ui/settings.ts
+      role: "Defines user expectations for configuration, model selection, and personalization"
+      layer: 0
+      depends_on: []
+      depended_on_by:
+        - features.text-model-selector
+        - features.vision-model-selector
+        - features.model-detector
+        - features.model-registry
+      user_value: "Users can easily configure and personalize their AI experience"
+      success_metrics: ["configuration_ease", "preference_persistence", "model_availability"]
+
+    mcp_experience:
+      file: experiences/ui/mcp.ts
+      role: "Defines user expectations for MCP tool discovery, execution, and integration"
+      layer: 0
+      depends_on: []
+      depended_on_by:
+        - features.server-manager
+        - features.tool-executor
+      user_value: "Users can seamlessly discover and use external tools without technical complexity"
+      success_metrics: ["tool_discovery_rate", "execution_success_rate", "integration_smoothness"]
+
+  # FEATURE LAYER (Level 1 - Technical Capabilities)
+  features:
+    # Chat Domain Features
+    conversation-manager:
+      file: packages/shared/features/chat/conversation-manager/contract.ts
+      role: "Manages conversation lifecycle, metadata, persistence, and organization"
+      layer: 1
+      depends_on:
+        - services.conversation-service
+        - events.conversation-created
+        - events.conversation-updated
+        - events.conversation-deleted
+        - models.conversation
+      depended_on_by:
+        - adapters.database-adapter
+        - adapters.websocket-adapter
+      serves_experience: [conversation_experience, layout_experience]
+      breaking_change_impact: "HIGH - Core chat functionality affected"
+      
+    message-processor:
+      file: packages/shared/features/chat/message-processor/contract.ts
+      role: "Handles message processing, AI model communication, streaming, and token management"
+      layer: 1
+      depends_on:
+        - services.message-service
+        - services.streaming-service
+        - events.message-sent
+        - events.message-received
+        - events.tokens-processed
+        - models.message
+      depended_on_by:
+        - adapters.ollama-adapter
+        - adapters.token-counter-adapter
+      serves_experience: [conversation_experience]
+      breaking_change_impact: "CRITICAL - All AI interactions affected"
+
+    conversation-title-generator:
+      file: packages/shared/features/chat/conversation-title-generator/contract.ts
+      role: "Automatically generates meaningful titles for conversations based on content"
+      layer: 1
+      depends_on:
+        - services.title-generation-service
+        - services.conversation-service
+        - events.conversation-title-generated
+        - models.title-generation
+      depended_on_by:
+        - adapters.ollama-title-adapter
+        - adapters.prompt-adapter
+      serves_experience: [conversation_experience, layout_experience]
+      breaking_change_impact: "MEDIUM - Affects conversation organization"
+
+    memory-manager:
+      file: packages/shared/features/chat/memory-manager/contract.ts
+      role: "Manages conversation context, memory cleanup, and token budget optimization"
+      layer: 1
+      depends_on:
+        - services.memory-service
+        - events.context-updated
+        - events.memory-cleaned
+        - models.memory-context
+      depended_on_by:
+        - adapters.context-adapter
+        - adapters.token-budget-adapter
+      serves_experience: [conversation_experience]
+      breaking_change_impact: "HIGH - Affects conversation quality and performance"
+
+    smart-model-router:
+      file: packages/shared/features/chat/smart-model-router/contract.ts
+      role: "Intelligently routes requests to appropriate models based on content analysis"
+      layer: 1
+      depends_on:
+        - services.model-registry-service
+        - events.model-routed
+        - events.routing-failed
+        - models.model-capability
+      depended_on_by:
+        - adapters.content-analysis-adapter
+        - adapters.model-selection-adapter
+        - adapters.availability-adapter
+      serves_experience: [conversation_experience, settings_experience]
+      breaking_change_impact: "HIGH - Affects model selection and performance"
+
+    # Connection Domain Features
+    ollama-connector:
+      file: packages/shared/features/connection/ollama-connector/contract.ts
+      role: "Manages connection to Ollama API, health checks, and communication protocols"
+      layer: 1
+      depends_on:
+        - services.connection-service
+        - events.connection-established
+        - models.ollama-connection
+        - models.health-status
+      depended_on_by:
+        - adapters.http-client-adapter
+        - adapters.health-checker-adapter
+      serves_experience: [conversation_experience, settings_experience]
+      breaking_change_impact: "CRITICAL - Core AI functionality depends on this"
+
+    model-detector:
+      file: packages/shared/features/connection/model-detector/contract.ts
+      role: "Detects available models from connected services and updates registry"
+      layer: 1
+      depends_on:
+        - services.detection-service
+        - events.models-detected
+        - models.model-capability
+      depended_on_by:
+        - adapters.capability-detector-adapter
+      serves_experience: [settings_experience]
+      breaking_change_impact: "MEDIUM - Affects model availability discovery"
+
+    model-registry:
+      file: packages/shared/features/connection/model-registry/contract.ts
+      role: "Maintains registry of available models with capabilities and metadata"
+      layer: 1
+      depends_on:
+        - services.model-registry-service
+        - models.model-registry
+        - models.model-capability
+      depended_on_by:
+        - adapters.model-registry-helper-adapter
+      serves_experience: [settings_experience, conversation_experience]
+      breaking_change_impact: "HIGH - Affects all model-dependent features"
+
+    # MCP Domain Features
+    server-manager:
+      file: packages/shared/features/mcp/server-manager/contract.ts
+      role: "Manages MCP server processes, lifecycle, and configuration"
+      layer: 1
+      depends_on:
+        - services.mcp-service
+        - events.server-started
+        - events.server-stopped
+        - events.server-error
+        - models.server-config
+      depended_on_by:
+        - adapters.process-adapter
+        - adapters.stdio-adapter
+        - adapters.config-adapter
+      serves_experience: [mcp_experience]
+      breaking_change_impact: "HIGH - Affects all MCP tool functionality"
         
-      - name: message-processor
-        contract: features/chat/message-processor/contract.ts
-        adapters:
-          - ollama-adapter
-          - token-counter-adapter
-        services:
-          - message-service
-          - streaming-service
-        events:
-          - message-sent
-          - message-received
-          - tokens-processed
-        config: config/features/chat/message-processor/schema.ts
+    tool-executor:
+      file: packages/shared/features/mcp/tool-executor/contract.ts
+      role: "Executes MCP tools, handles results, and manages tool communication protocols"
+      layer: 1
+      depends_on:
+        - services.tool-service
+        - events.tool-invoked
+        - events.tool-completed
+        - events.tool-failed
+        - models.tool-definition
+        - models.execution-result
+      depended_on_by:
+        - adapters.mcp-protocol-adapter
+        - adapters.result-transformer-adapter
+      serves_experience: [mcp_experience, conversation_experience]
+      breaking_change_impact: "HIGH - Affects tool integration in conversations"
 
-      - name: conversation-title-generator
-        contract: features/chat/conversation-title-generator/contract.ts
-        adapters:
-          - ollama-title-adapter
-          - prompt-adapter
-        services:
-          - title-generation-service
-          - conversation-service
-        events:
-          - conversation-title-generated
-        config: config/features/chat/conversation-title-generator/schema.ts
+    # Artifacts Domain Features
+    artifact-manager:
+      file: packages/shared/features/artifacts/artifact-manager/contract.ts
+      role: "Manages code artifacts, versions, and artifact lifecycle"
+      layer: 1
+      depends_on:
+        - services.artifact-service
+        - events.artifact-created
+        - events.artifact-updated
+        - events.artifact-deleted
+        - models.artifact
+        - models.version
+      depended_on_by:
+        - adapters.artifact-storage-adapter
+        - adapters.version-tracker-adapter
+      serves_experience: [layout_experience, conversation_experience]
+      breaking_change_impact: "MEDIUM - Affects code generation and management"
+
+    # UI Domain Features
+    dual-pane-layout:
+      file: packages/shared/features/ui/dual-pane-layout/contract.ts
+      role: "Manages dual-pane interface layout, responsiveness, and state persistence"
+      layer: 1
+      depends_on:
+        - services.layout-service
+        - events.layout-changed
+        - models.layout-config
+      depended_on_by:
+        - adapters.layout-persistence-adapter
+      serves_experience: [layout_experience]
+      breaking_change_impact: "MEDIUM - Affects UI organization"
+
+    reasoning-panel:
+      file: packages/shared/features/ui/reasoning-panel/contract.ts
+      role: "Manages reasoning display panel, thought processes, and transparency features"
+      layer: 1
+      depends_on:
+        - services.reasoning-service
+        - events.reasoning-events
+      depended_on_by: []
+      serves_experience: [layout_experience, conversation_experience]
+      breaking_change_impact: "LOW - Optional transparency feature"
+
+    text-model-selector:
+      file: packages/shared/features/ui/text-model-selector/contract.ts
+      role: "Provides UI for selecting and configuring text generation models"
+      layer: 1
+      depends_on:
+        - services.model-registry-service
+        - events.text-model-selected
+        - events.model-selection-failed
+        - models.model-selection
+      depended_on_by:
+        - adapters.text-model-filter-adapter
+        - adapters.selection-persistence-adapter
+      serves_experience: [settings_experience]
+      breaking_change_impact: "MEDIUM - Affects model selection UX"
+
+    vision-model-selector:
+      file: packages/shared/features/ui/vision-model-selector/contract.ts
+      role: "Provides UI for selecting and configuring vision/multimodal models"
+      layer: 1
+      depends_on:
+        - services.model-registry-service
+        - events.vision-model-selected
+        - events.model-selection-failed
+        - models.model-selection
+      depended_on_by:
+        - adapters.vision-model-filter-adapter
+        - adapters.selection-persistence-adapter
+      serves_experience: [settings_experience]
+      breaking_change_impact: "MEDIUM - Affects vision model selection UX"
+
+    # Vision Domain Features
+    image-processor:
+      file: packages/shared/features/vision/image-processor/contract.ts
+      role: "Processes images for vision models, handles formats, and manages image data"
+      layer: 1
+      depends_on:
+        - services.vision-service
+        - events.image-uploaded
+        - models.image-data
+        - models.processing-result
+      depended_on_by:
+        - adapters.image-processor-adapter
+      serves_experience: [conversation_experience]
+      breaking_change_impact: "MEDIUM - Affects vision capabilities"
+
+    # Observability Domain Features
+    browser-logger:
+      file: packages/shared/features/observability/browser-logger/contract.ts
+      role: "Captures browser logs, errors, and system events for debugging"
+      layer: 1
+      depends_on:
+        - events.browser-log-captured
+        - events.log-aggregation-requested
+        - models.system-status
+      depended_on_by: []
+      serves_experience: [] # Infrastructure feature
+      breaking_change_impact: "LOW - Development/debugging feature"
+
+  # SERVICE LAYER (Level 2 - Communication Contracts)
+  services:
+    conversation-service:
+      file: packages/shared/services/conversation-service.ts
+      role: "Defines inter-feature communication for conversation CRUD operations"
+      layer: 2
+      depends_on:
+        - models.conversation
+      depended_on_by:
+        - features.conversation-manager
+        - features.conversation-title-generator
+      transport_implementations: ["websocket", "http"]
+      breaking_change_impact: "HIGH - Multiple chat features affected"
+      
+    message-service:
+      file: packages/shared/services/message-service.ts
+      role: "Defines inter-feature communication for message operations and streaming"
+      layer: 2
+      depends_on:
+        - models.message
+      depended_on_by:
+        - features.message-processor
+      transport_implementations: ["websocket", "streaming"]
+      breaking_change_impact: "CRITICAL - Core messaging affected"
+
+    streaming-service:
+      file: packages/shared/services/streaming-service.ts
+      role: "Defines streaming communication protocols for real-time message delivery"
+      layer: 2
+      depends_on:
+        - models.message
+      depended_on_by:
+        - features.message-processor
+      transport_implementations: ["websocket", "server-sent-events"]
+      breaking_change_impact: "HIGH - Real-time features affected"
+
+    memory-service:
+      file: packages/shared/services/memory-service.ts
+      role: "Defines memory management and context operations"
+      layer: 2
+      depends_on:
+        - models.memory-context
+      depended_on_by:
+        - features.memory-manager
+      transport_implementations: ["http"]
+      breaking_change_impact: "HIGH - Context management affected"
+
+    title-generation-service:
+      file: packages/shared/services/title-generation-service.ts
+      role: "Defines title generation operations and AI model communication"
+      layer: 2
+      depends_on:
+        - models.title-generation
+      depended_on_by:
+        - features.conversation-title-generator
+      transport_implementations: ["http"]
+      breaking_change_impact: "MEDIUM - Title generation affected"
+
+    model-registry-service:
+      file: packages/shared/services/model-registry-service.ts
+      role: "Defines model registry operations, discovery, and capability queries"
+      layer: 2
+      depends_on:
+        - models.model-registry
+        - models.model-capability
+      depended_on_by:
+        - features.smart-model-router
+        - features.text-model-selector
+        - features.vision-model-selector
+        - features.model-registry
+      transport_implementations: ["http"]
+      breaking_change_impact: "HIGH - All model-dependent features affected"
+
+    connection-service:
+      file: packages/shared/services/connection-service.ts
+      role: "Defines external service connection management and health monitoring"
+      layer: 2
+      depends_on:
+        - models.ollama-connection
+        - models.health-status
+      depended_on_by:
+        - features.ollama-connector
+      transport_implementations: ["http"]
+      breaking_change_impact: "CRITICAL - External service connectivity affected"
+
+    detection-service:
+      file: packages/shared/services/detection-service.ts
+      role: "Defines model and capability detection operations"
+      layer: 2
+      depends_on:
+        - models.model-capability
+      depended_on_by:
+        - features.model-detector
+      transport_implementations: ["http"]
+      breaking_change_impact: "MEDIUM - Model discovery affected"
+
+    mcp-service:
+      file: packages/shared/services/mcp-service.ts
+      role: "Defines MCP server management and communication protocols"
+      layer: 2
+      depends_on:
+        - models.server-config
+      depended_on_by:
+        - features.server-manager
+      transport_implementations: ["stdio", "websocket"]
+      breaking_change_impact: "HIGH - MCP functionality affected"
         
-      - name: memory-manager
-        contract: features/chat/memory-manager/contract.ts
-        adapters:
-          - context-adapter
-          - token-budget-adapter
-        services:
-          - memory-service
-        events:
-          - context-updated
-          - memory-cleaned
-        config: config/features/chat/memory-manager/schema.ts
-
-      - name: smart-model-router
-        contract: features/chat/smart-model-router/contract.ts
-        adapters:
-          - content-analysis-adapter
-          - model-selection-adapter
-          - availability-adapter
-        services:
-          - model-registry-service
-        events:
-          - model-routed
-          - routing-failed
-        config: config/features/chat/smart-model-router/schema.ts
-
-  mcp:
-    features:
-      - name: server-manager
-        contract: features/mcp/server-manager/contract.ts
-        adapters:
-          - process-adapter
-          - stdio-adapter
-          - config-adapter
-        services:
-          - mcp-service
-        events:
-          - server-started
-          - server-stopped
-          - server-error
-        config: config/features/mcp/server-manager/schema.ts
+    tool-service:
+      file: packages/shared/services/tool-service.ts
+      role: "Defines tool execution, discovery, and result handling"
+      layer: 2
+      depends_on:
+        - models.tool-definition
+        - models.execution-result
+      depended_on_by:
+        - features.tool-executor
+      transport_implementations: ["mcp-protocol", "stdio"]
+      breaking_change_impact: "HIGH - Tool execution affected"
         
-      - name: tool-executor
-        contract: features/mcp/tool-executor/contract.ts
-        adapters:
-          - mcp-protocol-adapter
-          - result-transformer-adapter
-        services:
-          - tool-service
-        events:
-          - tool-invoked
-          - tool-completed
-          - tool-failed
-        config: config/features/mcp/tool-executor/schema.ts
+    artifact-service:
+      file: packages/shared/services/artifact-service.ts
+      role: "Defines artifact management, versioning, and storage operations"
+      layer: 2
+      depends_on:
+        - models.artifact
+        - models.version
+      depended_on_by:
+        - features.artifact-manager
+      transport_implementations: ["http", "websocket"]
+      breaking_change_impact: "MEDIUM - Artifact features affected"
+        
+    layout-service:
+      file: packages/shared/services/layout-service.ts
+      role: "Defines UI layout management and persistence operations"
+      layer: 2
+      depends_on:
+        - models.layout-config
+      depended_on_by:
+        - features.dual-pane-layout
+      transport_implementations: ["http"]
+      breaking_change_impact: "MEDIUM - UI layout affected"
 
-  artifacts:
-    features:
-      - name: artifact-manager
-        contract: features/artifacts/artifact-manager/contract.ts
-        adapters:
-          - artifact-storage-adapter
-          - version-tracker-adapter
-        services:
-          - artifact-service
-        events:
-          - artifact-created
-          - artifact-updated
-          - artifact-deleted
-        config: config/features/artifacts/artifact-manager/schema.ts
+    reasoning-service:
+      file: packages/shared/services/reasoning-service.ts
+      role: "Defines reasoning panel data and transparency operations"
+      layer: 2
+      depends_on: []
+      depended_on_by:
+        - features.reasoning-panel
+      transport_implementations: ["websocket"]
+      breaking_change_impact: "LOW - Optional feature affected"
 
-  ui:
-    features:
-      - name: dual-pane-layout
-        contract: features/ui/dual-pane-layout/contract.ts
-        adapters:
-          - layout-persistence-adapter
-        services:
-          - layout-service
-        events:
-          - layout-changed
-        config: config/features/ui/dual-pane-layout/schema.ts
+    vision-service:
+      file: packages/shared/services/vision-service.ts
+      role: "Defines vision processing and image handling operations"
+      layer: 2
+      depends_on:
+        - models.image-data
+        - models.processing-result
+      depended_on_by:
+        - features.image-processor
+      transport_implementations: ["http", "multipart"]
+      breaking_change_impact: "MEDIUM - Vision capabilities affected"
 
-      - name: text-model-selector
-        contract: features/ui/text-model-selector/contract.ts
-        adapters:
-          - text-model-filter-adapter
-          - selection-persistence-adapter
-        services:
-          - model-registry-service
-        events:
-          - text-model-selected
-          - model-selection-failed
-        config: config/features/ui/text-model-selector/schema.ts
+  # EVENT LAYER (Level 3 - Async Communication)
+  events:
+    # Conversation Events
+    conversation-created:
+      file: packages/shared/events/conversation-created.ts
+      role: "Async notification when new conversation is created"
+      layer: 3
+      depends_on:
+        - models.conversation
+      depended_on_by:
+        - features.conversation-manager
+        - features.memory-manager
+      emitted_by: [conversation-manager]
+      consumed_by: [memory-manager, title-generator, layout-manager]
+      breaking_change_impact: "MEDIUM - Event consumers need updates"
 
-      - name: vision-model-selector
-        contract: features/ui/vision-model-selector/contract.ts
-        adapters:
-          - vision-model-filter-adapter
-          - selection-persistence-adapter
-        services:
-          - model-registry-service
-        events:
-          - vision-model-selected
-          - model-selection-failed
-        config: config/features/ui/vision-model-selector/schema.ts
+    conversation-updated:
+      file: packages/shared/events/conversation-events.ts  
+      role: "Async notification when conversation metadata changes"
+      layer: 3
+      depends_on:
+        - models.conversation
+      depended_on_by:
+        - features.conversation-manager
+      emitted_by: [conversation-manager]
+      consumed_by: [layout-manager, artifact-manager]
+      breaking_change_impact: "MEDIUM - Event consumers need updates"
 
-# External Dependencies (Services)
-services:
-  - name: conversation-service
-    interface: services/conversation-service.ts
-    
-  - name: message-service
-    interface: services/message-service.ts
-    
-  - name: streaming-service
-    interface: services/streaming-service.ts
-    
-  - name: memory-service
-    interface: services/memory-service.ts
-    
-  - name: mcp-service
-    interface: services/mcp-service.ts
-    
-  - name: tool-service
-    interface: services/tool-service.ts
-    
-  - name: artifact-service
-    interface: services/artifact-service.ts
-    
-  - name: layout-service
-    interface: services/layout-service.ts
-    
-  - name: model-registry-service
-    interface: services/model-registry-service.ts
+    conversation-deleted:
+      file: packages/shared/events/conversation-events.ts
+      role: "Async notification when conversation is removed"
+      layer: 3
+      depends_on:
+        - models.conversation
+      depended_on_by:
+        - features.conversation-manager
+      emitted_by: [conversation-manager]
+      consumed_by: [memory-manager, artifact-manager]
+      breaking_change_impact: "MEDIUM - Cleanup operations affected"
 
-  - name: title-generation-service
-    interface: services/title-generation-service.ts
+    conversation-title-generated:
+      file: events/conversation-title-generated.ts
+      role: "Async notification when conversation title is auto-generated"
+      layer: 3
+      depends_on:
+        - models.title-generation
+      depended_on_by:
+        - features.conversation-title-generator
+      emitted_by: [conversation-title-generator]
+      consumed_by: [conversation-manager, layout-manager]
+      breaking_change_impact: "LOW - Title display affected"
 
-# Event Contract
-events:
-  - name: conversation-created
-    schema: events/conversation-created.ts
-    
-  - name: conversation-updated
-    schema: events/conversation-updated.ts
-    
-  - name: conversation-deleted
-    schema: events/conversation-deleted.ts
+    # Message Events
+    message-sent:
+      file: packages/shared/events/message-sent.ts
+      role: "Async notification when user sends message"
+      layer: 3
+      depends_on:
+        - models.message
+      depended_on_by:
+        - features.message-processor
+      emitted_by: [message-processor]
+      consumed_by: [memory-manager, artifact-manager, reasoning-panel]
+      breaking_change_impact: "MEDIUM - Message flow affected"
+        
+    message-received:
+      file: packages/shared/events/message-events.ts
+      role: "Async notification when AI response is received"
+      layer: 3
+      depends_on:
+        - models.message
+      depended_on_by:
+        - features.message-processor
+      emitted_by: [message-processor]
+      consumed_by: [memory-manager, conversation-manager]
+      breaking_change_impact: "MEDIUM - Response handling affected"
+        
+    tokens-processed:
+      file: packages/shared/events/tokens-processed.ts
+      role: "Async notification for token usage tracking"
+      layer: 3
+      depends_on:
+        - models.message
+      depended_on_by:
+        - features.message-processor
+      emitted_by: [message-processor]
+      consumed_by: [memory-manager, usage-tracker]
+      breaking_change_impact: "LOW - Usage tracking affected"
 
-  - name: conversation-title-generated
-    schema: events/conversation-title-generated.ts
-    
-  - name: message-sent
-    schema: events/message-sent.ts
-    
-  - name: message-received
-    schema: events/message-received.ts
-    
-  - name: tokens-processed
-    schema: events/tokens-processed.ts
-    
-  - name: context-updated
-    schema: events/context-updated.ts
-    
-  - name: memory-cleaned
-    schema: events/memory-cleaned.ts
+    # Memory Events
+    context-updated:
+      file: events/context-updated.ts
+      role: "Async notification when conversation context changes"
+      layer: 3
+      depends_on:
+        - models.memory-context
+      depended_on_by:
+        - features.memory-manager
+      emitted_by: [memory-manager]
+      consumed_by: [message-processor, smart-model-router]
+      breaking_change_impact: "HIGH - Context-dependent features affected"
+        
+    memory-cleaned:
+      file: packages/shared/events/memory-cleaned.ts
+      role: "Async notification when memory cleanup occurs"
+      layer: 3
+      depends_on:
+        - models.memory-context
+      depended_on_by:
+        - features.memory-manager
+      emitted_by: [memory-manager]
+      consumed_by: [conversation-manager, usage-tracker]
+      breaking_change_impact: "MEDIUM - Memory-dependent features affected"
 
-  - name: model-routed
-    schema: events/model-routed.ts
+    # Model Router Events
+    model-routed:
+      file: packages/shared/events/model-routed.ts
+      role: "Async notification when model selection is made"
+      layer: 3
+      depends_on:
+        - models.model-capability
+      depended_on_by:
+        - features.smart-model-router
+      emitted_by: [smart-model-router]
+      consumed_by: [message-processor, usage-tracker]
+      breaking_change_impact: "MEDIUM - Model selection flow affected"
 
-  - name: routing-failed
-    schema: events/routing-failed.ts
-    
-  - name: server-started
-    schema: events/server-started.ts
-    
-  - name: server-stopped
-    schema: events/server-stopped.ts
-    
-  - name: server-error
-    schema: events/server-error.ts
-    
-  - name: tool-invoked
-    schema: events/tool-invoked.ts
-    
-  - name: tool-completed
-    schema: events/tool-completed.ts
-    
-  - name: tool-failed
-    schema: events/tool-failed.ts
-    
-  - name: artifact-created
-    schema: events/artifact-created.ts
-    
-  - name: artifact-updated
-    schema: events/artifact-updated.ts
-    
-  - name: artifact-deleted
-    schema: events/artifact-deleted.ts
-    
-  - name: layout-changed
-    schema: events/layout-changed.ts
-    
-  - name: text-model-selected
-    schema: events/text-model-selected.ts
-    
-  - name: vision-model-selected
-    schema: events/vision-model-selected.ts
-    
-  - name: model-selection-failed
-    schema: events/model-selection-failed.ts
+    routing-failed:
+      file: packages/shared/events/routing-failed.ts
+      role: "Async notification when model routing fails"
+      layer: 3
+      depends_on:
+        - models.model-capability
+      depended_on_by:
+        - features.smart-model-router
+      emitted_by: [smart-model-router]
+      consumed_by: [error-handler, fallback-router]
+      breaking_change_impact: "MEDIUM - Error handling affected"
 
-# Models (Pure Types)
-models:
-  chat:
-    - conversation.ts
-    - message.ts
-    - memory-context.ts
-    
-  mcp:
-    - server-config.ts
-    - tool-definition.ts
-    - execution-result.ts
-    
-  ui:
-    - layout-config.ts
-    - model-selection.ts
-    
-  artifacts:
-    - artifact.ts
-    - version.ts
+    # Connection Events
+    connection-established:
+      file: packages/shared/events/connection-established.ts
+      role: "Async notification when external service connection is established"
+      layer: 3
+      depends_on:
+        - models.ollama-connection
+      depended_on_by:
+        - features.ollama-connector
+      emitted_by: [ollama-connector]
+      consumed_by: [model-detector, health-monitor]
+      breaking_change_impact: "MEDIUM - Connection-dependent features affected"
 
-# Utilities (Pure Functions)
+    models-detected:
+      file: packages/shared/events/models-detected.ts
+      role: "Async notification when available models are discovered"
+      layer: 3
+      depends_on:
+        - models.model-capability
+      depended_on_by:
+        - features.model-detector
+      emitted_by: [model-detector]
+      consumed_by: [model-registry, model-selectors]
+      breaking_change_impact: "MEDIUM - Model availability affected"
+
+    # MCP Events
+    server-started:
+      file: packages/shared/events/server-started.ts
+      role: "Async notification when MCP server starts successfully"
+      layer: 3
+      depends_on:
+        - models.server-config
+      depended_on_by:
+        - features.server-manager
+      emitted_by: [server-manager]
+      consumed_by: [tool-executor, health-monitor]
+      breaking_change_impact: "MEDIUM - MCP functionality affected"
+        
+    server-stopped:
+      file: packages/shared/events/server-events.ts
+      role: "Async notification when MCP server stops"
+      layer: 3
+      depends_on:
+        - models.server-config
+      depended_on_by:
+        - features.server-manager
+      emitted_by: [server-manager]
+      consumed_by: [tool-executor, error-handler]
+      breaking_change_impact: "MEDIUM - MCP cleanup affected"
+        
+    server-error:
+      file: packages/shared/events/server-events.ts
+      role: "Async notification when MCP server encounters errors"
+      layer: 3
+      depends_on:
+        - models.server-config
+      depended_on_by:
+        - features.server-manager
+      emitted_by: [server-manager]
+      consumed_by: [error-handler, health-monitor]
+      breaking_change_impact: "MEDIUM - Error handling affected"
+        
+    tool-invoked:
+      file: packages/shared/events/tool-invoked.ts
+      role: "Async notification when MCP tool execution begins"
+      layer: 3
+      depends_on:
+        - models.tool-definition
+      depended_on_by:
+        - features.tool-executor
+      emitted_by: [tool-executor]
+      consumed_by: [usage-tracker, progress-monitor]
+      breaking_change_impact: "MEDIUM - Tool execution tracking affected"
+        
+    tool-completed:
+      file: events/tool-completed.ts
+      role: "Async notification when MCP tool execution completes"
+      layer: 3
+      depends_on:
+        - models.execution-result
+      depended_on_by:
+        - features.tool-executor
+      emitted_by: [tool-executor]
+      consumed_by: [message-processor, artifact-manager]
+      breaking_change_impact: "MEDIUM - Tool result handling affected"
+        
+    tool-failed:
+      file: events/tool-failed.ts
+      role: "Async notification when MCP tool execution fails"
+      layer: 3
+      depends_on:
+        - models.execution-result
+      depended_on_by:
+        - features.tool-executor
+      emitted_by: [tool-executor]
+      consumed_by: [error-handler, retry-manager]
+      breaking_change_impact: "MEDIUM - Error handling affected"
+
+    # Artifact Events
+    artifact-created:
+      file: packages/shared/events/artifact-created.ts
+      role: "Async notification when new artifact is created"
+      layer: 3
+      depends_on:
+        - models.artifact
+      depended_on_by:
+        - features.artifact-manager
+      emitted_by: [artifact-manager]
+      consumed_by: [layout-manager, version-tracker]
+      breaking_change_impact: "MEDIUM - Artifact workflow affected"
+        
+    artifact-updated:
+      file: packages/shared/events/artifact-events.ts
+      role: "Async notification when artifact is modified"
+      layer: 3
+      depends_on:
+        - models.artifact
+      depended_on_by:
+        - features.artifact-manager
+      emitted_by: [artifact-manager]
+      consumed_by: [version-tracker, layout-manager]
+      breaking_change_impact: "MEDIUM - Artifact versioning affected"
+        
+    artifact-deleted:
+      file: packages/shared/events/artifact-events.ts
+      role: "Async notification when artifact is removed"
+      layer: 3
+      depends_on:
+        - models.artifact
+      depended_on_by:
+        - features.artifact-manager
+      emitted_by: [artifact-manager]
+      consumed_by: [layout-manager, cleanup-manager]
+      breaking_change_impact: "MEDIUM - Artifact cleanup affected"
+
+    # UI Events
+    layout-changed:
+      file: packages/shared/events/ui/layout-events.ts
+      role: "Async notification when UI layout configuration changes"
+      layer: 3
+      depends_on:
+        - models.layout-config
+      depended_on_by:
+        - features.dual-pane-layout
+      emitted_by: [dual-pane-layout]
+      consumed_by: [layout-persistence, responsive-manager]
+      breaking_change_impact: "LOW - UI responsiveness affected"
+        
+    text-model-selected:
+      file: events/text-model-selected.ts
+      role: "Async notification when text model is selected"
+      layer: 3
+      depends_on:
+        - models.model-selection
+      depended_on_by:
+        - features.text-model-selector
+      emitted_by: [text-model-selector]
+      consumed_by: [smart-model-router, preference-manager]
+      breaking_change_impact: "MEDIUM - Model selection affected"
+
+    vision-model-selected:
+      file: events/vision-model-selected.ts
+      role: "Async notification when vision model is selected"
+      layer: 3
+      depends_on:
+        - models.model-selection
+      depended_on_by:
+        - features.vision-model-selector
+      emitted_by: [vision-model-selector]
+      consumed_by: [smart-model-router, preference-manager]
+      breaking_change_impact: "MEDIUM - Vision model selection affected"
+        
+    model-selection-failed:
+      file: events/model-selection-failed.ts
+      role: "Async notification when model selection fails"
+      layer: 3
+      depends_on:
+        - models.model-selection
+      depended_on_by:
+        - features.text-model-selector
+        - features.vision-model-selector
+      emitted_by: [text-model-selector, vision-model-selector]
+      consumed_by: [error-handler, fallback-selector]
+      breaking_change_impact: "MEDIUM - Error handling affected"
+
+    # Vision Events
+    image-uploaded:
+      file: packages/shared/events/image-uploaded.ts
+      role: "Async notification when image is uploaded for processing"
+      layer: 3
+      depends_on:
+        - models.image-data
+      depended_on_by:
+        - features.image-processor
+      emitted_by: [image-processor]
+      consumed_by: [message-processor, artifact-manager]
+      breaking_change_impact: "MEDIUM - Image processing workflow affected"
+
+    # Observability Events
+    browser-log-captured:
+      file: events/browser-log-captured.ts
+      role: "Async notification when browser logs are captured"
+      layer: 3
+      depends_on:
+        - models.system-status
+      depended_on_by:
+        - features.browser-logger
+      emitted_by: [browser-logger]
+      consumed_by: [log-aggregator, debugging-panel]
+      breaking_change_impact: "LOW - Debugging tools affected"
+
+    log-aggregation-requested:
+      file: events/log-aggregation-requested.ts
+      role: "Async notification when log aggregation is requested"
+      layer: 3
+      depends_on:
+        - models.system-status
+      depended_on_by:
+        - features.browser-logger
+      emitted_by: [debugging-panel]
+      consumed_by: [browser-logger, log-exporter]
+      breaking_change_impact: "LOW - Debugging workflow affected"
+
+  # MODEL LAYER (Level 4 - Data Structures)
+  models:
+    # Chat Domain Models
+    conversation:
+      file: packages/shared/models/chat/conversation.ts
+      role: "Core data structure for conversation entity with metadata and lifecycle"
+      layer: 4
+      depends_on: []  # Pure types - no dependencies
+      depended_on_by:
+        - services.conversation-service
+        - events.conversation-created
+        - events.conversation-updated
+        - events.conversation-deleted
+        - features.conversation-manager
+      breaking_change_impact: "CRITICAL - Ripples through entire chat domain"
+
+    message:
+      file: packages/shared/models/chat/message.ts
+      role: "Core data structure for message entity with content, metadata, and relationships"
+      layer: 4
+      depends_on: []
+      depended_on_by:
+        - services.message-service
+        - services.streaming-service
+        - events.message-sent
+        - events.message-received
+        - events.tokens-processed
+        - features.message-processor
+      breaking_change_impact: "CRITICAL - Affects all message-related functionality"
+
+    memory-context:
+      file: packages/shared/models/chat/memory-context.ts
+      role: "Data structure for conversation context, memory management, and token budgets"
+      layer: 4
+      depends_on: []
+      depended_on_by:
+        - services.memory-service
+        - events.context-updated
+        - events.memory-cleaned
+        - features.memory-manager
+      breaking_change_impact: "HIGH - Affects conversation quality and context management"
+
+    title-generation:
+      file: packages/shared/models/chat/title-generation.ts
+      role: "Data structure for title generation configuration and results"
+      layer: 4
+      depends_on: []
+      depended_on_by:
+        - services.title-generation-service
+        - events.conversation-title-generated
+        - features.conversation-title-generator
+      breaking_change_impact: "MEDIUM - Affects title generation workflow"
+
+    # Connection Domain Models
+    ollama-connection:
+      file: packages/shared/models/connection/ollama-connection.ts
+      role: "Data structure for Ollama API connection configuration and state"
+      layer: 4
+      depends_on: []
+      depended_on_by:
+        - services.connection-service
+        - events.connection-established
+        - features.ollama-connector
+      breaking_change_impact: "CRITICAL - Affects external service connectivity"
+
+    health-status:
+      file: packages/shared/models/connection/health-status.ts
+      role: "Data structure for service health monitoring and status reporting"
+      layer: 4
+      depends_on: []
+      depended_on_by:
+        - services.connection-service
+        - features.ollama-connector
+      breaking_change_impact: "MEDIUM - Affects health monitoring"
+
+    model-capability:
+      file: packages/shared/models/connection/model-capability.ts
+      role: "Data structure for model capabilities, features, and metadata"
+      layer: 4
+      depends_on: []
+      depended_on_by:
+        - services.model-registry-service
+        - services.detection-service
+        - events.model-routed
+        - events.routing-failed
+        - events.models-detected
+        - features.smart-model-router
+        - features.model-detector
+      breaking_change_impact: "HIGH - Affects all model-dependent functionality"
+
+    model-registry:
+      file: packages/shared/models/connection/model-registry.ts
+      role: "Data structure for model registry with discovery and management metadata"
+      layer: 4
+      depends_on: []
+      depended_on_by:
+        - services.model-registry-service
+        - features.model-registry
+      breaking_change_impact: "HIGH - Affects model discovery and management"
+
+    # MCP Domain Models
+    server-config:
+      file: packages/shared/models/mcp/server-config.ts
+      role: "Data structure for MCP server configuration and process management"
+      layer: 4
+      depends_on: []
+      depended_on_by:
+        - services.mcp-service
+        - events.server-started
+        - events.server-stopped
+        - events.server-error
+        - features.server-manager
+      breaking_change_impact: "HIGH - Affects MCP server management"
+        
+    tool-definition:
+      file: packages/shared/models/mcp/tool-definition.ts
+      role: "Data structure for MCP tool schemas, parameters, and metadata"
+      layer: 4
+      depends_on: []
+      depended_on_by:
+        - services.tool-service
+        - events.tool-invoked
+        - features.tool-executor
+      breaking_change_impact: "HIGH - Affects tool discovery and execution"
+        
+    execution-result:
+      file: packages/shared/models/mcp/execution-result.ts
+      role: "Data structure for MCP tool execution results and error handling"
+      layer: 4
+      depends_on: []
+      depended_on_by:
+        - services.tool-service
+        - events.tool-completed
+        - events.tool-failed
+        - features.tool-executor
+      breaking_change_impact: "HIGH - Affects tool result processing"
+
+    # Artifacts Domain Models
+    artifact:
+      file: packages/shared/models/artifacts/artifact.ts
+      role: "Data structure for code artifacts with content, metadata, and relationships"
+      layer: 4
+      depends_on: []
+      depended_on_by:
+        - services.artifact-service
+        - events.artifact-created
+        - events.artifact-updated
+        - events.artifact-deleted
+        - features.artifact-manager
+      breaking_change_impact: "MEDIUM - Affects artifact management"
+        
+    version:
+      file: packages/shared/models/artifacts/version.ts
+      role: "Data structure for artifact versioning and change tracking"
+      layer: 4
+      depends_on: []
+      depended_on_by:
+        - services.artifact-service
+        - features.artifact-manager
+      breaking_change_impact: "MEDIUM - Affects artifact versioning"
+
+    # UI Domain Models
+    layout-config:
+      file: models/ui/layout-config.ts
+      role: "Data structure for UI layout configuration and responsive behavior"
+      layer: 4
+      depends_on: []
+      depended_on_by:
+        - services.layout-service
+        - events.layout-changed
+        - features.dual-pane-layout
+      breaking_change_impact: "MEDIUM - Affects UI layout management"
+        
+    model-selection:
+      file: packages/shared/models/ui/model-selection.ts
+      role: "Data structure for model selection state and preferences"
+      layer: 4
+      depends_on: []
+      depended_on_by:
+        - events.text-model-selected
+        - events.vision-model-selected
+        - events.model-selection-failed
+        - features.text-model-selector
+        - features.vision-model-selector
+      breaking_change_impact: "MEDIUM - Affects model selection UI"
+
+    # Vision Domain Models
+    image-data:
+      file: packages/shared/models/vision/image-data.ts
+      role: "Data structure for image data, formats, and processing metadata"
+      layer: 4
+      depends_on: []
+      depended_on_by:
+        - services.vision-service
+        - events.image-uploaded
+        - features.image-processor
+      breaking_change_impact: "MEDIUM - Affects image processing"
+
+    processing-result:
+      file: packages/shared/models/vision/processing-result.ts
+      role: "Data structure for vision processing results and analysis data"
+      layer: 4
+      depends_on: []
+      depended_on_by:
+        - services.vision-service
+        - features.image-processor
+      breaking_change_impact: "MEDIUM - Affects vision result handling"
+
+    # Observability Domain Models
+    system-status:
+      file: models/observability/system-status.ts
+      role: "Data structure for system status, logs, and debugging information"
+      layer: 4
+      depends_on: []
+      depended_on_by:
+        - events.browser-log-captured
+        - events.log-aggregation-requested
+        - features.browser-logger
+      breaking_change_impact: "LOW - Affects debugging tools"
+
+# UTILITIES (Level 5 - Pure Functions)
 utilities:
-  - name: token-counter
-    interface: utils/token-counter.ts
+  token-counter:
+    file: packages/shared/utils/token-counter.ts
+    role: "Pure functions for counting tokens in messages and managing token budgets"
+    layer: 5
+    depends_on: []
+    depended_on_by:
+      - adapters.token-counter-adapter
+      - adapters.token-budget-adapter
+    breaking_change_impact: "MEDIUM - Affects token management"
     
-  - name: context-manager
-    interface: utils/context-manager.ts
+  context-manager:
+    file: packages/shared/utils/context-manager.ts
+    role: "Pure functions for managing conversation context and memory operations"
+    layer: 5
+    depends_on: []
+    depended_on_by:
+      - adapters.context-adapter
+    breaking_change_impact: "MEDIUM - Affects context handling"
     
-  - name: config-parser
-    interface: utils/config-parser.ts
+  config-parser:
+    file: packages/shared/utils/config-parser.ts
+    role: "Pure functions for parsing and validating configuration files"
+    layer: 5
+    depends_on: []
+    depended_on_by:
+      - adapters.config-adapter
+    breaking_change_impact: "MEDIUM - Affects configuration handling"
     
-  - name: process-manager
-    interface: utils/process-manager.ts
+  process-manager:
+    file: packages/shared/utils/process-manager.ts
+    role: "Pure functions for managing external processes and MCP servers"
+    layer: 5
+    depends_on: []
+    depended_on_by:
+      - adapters.process-adapter
+    breaking_change_impact: "HIGH - Affects MCP server management"
     
-  - name: protocol-handler
-    interface: utils/protocol-handler.ts
+  protocol-handler:
+    file: packages/shared/utils/protocol-handler.ts
+    role: "Pure functions for handling MCP protocol communication"
+    layer: 5
+    depends_on: []
+    depended_on_by:
+      - adapters.mcp-protocol-adapter
+    breaking_change_impact: "HIGH - Affects MCP communication"
     
-  - name: artifact-validator
-    interface: utils/artifact-validator.ts
+  artifact-validator:
+    file: packages/shared/utils/artifact-validator.ts
+    role: "Pure functions for validating artifact content and structure"
+    layer: 5
+    depends_on: []
+    depended_on_by:
+      - adapters.artifact-storage-adapter
+    breaking_change_impact: "MEDIUM - Affects artifact validation"
 
-# Package Configuration
+  capability-detector:
+    file: packages/shared/utils/capability-detector.ts
+    role: "Pure functions for detecting model capabilities and features"
+    layer: 5
+    depends_on: []
+    depended_on_by:
+      - adapters.capability-detector-adapter
+    breaking_change_impact: "MEDIUM - Affects capability detection"
+
+  health-checker:
+    file: packages/shared/utils/health-checker.ts
+    role: "Pure functions for checking service health and connectivity"
+    layer: 5
+    depends_on: []
+    depended_on_by:
+      - adapters.health-checker-adapter  
+    breaking_change_impact: "MEDIUM - Affects health monitoring"
+
+  http-client:
+    file: packages/shared/utils/http-client.ts
+    role: "Pure functions for HTTP communication and request handling"
+    layer: 5
+    depends_on: []
+    depended_on_by:
+      - adapters.http-client-adapter
+    breaking_change_impact: "HIGH - Affects external service communication"
+
+  image-processor:
+    file: packages/shared/utils/image-processor.ts  
+    role: "Pure functions for image processing, format conversion, and validation"
+    layer: 5
+    depends_on: []
+    depended_on_by:
+      - adapters.image-processor-adapter
+    breaking_change_impact: "MEDIUM - Affects image handling"
+
+  model-registry-helper:
+    file: packages/shared/utils/model-registry-helper.ts
+    role: "Pure functions for model registry operations and queries"
+    layer: 5
+    depends_on: []
+    depended_on_by:
+      - adapters.model-registry-helper-adapter
+    breaking_change_impact: "MEDIUM - Affects model registry operations"
+
+  event-bus:
+    file: packages/shared/utils/event-bus.ts
+    role: "Pure functions for event system management and routing"
+    layer: 5
+    depends_on: []
+    depended_on_by:
+      - adapters.event-system-adapter
+    breaking_change_impact: "HIGH - Affects entire event system"
+
+# CHANGE IMPACT ANALYSIS
+# Automated assessment of modification consequences
+
+impact_analysis:
+  change_risk_levels:
+    CRITICAL: "Affects core user functionality - requires full regression testing and staged deployment"
+    HIGH: "Affects multiple features - requires integration testing and careful rollout" 
+    MEDIUM: "Affects specific workflows - requires targeted testing and validation"
+    LOW: "Isolated change - requires unit testing and basic validation"
+    
+  cascade_rules:
+    - "Experience contract changes require ALL dependent features to be validated against user goals"
+    - "Model changes trigger updates in ALL dependent contracts - assess data migration needs"
+    - "Service contract changes require transport layer verification and API compatibility checks"
+    - "Event schema changes require emitter/consumer compatibility checks and event versioning"
+    - "Feature changes must maintain experience contract fulfillment"
+    - "Utility changes require adapter validation and pure function guarantees"
+
+# AI DEVELOPMENT WORKFLOW
+# Step-by-step process for AI agents implementing features
+
+ai_workflow:
+  feature_implementation:
+    1: "Parse experience contract to understand specific user goal and success metrics"
+    2: "Identify required technical capabilities and interaction patterns"
+    3: "Check existing contracts for capability coverage and reuse opportunities"  
+    4: "Design new contracts or safely modify existing ones with impact analysis"
+    5: "Validate dependency chain consistency and layer compliance"
+    6: "Implement with contract-driven development and automated testing"
+    7: "Verify experience contract fulfillment and measure success metrics"
+    8: "Update manifest with new dependencies and impact assessments"
+    
+  change_impact_process:
+    1: "Identify contract being modified and its current dependents"
+    2: "Calculate dependency ripple effects using depended_on_by chains"
+    3: "Assess breaking_change_impact levels for all affected contracts"
+    4: "Design backward-compatible approach with versioning if possible"
+    5: "Create migration plan for unavoidable breaking changes"
+    6: "Validate all dependent contracts still satisfied after changes"
+    7: "Update success metrics and experience contract alignment"
+    8: "Plan testing strategy based on impact assessment"
+
+# CONTRACT VALIDATION RULES
+# Automated consistency checks for AI agents
+
+validation_rules:
+  dependency_integrity:
+    - "All depends_on references must exist in contracts section"
+    - "All depended_on_by must have corresponding depends_on in target contract"
+    - "Circular dependencies are forbidden across all layers"
+    - "Experience contracts must have at least one serving feature"
+    - "Layer violations forbidden (higher layers cannot depend on lower layers)"
+    
+  transport_completeness:
+    - "All service contracts with transport_implementations must have actual implementations"
+    - "All events must have at least one emitter and one consumer listed"
+    - "All features must serve at least one experience contract (no orphaned features)"
+    - "All experience contracts must have measurable success_metrics"
+    
+  architecture_coherence:
+    - "Every feature must answer: 'How does this help users achieve their goals?'"
+    - "Cross-domain dependencies must be explicit and documented"
+    - "Breaking change impact must be justified with user value assessment"
+    - "Experience contracts must define specific user value and success metrics"
+    - "Models must be pure data structures with no business logic"
+    - "Utilities must be pure functions with no side effects"
+
+# PACKAGE CONFIGURATION
 packages:
   client:
     path: packages/client
     framework: react-typescript
+    primary_contracts:
+      - features.dual-pane-layout
+      - features.text-model-selector
+      - features.vision-model-selector
+      - features.reasoning-panel
     
   server:
-    path: packages/server
+    path: packages/server  
     framework: node-express-typescript
+    primary_contracts:
+      - All service implementations
+      - Transport layer implementations
+      - Event emission and handling
     
   shared:
     path: packages/shared
     framework: typescript
+    primary_contracts:
+      - All feature contracts
+      - All service contracts  
+      - All event contracts
+      - All model definitions
+      - All utility functions
 
+# ARCHITECTURE COHERENCE MONITORING
+# Ensures contracts maintain alignment with user goals
 
-# USER EXPERIENCE CONTRACTS
-# Define UI interaction boundaries and user experience expectations
+coherence_monitoring:
+  experience_alignment_checks:
+    - "Every technical feature must trace back to user value"
+    - "Success metrics must be measurable and user-centric"
+    - "Breaking changes must justify impact on user experience"
+    - "New features must enhance existing user journeys"
+    
+  contract_completeness_checks:
+    - "All service contracts have transport implementations"
+    - "All events have both producers and consumers"
+    - "All features have complete adapter chains to utilities"
+    - "All models are used by at least one contract"
+    
+  dependency_health_checks:
+    - "No circular dependencies across any layers"
+    - "Layer separation maintained (Experience -> Features -> Services -> Events -> Models -> Utilities)"
+    - "Cross-domain communication only through explicit service contracts"
+    - "Adapter patterns consistently applied for external dependencies"
 
-experience_contracts:
+# DOMAINS ORGANIZATION
+# Logical grouping of related features for better AI navigation
+
+domains:
+  chat:
+    description: "Core conversation and messaging functionality"
+    features: [conversation-manager, message-processor, conversation-title-generator, memory-manager, smart-model-router]
+    primary_experience: conversation_experience
+    
+  connection:
+    description: "External service connectivity and model management"
+    features: [ollama-connector, model-detector, model-registry]
+    primary_experience: settings_experience
+    
+  mcp:
+    description: "Model Context Protocol integration and tool execution"
+    features: [server-manager, tool-executor]
+    primary_experience: mcp_experience
+    
+  artifacts:
+    description: "Code artifact management and versioning"
+    features: [artifact-manager]
+    primary_experience: layout_experience
+    
   ui:
-    - name: conversation
-      contract: experiences/ui/conversation.ts
-      description: Contract for everything that happens within a conversation window
-      scope:
-        - Message display and formatting
-        - Input handling and validation
-        - Conversation flow and state
-        - Real-time updates and streaming
-      
-    - name: layout
-      contract: experiences/ui/layout.ts
-      description: Contract for how things are displayed and actionned
-      scope:
-        - Component positioning and responsiveness
-        - Navigation and routing behavior
-        - Visual hierarchy and accessibility
-        - Interactive element behavior
-      
-    - name: settings
-      contract: experiences/ui/settings.ts
-      description: Contract for how user settings work
-      scope:
-        - Configuration management interface
-        - Preference persistence and sync
-        - Setting validation and defaults
-        - User customization capabilities
-        
-    - name: mcp
-      contract: experiences/ui/mcp.ts
-      description: Contract for how MCP tools are handled in UI
-      scope:
-        - Tool discovery and presentation
-        - Tool execution feedback and status
-        - Result display and interaction
-        - Error handling and recovery
+    description: "User interface components and layout management"
+    features: [dual-pane-layout, reasoning-panel, text-model-selector, vision-model-selector]
+    primary_experience: layout_experience
+    
+  vision:
+    description: "Image processing and multimodal capabilities"
+    features: [image-processor]
+    primary_experience: conversation_experience
+    
+  observability:
+    description: "Logging, monitoring, and debugging tools"
+    features: [browser-logger]
+    primary_experience: [] # Infrastructure features
 
-# EXPERIENCE-FEATURE MAPPING
-# Ensures all features serve clear UI user experience goals
+# AI AGENT COORDINATION
+# Guidelines for multi-agent collaboration on the codebase
 
-experience_integration:
-  conversation_experience:
-    primary_features:
-      - conversation-manager
-      - message-processor
-      - smart-model-router
-    ui_contract: experiences/ui/conversation.ts
-    user_expectations:
-      - Smooth message flow without technical complexity
-      - Clear feedback on processing states
-      - Consistent conversation history access
-      
-  layout_experience:
-    primary_features:
-      - conversation-manager
-      - artifact-manager
-    ui_contract: experiences/ui/layout.ts
-    user_expectations:
-      - Intuitive navigation between conversations
-      - Responsive design across devices
-      - Accessible interface elements
-      
-  settings_experience:
-    primary_features:
-      - All features (configuration consumers)
-    ui_contract: experiences/ui/settings.ts
-    user_expectations:
-      - Simple preference management
-      - Immediate setting effect visibility
-      - Persistent user customizations
-      
-  mcp_experience:
-    primary_features:
-      - server-manager
-      - tool-executor
-    ui_contract: experiences/ui/mcp.ts
-    user_expectations:
-      - Clear tool availability status
-      - Intuitive tool interaction patterns
-      - Helpful error messages and guidance
+agent_coordination:
+  ownership_model:
+    - "Each agent should focus on specific domains to avoid conflicts"
+    - "Cross-domain changes require coordination through experience contracts"
+    - "Breaking changes must be discussed in architecture review"
+    
+  collaboration_patterns:
+    - "Use experience contracts as coordination points between agents"
+    - "Validate impact analysis before making changes"
+    - "Update manifest dependencies when modifying contracts"
+    - "Maintain contract coherence across all layers"
+    
+  conflict_resolution:
+    - "Experience contract requirements take priority over technical preferences"
+    - "User value justification required for architecture changes"
+    - "Backward compatibility preferred over breaking changes"
+    - "Contract violations must be fixed immediately"

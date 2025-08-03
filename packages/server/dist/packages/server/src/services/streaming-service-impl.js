@@ -23,9 +23,8 @@ class StreamingServiceImpl {
             start(controller) {
                 // Implementation would create actual streaming logic here
                 controller.enqueue({
-                    type: 'content',
                     content: 'Mock streaming response',
-                    finished: false
+                    complete: false
                 });
                 controller.close();
             }

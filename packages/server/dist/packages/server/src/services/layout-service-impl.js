@@ -11,13 +11,11 @@ class LayoutServiceImpl {
     constructor() {
         // Initialize with default layout
         this.currentLayout = {
-            leftPaneVisible: true,
-            rightPaneVisible: true,
-            leftPaneWidth: 50,
-            activeLeftTab: 'conversation',
-            activeRightTab: 'codeEditor',
+            sidebarOpen: true,
+            conversationPanelWidth: 50,
+            codeEditorOpen: true,
             reasoningPanelOpen: false,
-            reasoningPanelHeight: 200
+            theme: 'light'
         };
     }
     async loadLayout() {
@@ -36,23 +34,21 @@ class LayoutServiceImpl {
     }
     async resetLayout() {
         this.currentLayout = {
-            leftPaneVisible: true,
-            rightPaneVisible: true,
-            leftPaneWidth: 50,
-            activeLeftTab: 'conversation',
-            activeRightTab: 'codeEditor',
+            sidebarOpen: true,
+            conversationPanelWidth: 50,
+            codeEditorOpen: true,
             reasoningPanelOpen: false,
-            reasoningPanelHeight: 200
+            theme: 'light'
         };
         return { ...this.currentLayout };
     }
     async togglePanel(panel) {
         switch (panel) {
             case 'conversation':
-                this.currentLayout.leftPaneVisible = !this.currentLayout.leftPaneVisible;
+                this.currentLayout.sidebarOpen = !this.currentLayout.sidebarOpen;
                 break;
             case 'codeEditor':
-                this.currentLayout.rightPaneVisible = !this.currentLayout.rightPaneVisible;
+                this.currentLayout.codeEditorOpen = !this.currentLayout.codeEditorOpen;
                 break;
             case 'reasoning':
                 this.currentLayout.reasoningPanelOpen = !this.currentLayout.reasoningPanelOpen;

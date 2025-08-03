@@ -1,0 +1,32 @@
+    // Initialize model selector adapters
+    const textModelFilterAdapter = createTextModelFilterAdapter();
+    const visionModelFilterAdapter = createVisionModelFilterAdapter();
+    const selectionPersistenceAdapter = createSelectionPersistenceAdapter();
+    const imageDetectionAdapter = createImageDetectionAdapter();
+
+    // Create model selectors with their adapters
+    const textModelSelector = createTextModelSelector(
+      modelRegistryService,
+      textModelFilterAdapter,
+      selectionPersistenceAdapter
+    );
+
+    const visionModelSelector = createVisionModelSelector(
+      modelRegistryService,
+      visionModelFilterAdapter,
+      selectionPersistenceAdapter,
+      imageDetectionAdapter
+    );
+
+    // Initialize WebSocket handler with all services
+    const webSocketHandler = new WebSocketHandler(
+      io,
+      conversationService,
+      messageService,
+      mcpManager,
+      ollamaService,
+      textModelSelector,
+      visionModelSelector,
+      titleIntegration.titleGenerationService
+    );
+    console.log("🔌 WebSocket handler initialized");

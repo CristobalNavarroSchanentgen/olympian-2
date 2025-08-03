@@ -1,1 +1,0 @@
-{"version":3,"file":"prompt-adapter.d.ts","sourceRoot":"","sources":["../../../../../adapters/features/chat/conversation-title-generator/prompt-adapter.ts"],"names":[],"mappings":"AAAA;;;GAGG;AAEH,qBAAa,aAAa;IACxB,iBAAiB,CAAC,OAAO,EAAE,MAAM,EAAE,SAAS,EAAE,MAAM,GAAG,MAAM;IAS7D,YAAY,CAAC,QAAQ,EAAE,MAAM,GAAG,MAAM,GAAG,IAAI;IA6B7C,aAAa,CAAC,KAAK,EAAE,MAAM,GAAG,MAAM;CAIrC"}

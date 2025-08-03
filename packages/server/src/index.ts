@@ -13,7 +13,7 @@ import { ArtifactServiceImpl } from "./services/artifact-service-impl";
 import { McpServiceImpl } from "./services/mcp-service-impl";
 import { ModelRegistryServiceImpl } from "./services/model-registry-service-impl";
 import { TitleGenerationServiceImpl } from "./services/title-generation-service-impl";
-// Registry-aware model service imports
+import { StreamingServiceImpl } from "./services/streaming-service-impl";// Registry-aware model service imports
 import { createModelRegistryManager } from "../../../packages/shared/features/connection/model-registry";
 import { createRegistryLoaderAdapter } from "../../../packages/shared/adapters/features/connection/model-registry/registry-loader-adapter";
 
@@ -66,7 +66,7 @@ async function startServer() {
     const artifactService = new ArtifactServiceImpl();
     const mcpService = new McpServiceImpl();
     const titleGenerationService = new TitleGenerationServiceImpl();    console.log("💼 Business services initialized");
-
+    const streamingService = new StreamingServiceImpl();
     // Initialize MCP Manager
     const mcpManager = new MCPManager();
     await mcpManager.initialize();

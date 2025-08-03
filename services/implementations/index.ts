@@ -6,16 +6,16 @@
 import { ConversationServiceImpl } from './conversation-service-impl';
 import { MessageServiceImpl } from './message-service-impl';
 import { TitleGenerationServiceImpl } from './title-generation-service-impl';
-
+import { StreamingServiceImpl } from "../../packages/server/src/services/streaming-service-impl";
 import type { ConversationService } from '../conversation-service';
 import type { MessageService } from '../message-service';
 import type { TitleGenerationService } from '../title-generation-service';
-
+import type { StreamingService } from "../streaming-service";
 // Service instances (singletons)
 let conversationService: ConversationService | null = null;
 let messageService: MessageService | null = null;
 let titleGenerationService: TitleGenerationService | null = null;
-
+let streamingService: StreamingService | null = null;
 /**
  * Get conversation service instance
  */
@@ -47,6 +47,15 @@ export function getTitleGenerationService(): TitleGenerationService {
 }
 
 /**
+ * Get streaming service instance
+ */
+export function getStreamingService(): StreamingService {
+  if (!streamingService) {
+    streamingService = new StreamingServiceImpl();
+  }
+  return streamingService;}
+
+/**
  * Initialize all services
  * Call this during application startup
  */
@@ -55,7 +64,7 @@ export function initializeServices(): void {
   getConversationService();
   getMessageService();
   getTitleGenerationService();
-  
+  getStreamingService();  
   console.log('✅ Services initialized');
 }
 
@@ -66,4 +75,4 @@ export {
   ConversationServiceImpl,
   MessageServiceImpl,
   TitleGenerationServiceImpl
-};
+  StreamingServiceImpl};

@@ -1,0 +1,1 @@
+// Contract for everything that happens within a conversation window

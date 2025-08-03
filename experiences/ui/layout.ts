@@ -1,0 +1,1 @@
+// Contract for how things are displayed and actionned

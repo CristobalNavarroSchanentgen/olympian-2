@@ -1,0 +1,1 @@
+// Contract for how mcp tools are handled

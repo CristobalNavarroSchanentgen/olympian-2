@@ -12,7 +12,7 @@ import { MessageServiceImpl } from "./services/message-service-impl";
 import { ArtifactServiceImpl } from "./services/artifact-service-impl";
 import { McpServiceImpl } from "./services/mcp-service-impl";
 import { ModelRegistryServiceImpl } from "./services/model-registry-service-impl";
-
+import { TitleGenerationServiceImpl } from "./services/title-generation-service-impl";
 // Registry-aware model service imports
 import { createModelRegistryManager } from "../../../packages/shared/features/connection/model-registry";
 import { createRegistryLoaderAdapter } from "../../../packages/shared/adapters/features/connection/model-registry/registry-loader-adapter";
@@ -65,7 +65,7 @@ async function startServer() {
     const messageService = new MessageServiceImpl();
     const artifactService = new ArtifactServiceImpl();
     const mcpService = new McpServiceImpl();
-    console.log("💼 Business services initialized");
+    const titleGenerationService = new TitleGenerationServiceImpl();    console.log("💼 Business services initialized");
 
     // Initialize MCP Manager
     const mcpManager = new MCPManager();
@@ -131,8 +131,8 @@ async function startServer() {
       messageService,
       mcpManager,
       ollamaService,
-      modelRegistryService
-    );
+      modelRegistryService,
+      titleGenerationService    );
     console.log("🔌 WebSocket handler initialized");
 
     // Initialize model selector adapters
@@ -143,14 +143,12 @@ async function startServer() {
 
     // Initialize model selector features
     const textModelSelector = createTextModelSelector(
-      modelRegistryService,
-      textModelFilterAdapter,
+      textModelFilterAdapter,      modelRegistryService,
       selectionPersistenceAdapter);
 
     const visionModelSelector = createVisionModelSelector(
       modelRegistryService,
-      visionModelFilterAdapter,
-      selectionPersistenceAdapter,
+      visionModelFilterAdapter,      selectionPersistenceAdapter,
       imageDetectionAdapter);
 
     console.log("🎯 All API routes configured");
@@ -161,8 +159,8 @@ async function startServer() {
       messageService,
       artifactService,
       mcpService,
-      modelRegistryService
-    };
+      modelRegistryService,
+      titleGenerationService    };
     
     setupAllRoutes(app, apiServices);
 

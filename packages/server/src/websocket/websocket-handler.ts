@@ -4,7 +4,7 @@ import { MessageService } from "@olympian/shared/services/message-service";
 import { MessageRole } from "@olympian/shared/models/chat/message";
 import { MCPManager } from '../mcp/mcp-manager-stub';
 import { ModelRegistryService } from "@olympian/shared/services/model-registry-service";
-import { OllamaService } from '../services/ollama-service';
+import { TitleGenerationService } from "@olympian/shared/services/title-generation-service";import { OllamaService } from '../services/ollama-service';
 
 export class WebSocketHandler {
   private io: SocketIOServer;
@@ -13,22 +13,22 @@ export class WebSocketHandler {
   private mcpManager: MCPManager;
   private ollamaService: OllamaService;
   private modelRegistryService: ModelRegistryService;
-
+  private titleGenerationService: TitleGenerationService;
   constructor(
     io: SocketIOServer,
     conversationService: ConversationService,
     messageService: MessageService,
     mcpManager: MCPManager,
     ollamaService: OllamaService,
-    modelRegistryService: ModelRegistryService
-  ) {
+    modelRegistryService: ModelRegistryService,
+    titleGenerationService: TitleGenerationService  ) {
     this.io = io;
     this.conversationService = conversationService;
     this.messageService = messageService;
     this.mcpManager = mcpManager;
     this.ollamaService = ollamaService;
     this.modelRegistryService = modelRegistryService;
-    
+    this.titleGenerationService = titleGenerationService;    
     this.setupHandlers();
   }
 
@@ -201,6 +201,8 @@ export class WebSocketHandler {
       
       socket.emit('chat:message', userMessage);
       
+      // Generate title if this is first user message
+      this.handleTitleGeneration(data.conversationId, data.content);      
       // Select the best available model
       const requestedModel = data.model || 'llama3.2:3b';
       const selectedModel = await this.selectBestAvailableModel(requestedModel);
@@ -265,4 +267,35 @@ export class WebSocketHandler {
       });
     }
   }
-}
+
+  private async handleTitleGeneration(conversationId: string, firstMessage: string): Promise<void> {
+    try {
+      const conversation = await this.conversationService.getConversation(conversationId);
+      if (!conversation) return;
+      
+      if (conversation.title !== "New Chat" && conversation.title !== "Chat") {
+        return;
+      }
+      
+      const generatedTitle = await this.titleGenerationService.autoGenerateTitle(
+        conversationId,
+        firstMessage
+      );
+      
+      await this.conversationService.updateConversation(conversationId, {
+        title: generatedTitle
+      });
+      
+      this.io.emit("conversation:title-updated", {
+        conversationId,
+        title: generatedTitle,
+        timestamp: new Date().toISOString()
+      });
+      
+      console.log("Generated title for conversation", conversationId, ":", generatedTitle);
+      
+    } catch (error) {
+      console.error("Failed to generate conversation title:", error);
+    }
+  }}
+

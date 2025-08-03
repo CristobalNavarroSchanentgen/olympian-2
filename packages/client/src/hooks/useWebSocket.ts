@@ -51,7 +51,14 @@ export function useWebSocket() {
     });
 
     socket.on('chat:error', (data) => {
-      console.error('Chat error:', data.error);
+
+    socket.on("conversation:title-updated", (data) => {
+      console.log("📝 Title updated for conversation", data.conversationId, ":", data.title);
+      // Update conversation title in store - we need to add this to the chat store
+      if (typeof window !== "undefined") {
+        updateConversation(data.conversationId, { title: data.title });
+      }
+    });      console.error('Chat error:', data.error);
       setStreaming(null);
     });
 

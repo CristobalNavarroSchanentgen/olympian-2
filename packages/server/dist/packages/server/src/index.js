@@ -17,6 +17,7 @@ const message_service_impl_1 = require("./services/message-service-impl");
 const artifact_service_impl_1 = require("./services/artifact-service-impl");
 const mcp_service_impl_1 = require("./services/mcp-service-impl");
 const model_registry_service_impl_1 = require("./services/model-registry-service-impl");
+const title_generation_service_impl_1 = require("./services/title-generation-service-impl");
 // Registry-aware model service imports
 const model_registry_1 = require("../../../packages/shared/features/connection/model-registry");
 const registry_loader_adapter_1 = require("../../../packages/shared/adapters/features/connection/model-registry/registry-loader-adapter");
@@ -61,6 +62,7 @@ async function startServer() {
         const messageService = new message_service_impl_1.MessageServiceImpl();
         const artifactService = new artifact_service_impl_1.ArtifactServiceImpl();
         const mcpService = new mcp_service_impl_1.McpServiceImpl();
+        const titleGenerationService = new title_generation_service_impl_1.TitleGenerationServiceImpl();
         console.log("💼 Business services initialized");
         // Initialize MCP Manager
         const mcpManager = new mcp_manager_stub_1.MCPManager();
@@ -113,7 +115,7 @@ async function startServer() {
             }
         }
         // Initialize WebSocket handler with all services
-        const webSocketHandler = new websocket_handler_1.WebSocketHandler(io, conversationService, messageService, mcpManager, ollamaService, modelRegistryService);
+        const webSocketHandler = new websocket_handler_1.WebSocketHandler(io, conversationService, messageService, mcpManager, ollamaService, modelRegistryService, titleGenerationService);
         console.log("🔌 WebSocket handler initialized");
         // Initialize model selector adapters
         const textModelFilterAdapter = (0, text_model_filter_adapter_1.createTextModelFilterAdapter)();
@@ -121,7 +123,7 @@ async function startServer() {
         const selectionPersistenceAdapter = (0, selection_persistence_adapter_1.createSelectionPersistenceAdapter)();
         const imageDetectionAdapter = (0, image_detection_adapter_1.createImageDetectionAdapter)();
         // Initialize model selector features
-        const textModelSelector = (0, text_model_selector_1.createTextModelSelector)(modelRegistryService, textModelFilterAdapter, selectionPersistenceAdapter);
+        const textModelSelector = (0, text_model_selector_1.createTextModelSelector)(textModelFilterAdapter, modelRegistryService, selectionPersistenceAdapter);
         const visionModelSelector = (0, vision_model_selector_1.createVisionModelSelector)(modelRegistryService, visionModelFilterAdapter, selectionPersistenceAdapter, imageDetectionAdapter);
         console.log("🎯 All API routes configured");
         // Setup all API routes with service injection
@@ -130,7 +132,8 @@ async function startServer() {
             messageService,
             artifactService,
             mcpService,
-            modelRegistryService
+            modelRegistryService,
+            titleGenerationService
         };
         (0, api_1.setupAllRoutes)(app, apiServices);
         const PORT = process.env.PORT || 3001;

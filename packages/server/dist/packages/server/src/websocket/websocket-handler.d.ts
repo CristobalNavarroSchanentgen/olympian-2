@@ -3,6 +3,7 @@ import { ConversationService } from "@olympian/shared/services/conversation-serv
 import { MessageService } from "@olympian/shared/services/message-service";
 import { MCPManager } from '../mcp/mcp-manager-stub';
 import { ModelRegistryService } from "@olympian/shared/services/model-registry-service";
+import { TitleGenerationService } from "@olympian/shared/services/title-generation-service";
 import { OllamaService } from '../services/ollama-service';
 export declare class WebSocketHandler {
     private io;
@@ -11,7 +12,8 @@ export declare class WebSocketHandler {
     private mcpManager;
     private ollamaService;
     private modelRegistryService;
-    constructor(io: SocketIOServer, conversationService: ConversationService, messageService: MessageService, mcpManager: MCPManager, ollamaService: OllamaService, modelRegistryService: ModelRegistryService);
+    private titleGenerationService;
+    constructor(io: SocketIOServer, conversationService: ConversationService, messageService: MessageService, mcpManager: MCPManager, ollamaService: OllamaService, modelRegistryService: ModelRegistryService, titleGenerationService: TitleGenerationService);
     private setupHandlers;
     private selectBestAvailableModel;
     private handleTextModelsRequest;
@@ -19,4 +21,5 @@ export declare class WebSocketHandler {
     private handleVisionModelsRequest;
     private handleVisionModelSelect;
     private handleChatMessage;
+    private handleTitleGeneration;
 }

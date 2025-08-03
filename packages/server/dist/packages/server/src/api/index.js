@@ -14,6 +14,7 @@ const messages_1 = require("./messages");
 const artifacts_1 = require("./artifacts");
 const mcp_1 = require("./mcp");
 const ollama_1 = require("./ollama");
+const title_generation_1 = require("./title-generation");
 const logs_1 = __importDefault(require("./logs"));
 /**
  * Setup all API routes with dependency injection
@@ -29,6 +30,7 @@ function setupAllRoutes(app, services) {
     // Integration routes
     (0, mcp_1.setupMcpRoutes)(app, services.mcpService);
     (0, ollama_1.setupOllamaRoutes)(app, services.modelRegistryService);
+    (0, title_generation_1.setupTitleGenerationRoutes)(app, services.titleGenerationService);
     // Observability routes
     app.use('/api/logs', logs_1.default);
     console.log('? All API routes configured');

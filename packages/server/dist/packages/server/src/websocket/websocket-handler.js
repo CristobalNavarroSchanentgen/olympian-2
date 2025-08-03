@@ -8,13 +8,15 @@ class WebSocketHandler {
     mcpManager;
     ollamaService;
     modelRegistryService;
-    constructor(io, conversationService, messageService, mcpManager, ollamaService, modelRegistryService) {
+    titleGenerationService;
+    constructor(io, conversationService, messageService, mcpManager, ollamaService, modelRegistryService, titleGenerationService) {
         this.io = io;
         this.conversationService = conversationService;
         this.messageService = messageService;
         this.mcpManager = mcpManager;
         this.ollamaService = ollamaService;
         this.modelRegistryService = modelRegistryService;
+        this.titleGenerationService = titleGenerationService;
         this.setupHandlers();
     }
     setupHandlers() {
@@ -171,6 +173,8 @@ class WebSocketHandler {
             // Create and store user message
             const userMessage = await this.messageService.createMessage(data.conversationId, { content: data.content, role: "user" }, "user");
             socket.emit('chat:message', userMessage);
+            // Generate title if this is first user message
+            this.handleTitleGeneration(data.conversationId, data.content);
             // Select the best available model
             const requestedModel = data.model || 'llama3.2:3b';
             const selectedModel = await this.selectBestAvailableModel(requestedModel);
@@ -223,6 +227,29 @@ class WebSocketHandler {
             socket.emit('chat:error', {
                 error: error instanceof Error ? error.message : 'Unknown error'
             });
+        }
+    }
+    async handleTitleGeneration(conversationId, firstMessage) {
+        try {
+            const conversation = await this.conversationService.getConversation(conversationId);
+            if (!conversation)
+                return;
+            if (conversation.title !== "New Chat" && conversation.title !== "Chat") {
+                return;
+            }
+            const generatedTitle = await this.titleGenerationService.autoGenerateTitle(conversationId, firstMessage);
+            await this.conversationService.updateConversation(conversationId, {
+                title: generatedTitle
+            });
+            this.io.emit("conversation:title-updated", {
+                conversationId,
+                title: generatedTitle,
+                timestamp: new Date().toISOString()
+            });
+            console.log("Generated title for conversation", conversationId, ":", generatedTitle);
+        }
+        catch (error) {
+            console.error("Failed to generate conversation title:", error);
         }
     }
 }

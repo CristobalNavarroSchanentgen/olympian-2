@@ -24,6 +24,9 @@ const tool_service_impl_1 = require("./services/tool-service-impl");
 const layout_service_impl_1 = require("./services/layout-service-impl");
 const model_registry_1 = require("../../../packages/shared/features/connection/model-registry");
 const registry_loader_adapter_1 = require("../../../packages/shared/adapters/features/connection/model-registry/registry-loader-adapter");
+// Model Selector Features
+const text_model_selector_1 = require("../../../features/ui/text-model-selector");
+const vision_model_selector_1 = require("../../../features/ui/vision-model-selector");
 const text_model_filter_adapter_1 = require("../../../adapters/features/ui/text-model-selector/text-model-filter-adapter");
 const vision_model_filter_adapter_1 = require("../../../adapters/features/ui/vision-model-selector/vision-model-filter-adapter");
 const selection_persistence_adapter_1 = require("../../../adapters/features/ui/model-selector/selection-persistence-adapter");
@@ -118,20 +121,14 @@ async function startServer() {
             }
         }
         // Initialize WebSocket handler with all services
-        const webSocketHandler = new websocket_handler_1.WebSocketHandler(io, conversationService, messageService, mcpManager, ollamaService, modelRegistryService, titleGenerationService);
-        console.log("🔌 WebSocket handler initialized");
         // Initialize model selector adapters
         const textModelFilterAdapter = (0, text_model_filter_adapter_1.createTextModelFilterAdapter)();
         const visionModelFilterAdapter = (0, vision_model_filter_adapter_1.createVisionModelFilterAdapter)();
         const selectionPersistenceAdapter = (0, selection_persistence_adapter_1.createSelectionPersistenceAdapter)();
         const imageDetectionAdapter = (0, image_detection_adapter_1.createImageDetectionAdapter)();
-        textModelFilterAdapter, modelRegistryService,
-            selectionPersistenceAdapter;
-        ;
-        modelRegistryService,
-            visionModelFilterAdapter, selectionPersistenceAdapter,
-            imageDetectionAdapter;
-        ;
+        // Initialize model selectors
+        const textModelSelector = (0, text_model_selector_1.createTextModelSelector)(modelRegistryService, textModelFilterAdapter, selectionPersistenceAdapter);
+        const visionModelSelector = (0, vision_model_selector_1.createVisionModelSelector)(modelRegistryService, visionModelFilterAdapter, selectionPersistenceAdapter, imageDetectionAdapter);
         console.log("🎯 All API routes configured");
         // Setup all API routes with service injection
         const apiServices = {
@@ -146,6 +143,9 @@ async function startServer() {
             toolService,
             layoutService
         };
+        // Initialize WebSocket handler with all services
+        const webSocketHandler = new websocket_handler_1.WebSocketHandler(io, conversationService, messageService, mcpManager, ollamaService, textModelSelector, visionModelSelector, titleGenerationService);
+        console.log("🔌 WebSocket handler initialized");
         (0, api_1.setupAllRoutes)(app, apiServices);
         const PORT = process.env.PORT || 3001;
         server.listen(PORT, () => {

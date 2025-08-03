@@ -129,15 +129,6 @@ async function startServer() {
     }
 
     // Initialize WebSocket handler with all services
-    const webSocketHandler = new WebSocketHandler(
-      io,
-      conversationService,
-      messageService,
-      mcpManager,
-      ollamaService,
-      modelRegistryService,
-      titleGenerationService    );
-    console.log("🔌 WebSocket handler initialized");
 
     // Initialize model selector adapters
     const textModelFilterAdapter = createTextModelFilterAdapter();
@@ -145,13 +136,20 @@ async function startServer() {
     const selectionPersistenceAdapter = createSelectionPersistenceAdapter();
     const imageDetectionAdapter = createImageDetectionAdapter();
 
-      textModelFilterAdapter,      modelRegistryService,
-      selectionPersistenceAdapter);
 
+    // Initialize model selectors
+    const textModelSelector = createTextModelSelector(
       modelRegistryService,
-      visionModelFilterAdapter,      selectionPersistenceAdapter,
-      imageDetectionAdapter);
+      textModelFilterAdapter,
+      selectionPersistenceAdapter
+    );
 
+    const visionModelSelector = createVisionModelSelector(
+      modelRegistryService,
+      visionModelFilterAdapter,
+      selectionPersistenceAdapter,
+      imageDetectionAdapter
+    );
     console.log("🎯 All API routes configured");
 
     // Setup all API routes with service injection
@@ -166,7 +164,20 @@ async function startServer() {
       memoryService,
       toolService,
       layoutService
-    };    
+    };
+
+    // Initialize WebSocket handler with all services
+    const webSocketHandler = new WebSocketHandler(
+      io,
+      conversationService,
+      messageService,
+      mcpManager,
+      ollamaService,
+      textModelSelector,
+      visionModelSelector,
+      titleGenerationService
+    );
+    console.log("🔌 WebSocket handler initialized");
     setupAllRoutes(app, apiServices);
 
     const PORT = process.env.PORT || 3001;

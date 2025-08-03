@@ -1,5 +1,5 @@
 /**
- * Streaming service interface
+ * Streaming service contract
  */
 
 import { StreamingToken } from '../models/chat/message';

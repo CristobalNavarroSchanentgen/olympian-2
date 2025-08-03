@@ -1,5 +1,5 @@
 // Logging Service Interface
-// Synchronous service interface for cross-feature logging communication
+// Synchronous service contract for cross-feature logging communication
 
 import { BrowserLogEntry, UserInteractionLog } from '../features/observability/browser-logger/contract';
 

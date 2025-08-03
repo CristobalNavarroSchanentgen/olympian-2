@@ -1,5 +1,5 @@
 /**
- * Message service interface
+ * Message service contract
  */
 import { Message, MessageDraft } from '../models/chat/message';
 export interface MessageService {

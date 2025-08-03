@@ -1,5 +1,5 @@
 /**
- * Conversation service interface
+ * Conversation service contract
  * All methods return Promises for consistency
  */
 import { Conversation, ConversationSummary, ConversationFilter } from '../models/chat/conversation';

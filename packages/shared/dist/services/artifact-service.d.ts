@@ -1,5 +1,5 @@
 /**
- * Artifact management service interface
+ * Artifact management service contract
  */
 import { Artifact, ArtifactVersion, ArtifactFilter } from '../models/artifacts';
 export interface ArtifactService {

@@ -63,7 +63,7 @@ Parents manage state, children remain pure and predictable
 ### Feature Boundaries
 UI components respect established AI-native boundaries defined in manifest.yaml
 
-### Service Interfaces
+### Service Contracts
 Components depend on contracts, not concrete implementations
 
 ### Adapter Pattern

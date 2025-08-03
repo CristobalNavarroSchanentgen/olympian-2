@@ -1,5 +1,5 @@
 /**
- * Memory management service interface
+ * Memory management service contract
  */
 
 import { MemoryContext, ContextWindow, ContextStats } from '../models/chat/memory-context';

@@ -185,7 +185,7 @@ services:
   - name: title-generation-service
     interface: services/title-generation-service.ts
 
-# Event Schema
+# Event Contract
 events:
   - name: conversation-created
     schema: events/conversation-created.ts

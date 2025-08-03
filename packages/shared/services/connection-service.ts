@@ -1,5 +1,5 @@
 /**
- * Connection service interface
+ * Connection service contract
  */
 
 import { OllamaConnection, ConnectionHealth } from '../models/connection/ollama-connection';

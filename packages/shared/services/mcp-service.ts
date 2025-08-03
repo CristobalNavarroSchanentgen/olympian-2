@@ -1,5 +1,5 @@
 /**
- * MCP service interface
+ * MCP service contract
  */
 
 import { McpServerConfig, McpServerStatus } from '../models/mcp/server-config';

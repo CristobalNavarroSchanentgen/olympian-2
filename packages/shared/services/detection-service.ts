@@ -1,5 +1,5 @@
 /**
- * Model capability detection service interface
+ * Model capability detection service contract
  */
 
 import { ModelCapability, DetectionResult } from '../models/connection/model-capability';

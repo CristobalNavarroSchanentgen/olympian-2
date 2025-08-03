@@ -91,7 +91,7 @@ async function startServer() {
         config: { mode: 'registry' }
       });
       
-      // Wrap in service interface
+      // Wrap in service contract
       modelRegistryService = {
         async getModelCapability(modelName: string) {
           return await registryManager.getModelCapability(modelName);

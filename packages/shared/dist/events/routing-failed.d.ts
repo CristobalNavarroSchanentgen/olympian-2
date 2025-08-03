@@ -1,5 +1,5 @@
 /**
- * Routing Failed Event Schema
+ * Routing Failed Event Contract
  * Published when model routing fails and fallback is activated
  */
 export interface RoutingFailed {

@@ -1,5 +1,5 @@
 /**
- * Model Routed Event Schema
+ * Model Routed Event Contract
  * Published when a message is successfully routed to a model
  */
 export interface ModelRouted {

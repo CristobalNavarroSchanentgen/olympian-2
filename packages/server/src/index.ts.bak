@@ -4,7 +4,7 @@ import helmet from "helmet";
 import { createServer } from "http";
 import { Server as SocketIOServer } from "socket.io";
 import dotenv from "dotenv";
-
+console.log("🔧 Loading modified index.ts with registry logic");
 // Service implementations  
 import { getDatabaseService } from "./database";
 import { ConversationServiceImpl } from "./services/conversation-service-impl";
@@ -12,7 +12,21 @@ import { MessageServiceImpl } from "./services/message-service-impl";
 import { ArtifactServiceImpl } from "./services/artifact-service-impl";
 import { McpServiceImpl } from "./services/mcp-service-impl";
 import { ModelRegistryServiceImpl } from "./services/model-registry-service-impl";
+import { TitleGenerationServiceImpl } from "./services/title-generation-service-impl";
+import { StreamingServiceImpl } from "./services/streaming-service-impl";// Registry-aware model service imports
+import { MemoryServiceImpl } from "./services/memory-service-impl";
+import { ToolServiceImpl } from "./services/tool-service-impl";
+import { LayoutServiceImpl } from "./services/layout-service-impl";import { createModelRegistryManager } from "../../../packages/shared/features/connection/model-registry";
+import { createRegistryLoaderAdapter } from "../../../packages/shared/adapters/features/connection/model-registry/registry-loader-adapter";
 
+// Model Selector Features
+import { createTextModelSelector } from "../../../features/ui/text-model-selector";
+import { createVisionModelSelector } from "../../../features/ui/vision-model-selector";
+
+import { createTextModelFilterAdapter } from "../../../adapters/features/ui/text-model-selector/text-model-filter-adapter";
+import { createVisionModelFilterAdapter } from "../../../adapters/features/ui/vision-model-selector/vision-model-filter-adapter";
+import { createSelectionPersistenceAdapter } from "../../../adapters/features/ui/model-selector/selection-persistence-adapter";
+import { createImageDetectionAdapter } from "../../../adapters/features/ui/vision-model-selector/image-detection-adapter";
 // Infrastructure
 import { MCPManager } from "./mcp/mcp-manager-stub";
 import { WebSocketHandler } from "./websocket/websocket-handler";
@@ -44,6 +58,8 @@ async function startServer() {
     // Initialize database
     const dbService = getDatabaseService();
     await dbService.connect();
+    console.log("📊 Database indexes created");
+    console.log("✅ MongoDB connected: olympian");
     console.log("📊 MongoDB connected and ready");
 
     // Initialize business logic services
@@ -51,21 +67,95 @@ async function startServer() {
     const messageService = new MessageServiceImpl();
     const artifactService = new ArtifactServiceImpl();
     const mcpService = new McpServiceImpl();
-    const modelRegistryService = new ModelRegistryServiceImpl();
-    
-    console.log("💼 Business services initialized");
-
-    // Initialize infrastructure services
+    const titleGenerationService = new TitleGenerationServiceImpl();    console.log("💼 Business services initialized");
+    const streamingService = new StreamingServiceImpl();
+    const memoryService = new MemoryServiceImpl();
+    const toolService = new ToolServiceImpl();
+    const layoutService = new LayoutServiceImpl();    // Initialize MCP Manager
     const mcpManager = new MCPManager();
     await mcpManager.initialize();
     console.log("🔧 MCP Manager initialized");
 
+    // Initialize Ollama service first (required by Model Registry)
     const ollamaService = new OllamaService();
-    console.log("🦙 Ollama service initialized");
+    
+    // Initialize model registry based on AUTO_SCAN_MODELS setting
+    const useRegistry = process.env.AUTO_SCAN_MODELS === 'false';
+    let modelRegistryService;
+    
+    if (useRegistry) {
+      console.log("📋 Using predefined model registry (AUTO_SCAN_MODELS=false)");
+      const registryAdapter = createRegistryLoaderAdapter();
+      const registryManager = createModelRegistryManager({
+        registryAdapter,
+        config: { mode: 'registry' }
+      });
+      
+      // Wrap in service interface
+      modelRegistryService = {
+        async getModelCapability(modelName: string) {
+          return await registryManager.getModelCapability(modelName);
+        },
+        async getAllModels() {
+          return await registryManager.getAllModels();
+        },
+        async getAllRegisteredModels() {
+          return await registryManager.getAllModels();
+        },
+        async validateModelAccess(modelName: string) {
+          return await registryManager.validateModelAccess(modelName);
+        },
+        async isRegistryMode() {
+          return true;
+        }
+      };
+      
+      const registryModels = await modelRegistryService.getAllModels();
+      console.log('📋 Loaded ' + registryModels.length + ' models from predefined registry:');
+      registryModels.forEach(model => {
+        console.log('   • ' + model.modelName + ' (' + model.capabilities.join(', ') + ')');
+      });
+      
+    } else {
+      console.log("🔍 Using auto-scan mode (AUTO_SCAN_MODELS=true)");
+      modelRegistryService = new ModelRegistryServiceImpl(ollamaService);
+      
+      // Wait for initial model fetch from Ollama
+      if ((modelRegistryService as any).forceRefresh) {
+        console.log("⏳ Loading models from Ollama...");
+        await (modelRegistryService as any).forceRefresh();
+        console.log("✅ Models loaded successfully");
+      }
+    }
 
-    // Setup WebSocket handling
-    const wsHandler = new WebSocketHandler(io, conversationService, messageService, mcpManager, ollamaService);
+    // Initialize WebSocket handler with all services
+    const webSocketHandler = new WebSocketHandler(
+      io,
+      conversationService,
+      messageService,
+      mcpManager,
+      ollamaService,
+      modelRegistryService,
+      titleGenerationService    );
     console.log("🔌 WebSocket handler initialized");
+
+    // Initialize model selector adapters
+    const textModelFilterAdapter = createTextModelFilterAdapter();
+    const visionModelFilterAdapter = createVisionModelFilterAdapter();
+    const selectionPersistenceAdapter = createSelectionPersistenceAdapter();
+    const imageDetectionAdapter = createImageDetectionAdapter();
+
+    // Initialize model selector features
+    const textModelSelector = createTextModelSelector(
+      textModelFilterAdapter,      modelRegistryService,
+      selectionPersistenceAdapter);
+
+    const visionModelSelector = createVisionModelSelector(
+      modelRegistryService,
+      visionModelFilterAdapter,      selectionPersistenceAdapter,
+      imageDetectionAdapter);
+
+    console.log("🎯 All API routes configured");
 
     // Setup all API routes with service injection
     const apiServices: ApiServices = {
@@ -73,14 +163,18 @@ async function startServer() {
       messageService,
       artifactService,
       mcpService,
-      modelRegistryService
-    };
-    
+      modelRegistryService,
+      titleGenerationService,
+      streamingService,
+      memoryService,
+      toolService,
+      layoutService
+    };    
     setupAllRoutes(app, apiServices);
 
     const PORT = process.env.PORT || 3001;
     server.listen(PORT, () => {
-      console.log(`🚀 Server running on port ${PORT}`);
+      console.log('🚀 Server running on port ' + PORT);
     });
 
   } catch (error) {

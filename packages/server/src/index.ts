@@ -145,12 +145,9 @@ async function startServer() {
     const selectionPersistenceAdapter = createSelectionPersistenceAdapter();
     const imageDetectionAdapter = createImageDetectionAdapter();
 
-    // Initialize model selector features
-    const textModelSelector = createTextModelSelector(
       textModelFilterAdapter,      modelRegistryService,
       selectionPersistenceAdapter);
 
-    const visionModelSelector = createVisionModelSelector(
       modelRegistryService,
       visionModelFilterAdapter,      selectionPersistenceAdapter,
       imageDetectionAdapter);

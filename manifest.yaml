@@ -3,7 +3,6 @@
 
 version: '1.0.0'
 name: 'olympian-ai-lightweight'
-    - model-registry-service
 description: 'AI-Native chat interface with integrated MCP support'
 
 # Core Domains and Features
@@ -50,6 +49,16 @@ domains:
         config: config/features/chat/conversation-title-generator/schema.ts
         
       - name: memory-manager
+        contract: features/chat/memory-manager/contract.ts
+        adapters:
+          - context-adapter
+          - token-budget-adapter
+        services:
+          - memory-service
+        events:
+          - context-updated
+          - memory-cleaned
+        config: config/features/chat/memory-manager/schema.ts
 
       - name: smart-model-router
         contract: features/chat/smart-model-router/contract.ts
@@ -62,16 +71,7 @@ domains:
         events:
           - model-routed
           - routing-failed
-        config: config/features/chat/smart-model-router/schema.ts        contract: features/chat/memory-manager/contract.ts
-        adapters:
-          - context-adapter
-          - token-budget-adapter
-        services:
-          - memory-service
-        events:
-          - context-updated
-          - memory-cleaned
-        config: config/features/chat/memory-manager/schema.ts
+        config: config/features/chat/smart-model-router/schema.ts
 
   mcp:
     features:
@@ -83,7 +83,6 @@ domains:
           - config-adapter
         services:
           - mcp-service
-          - process-service
         events:
           - server-started
           - server-stopped
@@ -102,48 +101,6 @@ domains:
           - tool-completed
           - tool-failed
         config: config/features/mcp/tool-executor/schema.ts
-
-  connection:
-    features:
-      - name: ollama-connector
-        contract: features/connection/ollama-connector/contract.ts
-        adapters:
-          - http-adapter
-          - health-monitor-adapter
-        services:
-          - connection-service
-          - health-service
-        events:
-          - connection-established
-          - connection-lost
-          - health-checked
-        config: config/features/connection/ollama-connector/schema.ts
-        
-      - name: model-detector
-        contract: features/connection/model-detector/contract.ts
-        adapters:
-          - capability-scanner-adapter
-          - model-metadata-adapter
-        services:
-          - detection-service
-        events:
-          - models-detected
-          - capabilities-updated
-        config: config/features/connection/model-detector/schema.ts
-
-  vision:
-    features:
-      - name: image-processor
-        contract: features/vision/image-processor/contract.ts
-        adapters:
-          - image-upload-adapter
-          - format-converter-adapter
-        services:
-          - image-service
-        events:
-          - image-uploaded
-          - image-processed
-        config: config/features/vision/image-processor/schema.ts
 
   artifacts:
     features:
@@ -166,40 +123,11 @@ domains:
         contract: features/ui/dual-pane-layout/contract.ts
         adapters:
           - layout-persistence-adapter
-          - theme-adapter
         services:
           - layout-service
-          - code-editor-service
         events:
           - layout-changed
-          - theme-switched
         config: config/features/ui/dual-pane-layout/schema.ts
-
-      - name: reasoning-panel
-        contract: features/ui/reasoning-panel/contract.ts
-        adapters:
-          - reasoning-data-adapter
-        services:
-          - reasoning-service
-    
-  - name: logging-service
-    interface: services/logging-service.ts        events:
-          - reasoning-expanded
-          - reasoning-collapsed
-    
-  - name: browser-log-captured
-    schema: events/browser-log-captured.ts
-    
-  - name: log-aggregation-requested
-    schema: events/log-aggregation-requested.ts        config: config/features/ui/reasoning-panel/schema.ts
-  - name: text-model-selected
-    schema: events/text-model-selected.ts
-    
-  - name: vision-model-selected
-    schema: events/vision-model-selected.ts
-    
-  - name: model-selection-failed
-    schema: events/model-selection-failed.ts
 
       - name: text-model-selector
         contract: features/ui/text-model-selector/contract.ts
@@ -225,26 +153,6 @@ domains:
           - model-selection-failed
         config: config/features/ui/vision-model-selector/schema.ts
 
-  
-  observability:
-    - system-status.ts
-    - browser-log.ts
-    - log-collection-config.ts
-    - user-interaction.ts
-  observability:
-    features:
-      - name: browser-logger
-        contract: features/observability/browser-logger/contract.ts
-        adapters:
-          - console-capture-adapter
-          - error-capture-adapter
-          - interaction-capture-adapter
-        services:
-          - logging-service
-        events:
-          - browser-log-captured
-          - log-aggregation-requested
-        config: config/features/observability/browser-logger/schema.ts
 # External Dependencies (Services)
 services:
   - name: conversation-service
@@ -262,23 +170,8 @@ services:
   - name: mcp-service
     interface: services/mcp-service.ts
     
-  - name: process-service
-    interface: services/process-service.ts
-    
   - name: tool-service
     interface: services/tool-service.ts
-    
-  - name: connection-service
-    interface: services/connection-service.ts
-    
-  - name: health-service
-    interface: services/health-service.ts
-    
-  - name: detection-service
-    interface: services/detection-service.ts
-    
-  - name: image-service
-    interface: services/image-service.ts
     
   - name: artifact-service
     interface: services/artifact-service.ts
@@ -286,17 +179,12 @@ services:
   - name: layout-service
     interface: services/layout-service.ts
     
-  - name: code-editor-service
-    interface: services/code-editor-service.ts
-    
-  - name: reasoning-service
-    
-  - name: logging-service
-    interface: services/logging-service.ts    interface: services/reasoning-service.ts
-
+  - name: model-registry-service
+    interface: services/model-registry-service.ts
 
   - name: title-generation-service
     interface: services/title-generation-service.ts
+
 # Event Schema
 events:
   - name: conversation-created
@@ -324,12 +212,13 @@ events:
     schema: events/context-updated.ts
     
   - name: memory-cleaned
+    schema: events/memory-cleaned.ts
 
   - name: model-routed
     schema: events/model-routed.ts
 
   - name: routing-failed
-    schema: events/routing-failed.ts    schema: events/memory-cleaned.ts
+    schema: events/routing-failed.ts
     
   - name: server-started
     schema: events/server-started.ts
@@ -349,27 +238,6 @@ events:
   - name: tool-failed
     schema: events/tool-failed.ts
     
-  - name: connection-established
-    schema: events/connection-established.ts
-    
-  - name: connection-lost
-    schema: events/connection-lost.ts
-    
-  - name: health-checked
-    schema: events/health-checked.ts
-    
-  - name: models-detected
-    schema: events/models-detected.ts
-    
-  - name: capabilities-updated
-    schema: events/capabilities-updated.ts
-    
-  - name: image-uploaded
-    schema: events/image-uploaded.ts
-    
-  - name: image-processed
-    schema: events/image-processed.ts
-    
   - name: artifact-created
     schema: events/artifact-created.ts
     
@@ -382,19 +250,6 @@ events:
   - name: layout-changed
     schema: events/layout-changed.ts
     
-  - name: theme-switched
-    schema: events/theme-switched.ts
-    
-  - name: reasoning-expanded
-    schema: events/reasoning-expanded.ts
-    
-  - name: reasoning-collapsed
-    
-  - name: browser-log-captured
-    schema: events/browser-log-captured.ts
-    
-  - name: log-aggregation-requested
-    schema: events/log-aggregation-requested.ts    schema: events/reasoning-collapsed.ts
   - name: text-model-selected
     schema: events/text-model-selected.ts
     
@@ -416,39 +271,14 @@ models:
     - tool-definition.ts
     - execution-result.ts
     
-  connection:
-    - ollama-connection.ts
-    - model-capability.ts
-    - health-status.ts
-    
-  vision:
-    - image-data.ts
-    - processing-result.ts
   ui:
     - layout-config.ts
-    - theme-config.ts
     - model-selection.ts
-    - reasoning-data.ts
     
   artifacts:
     - artifact.ts
     - version.ts
-    
-  ui:
-    - layout-config.ts
-    - theme-config.ts
-    - reasoning-data.ts
-    
-  
-  observability:
-    - system-status.ts
-    - browser-log.ts
-    - log-collection-config.ts
-    - user-interaction.ts
-  observability:
-    - browser-log.ts
-    - log-collection-config.ts
-    - user-interaction.ts
+
 # Utilities (Pure Functions)
 utilities:
   - name: token-counter
@@ -466,18 +296,6 @@ utilities:
   - name: protocol-handler
     interface: utils/protocol-handler.ts
     
-  - name: http-client
-    interface: utils/http-client.ts
-    
-  - name: health-checker
-    interface: utils/health-checker.ts
-    
-  - name: capability-detector
-    interface: utils/capability-detector.ts
-    
-  - name: image-processor
-    interface: utils/image-processor.ts
-    
   - name: artifact-validator
     interface: utils/artifact-validator.ts
 
@@ -494,86 +312,3 @@ packages:
   shared:
     path: packages/shared
     framework: typescript
-
-# Infrastructure
-infrastructure:
-  containers:
-    - frontend
-    - backend
-    - mongodb
-    
-  external_services:
-    - ollama_host
-
-# Configuration Files
-configuration:
-  - .env
-  - mcp.config.json
-  - docker-compose.yml
-  - Makefile
-
-model-registry:
-  path: packages/shared/features/connection/model-registry
-  dependencies:
-    adapters:
-      - registry-loader: packages/shared/adapters/features/connection/model-registry/registry-loader-adapter.ts
-    services:
-      - model-registry-service
-    models:
-      - connection/model-registry
-    events:
-      - models-detected
-    config:
-      mode: registry | auto-scan
-  exports:
-    - ModelRegistryContract
-    - ModelRegistryManager
-    - createModelRegistryManager
-
-
-  ui:
-    features:
-      - name: dual-pane-layout
-        contract: features/ui/dual-pane-layout/contract.ts
-        adapters:
-          - layout-persistence-adapter
-        services: []
-        events:
-          - layout-updated
-          - panel-toggled
-        config: config/features/ui/dual-pane-layout/schema.ts
-        
-      - name: reasoning-panel
-        contract: features/ui/reasoning-panel/contract.ts
-        adapters:
-          - reasoning-data-adapter
-        services: []
-        events:
-          - reasoning-block-added
-          - reasoning-panel-toggled
-          - reasoning-exported
-        config: config/features/ui/reasoning-panel/schema.ts
-
-      - name: text-model-selector
-        contract: features/ui/text-model-selector/contract.ts
-        adapters:
-          - text-model-filter-adapter
-          - selection-persistence-adapter
-        services:
-          - model-registry-service
-        events:
-          - text-model-selected
-          - model-selection-failed
-        config: config/features/ui/text-model-selector/schema.ts
-
-      - name: vision-model-selector
-        contract: features/ui/vision-model-selector/contract.ts
-        adapters:
-          - vision-model-filter-adapter
-          - selection-persistence-adapter
-        services:
-          - model-registry-service
-        events:
-          - vision-model-selected
-          - model-selection-failed
-        config: config/features/ui/vision-model-selector/schema.ts

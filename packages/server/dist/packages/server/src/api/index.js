@@ -33,6 +33,6 @@ function setupAllRoutes(app, services) {
     (0, title_generation_1.setupTitleGenerationRoutes)(app, services.titleGenerationService);
     // Observability routes
     app.use('/api/logs', logs_1.default);
-    console.log('? All API routes configured');
+    console.log('✅ All API routes configured');
 }
 //# sourceMappingURL=index.js.map

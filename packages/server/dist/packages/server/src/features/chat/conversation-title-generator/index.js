@@ -15,9 +15,22 @@ class ConversationTitleGenerator {
         const { conversationId, firstMessage, model = 'llama3.2:1b' } = request;
         // Validate message is suitable for title generation
         if (!this.isValidForTitleGeneration(firstMessage)) {
+            const fallbackTitle = this.generateFallbackTitle(firstMessage);
+            // Emit event for fallback title with proper schema
+            event_bus_1.eventBus.emit('conversation-title-generated', {
+                conversationId,
+                oldTitle: 'Untitled Chat',
+                newTitle: fallbackTitle,
+                confidence: 0.1,
+                fallbackUsed: true,
+                timestamp: new Date(),
+                metadata: {
+                    model: 'fallback'
+                }
+            });
             return {
                 conversationId,
-                generatedTitle: this.generateFallbackTitle(firstMessage),
+                generatedTitle: fallbackTitle,
                 fallbackUsed: true,
                 model: 'fallback'
             };
@@ -25,6 +38,7 @@ class ConversationTitleGenerator {
         try {
             // Generate title prompt
             const prompt = prompt_adapter_1.promptAdapter.createTitlePrompt(firstMessage);
+            const startTime = Date.now();
             // Call AI model through adapter
             const aiResponse = await ollama_title_adapter_1.ollamaTitleAdapter.generateTitle({
                 prompt,
@@ -33,12 +47,20 @@ class ConversationTitleGenerator {
                 temperature: 0.7
             });
             const generatedTitle = this.cleanTitle(aiResponse.response);
-            // Emit event for title generation
+            const processingTime = Date.now() - startTime;
+            // Emit event for title generation with proper schema
             event_bus_1.eventBus.emit('conversation-title-generated', {
                 conversationId,
-                title: generatedTitle,
-                model,
-                tokensUsed: aiResponse.tokensUsed
+                oldTitle: 'Untitled Chat',
+                newTitle: generatedTitle,
+                confidence: 0.85,
+                fallbackUsed: false,
+                timestamp: new Date(),
+                metadata: {
+                    model,
+                    processingTime,
+                    tokensUsed: aiResponse.tokensUsed
+                }
             });
             return {
                 conversationId,
@@ -52,11 +74,18 @@ class ConversationTitleGenerator {
             console.warn('Title generation failed, using fallback:', error);
             const fallbackTitle = this.generateFallbackTitle(firstMessage);
             const errorMessage = error instanceof Error ? error.message : String(error);
+            // Emit event for fallback with proper schema
             event_bus_1.eventBus.emit('conversation-title-generated', {
                 conversationId,
-                title: fallbackTitle,
-                model: 'fallback',
-                error: errorMessage
+                oldTitle: 'Untitled Chat',
+                newTitle: fallbackTitle,
+                confidence: 0.1,
+                fallbackUsed: true,
+                timestamp: new Date(),
+                metadata: {
+                    model: 'fallback',
+                    error: errorMessage
+                }
             });
             return {
                 conversationId,
@@ -84,7 +113,8 @@ class ConversationTitleGenerator {
     }
     cleanTitle(title) {
         return title
-            .replace(/^["']|["']$/g, '')
+            .replace(/^["']/g, '')
+            .replace(/["']$/g, '')
             .replace(/^(Title:|Chat:|Conversation:)\s*/i, '')
             .trim()
             .substring(0, this.maxTitleLength);

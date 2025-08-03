@@ -12,19 +12,11 @@ import { MessageServiceImpl } from "./services/message-service-impl";
 import { ArtifactServiceImpl } from "./services/artifact-service-impl";
 import { McpServiceImpl } from "./services/mcp-service-impl";
 import { ModelRegistryServiceImpl } from "./services/model-registry-service-impl";
-import { StreamingServiceImpl } from "./services/streaming-service-impl";
+import { TitleGenerationServiceImpl } from "./services/title-generation-service-impl";
+import { StreamingServiceImpl } from "./services/streaming-service-impl";// Registry-aware model service imports
 import { MemoryServiceImpl } from "./services/memory-service-impl";
 import { ToolServiceImpl } from "./services/tool-service-impl";
-import { LayoutServiceImpl } from "./services/layout-service-impl";
-
-// Integration imports
-import { createTitleGenerationIntegration } from "../../../integrations/title-generation-integration";
-import { eventBus } from "../../../utils/event-bus";
-import { OllamaTitleAdapter } from "../../../adapters/features/chat/conversation-title-generator/ollama-title-adapter";
-import { PromptAdapter } from "../../../adapters/features/chat/conversation-title-generator/prompt-adapter";
-import { defaultConfig } from "../../../config/features/chat/conversation-title-generator/schema";
-
-import { createModelRegistryManager } from "../../../packages/shared/features/connection/model-registry";
+import { LayoutServiceImpl } from "./services/layout-service-impl";import { createModelRegistryManager } from "../../../packages/shared/features/connection/model-registry";
 import { createRegistryLoaderAdapter } from "../../../packages/shared/adapters/features/connection/model-registry/registry-loader-adapter";
 
 // Model Selector Features
@@ -39,7 +31,6 @@ import { createImageDetectionAdapter } from "../../../adapters/features/ui/visio
 import { MCPManager } from "./mcp/mcp-manager-stub";
 import { WebSocketHandler } from "./websocket/websocket-handler";
 import { OllamaService } from "./services/ollama-service";
-import axios from "axios";
 
 // API setup
 import { setupAllRoutes, ApiServices } from "./api";
@@ -52,7 +43,8 @@ const io = new SocketIOServer(server, {
   cors: {
     origin: process.env.CLIENT_URL || "http://localhost:3000",
     methods: ["GET", "POST"]
-  }});
+  }
+});
 
 app.use(helmet());
 app.use(cors({
@@ -75,13 +67,11 @@ async function startServer() {
     const messageService = new MessageServiceImpl();
     const artifactService = new ArtifactServiceImpl();
     const mcpService = new McpServiceImpl();
-    console.log("💼 Business services initialized");
+    const titleGenerationService = new TitleGenerationServiceImpl();    console.log("💼 Business services initialized");
     const streamingService = new StreamingServiceImpl();
     const memoryService = new MemoryServiceImpl();
     const toolService = new ToolServiceImpl();
-    const layoutService = new LayoutServiceImpl();
-    
-    // Initialize MCP Manager
+    const layoutService = new LayoutServiceImpl();    // Initialize MCP Manager
     const mcpManager = new MCPManager();
     await mcpManager.initialize();
     console.log("🔧 MCP Manager initialized");
@@ -135,52 +125,34 @@ async function startServer() {
         console.log("⏳ Loading models from Ollama...");
         await (modelRegistryService as any).forceRefresh();
         console.log("✅ Models loaded successfully");
-      };
-    };
+      }
+    }
 
-    // Create adapters for title generation integration
-    const ollamaAdapter = new OllamaTitleAdapter(axios);
-    const promptAdapter = new PromptAdapter();
-    
-    // Wire features together using integration
-    const titleIntegration = createTitleGenerationIntegration({
-      eventEmitter: eventBus,
-      conversationServiceImpl: conversationService,
-      messageServiceImpl: messageService,
-      ollamaAdapter,
-      promptAdapter,
-      titleGenerationConfig: defaultConfig
-    });
-    // Initialize model selector adapters
-    const textModelFilterAdapter = createTextModelFilterAdapter();
-    const visionModelFilterAdapter = createVisionModelFilterAdapter();
-    const selectionPersistenceAdapter = createSelectionPersistenceAdapter();
-    const imageDetectionAdapter = createImageDetectionAdapter();
-    
-    // Create model selectors with their adapters
-    const textModelSelector = createTextModelSelector(
-      textModelFilterAdapter,
-      selectionPersistenceAdapter
-    });
-    
-    const visionModelSelector = createVisionModelSelector(
-      visionModelFilterAdapter,
-      selectionPersistenceAdapter,
-      imageDetectionAdapter
-    });
-    console.log("🔗 Title generation integration wired");
-
-    // Initialize WebSocket handler with all services (using integrated title service)
+    // Initialize WebSocket handler with all services
     const webSocketHandler = new WebSocketHandler(
       io,
       conversationService,
       messageService,
       mcpManager,
       ollamaService,
-      titleIntegration.titleGenerationService
-    });
+      modelRegistryService,
+      titleGenerationService    );
     console.log("🔌 WebSocket handler initialized");
 
+    // Initialize model selector adapters
+    const textModelFilterAdapter = createTextModelFilterAdapter();
+    const visionModelFilterAdapter = createVisionModelFilterAdapter();
+    const selectionPersistenceAdapter = createSelectionPersistenceAdapter();
+    const imageDetectionAdapter = createImageDetectionAdapter();
+
+      textModelFilterAdapter,      modelRegistryService,
+      selectionPersistenceAdapter);
+
+      modelRegistryService,
+      visionModelFilterAdapter,      selectionPersistenceAdapter,
+      imageDetectionAdapter);
+
+    console.log("🎯 All API routes configured");
 
     // Setup all API routes with service injection
     const apiServices: ApiServices = {
@@ -188,24 +160,24 @@ async function startServer() {
       messageService,
       artifactService,
       mcpService,
-      titleGenerationService: titleIntegration.titleGenerationService,
+      modelRegistryService,
+      titleGenerationService,
       streamingService,
       memoryService,
       toolService,
       layoutService
-    };;    
+    };    
     setupAllRoutes(app, apiServices);
-    console.log("🎯 All API routes configured");
 
     const PORT = process.env.PORT || 3001;
     server.listen(PORT, () => {
       console.log('🚀 Server running on port ' + PORT);
     });
 
-  }; catch (error) {
+  } catch (error) {
     console.error("❌ Failed to start server:", error);
     process.exit(1);
-  };
+  }
 }
 
 startServer();

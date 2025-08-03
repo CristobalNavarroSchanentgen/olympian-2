@@ -1,4 +1,4 @@
-import { ToolService } from '../../../services/tool-service';
+import { ToolService } from '@olympian/shared/services/tool-service';
 
 /**
  * Tool Service Implementation

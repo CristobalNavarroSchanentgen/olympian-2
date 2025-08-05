@@ -315,86 +315,65 @@ packages:
 
 
 # USER EXPERIENCE CONTRACTS
-# Define UI interaction boundaries and user experience expectations
+# Define how features orchestrate to achieve user goals
 
 experience_contracts:
-  ui:
-    - name: conversation
-      contract: experiences/ui/conversation.ts
-      description: Contract for everything that happens within a conversation window
-      scope:
-        - Message display and formatting
-        - Input handling and validation
-        - Conversation flow and state
-        - Real-time updates and streaming
+  journeys:
+    - name: ai-development-assistance
+      contract: experiences/journeys/ai-development-assistance.contract.ts
+      description: Complete user journey for AI-assisted development
+      success_criteria:
+        - User achieves development goal faster than alone
+        - User learns new concepts during interaction
+        - User maintains flow state throughout session
+        - User trusts AI recommendations
       
-    - name: layout
-      contract: experiences/ui/layout.ts
-      description: Contract for how things are displayed and actionned
-      scope:
-        - Component positioning and responsiveness
-        - Navigation and routing behavior
-        - Visual hierarchy and accessibility
-        - Interactive element behavior
+  interactions:
+    - name: chat-flow
+      contract: experiences/interactions/chat-flow.contract.ts
+      description: How user actions flow through system features
+      patterns:
+        - Smart message processing with model routing
+        - Seamless tool integration without friction
+        - Invisible memory management
+        - Persistent artifact lifecycle
       
-    - name: settings
-      contract: experiences/ui/settings.ts
-      description: Contract for how user settings work
-      scope:
-        - Configuration management interface
-        - Preference persistence and sync
-        - Setting validation and defaults
-        - User customization capabilities
-        
-    - name: mcp
-      contract: experiences/ui/mcp.ts
-      description: Contract for how MCP tools are handled in UI
-      scope:
-        - Tool discovery and presentation
-        - Tool execution feedback and status
-        - Result display and interaction
-        - Error handling and recovery
+  outcomes:
+    - name: user-success
+      contract: experiences/outcomes/user-success.contract.ts
+      description: Measurable success criteria for user value
+      metrics:
+        - Task completion rate and time
+        - Learning outcomes and skill growth
+        - Experience quality and flow
+        - Trust building and adoption
+      
+  workflows:
+    - name: development-assistance
+      contract: experiences/workflows/development-assistance.contract.ts
+      description: Cross-feature coordination for user goals
+      orchestrations:
+        - intelligent-chat: conversation + processing + routing + memory
+        - tool-integration: execution + conversation + artifacts
+        - model-optimization: routing + text-selector + vision-selector
+        - knowledge-capture: memory + artifacts + conversation
 
 # EXPERIENCE-FEATURE MAPPING
-# Ensures all features serve clear UI user experience goals
+# Ensures all features contribute to user goals
 
 experience_integration:
-  conversation_experience:
+  ai-development-assistance:
     primary_features:
       - conversation-manager
       - message-processor
       - smart-model-router
-    ui_contract: experiences/ui/conversation.ts
-    user_expectations:
-      - Smooth message flow without technical complexity
-      - Clear feedback on processing states
-      - Consistent conversation history access
-      
-  layout_experience:
-    primary_features:
-      - conversation-manager
-      - artifact-manager
-    ui_contract: experiences/ui/layout.ts
-    user_expectations:
-      - Intuitive navigation between conversations
-      - Responsive design across devices
-      - Accessible interface elements
-      
-  settings_experience:
-    primary_features:
-      - All features (configuration consumers)
-    ui_contract: experiences/ui/settings.ts
-    user_expectations:
-      - Simple preference management
-      - Immediate setting effect visibility
-      - Persistent user customizations
-      
-  mcp_experience:
-    primary_features:
-      - server-manager
       - tool-executor
-    ui_contract: experiences/ui/mcp.ts
-    user_expectations:
-      - Clear tool availability status
-      - Intuitive tool interaction patterns
-      - Helpful error messages and guidance
+    supporting_features:
+      - memory-manager
+      - artifact-manager
+      - model-selectors
+    success_dependencies:
+      - All features must coordinate seamlessly
+      - User never sees technical complexity
+      - Every interaction advances user goal
+      - System learns and adapts to user patterns

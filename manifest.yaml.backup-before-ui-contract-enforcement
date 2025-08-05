@@ -24,13 +24,6 @@ contracts:
         - features.smart-model-router
         - features.memory-manager
         - features.conversation-title-generator
-        - features.response-streaming-ui
-        - features.status-badge-system
-        - features.reasoning-panel-ui
-        - features.artifact-panel-ui
-        - features.message-flow-ui
-        - features.error-recovery-ui
-        - features.context-indicators-ui
       user_value: "Users can have natural conversations without technical friction"
       success_metrics: ["message_response_time", "conversation_flow_smoothness", "context_retention"]
       
@@ -303,99 +296,6 @@ contracts:
       breaking_change_impact: "MEDIUM - Affects vision model selection UX"
 
     # Vision Domain Features
-
-    # CONVERSATION EXPERIENCE ENFORCEMENT UI FEATURES
-    # These features enforce the conversation experience contract at the UI level
-    
-    response-streaming-ui:
-      file: features/ui/response-streaming-ui/contract.ts
-      role: "Enforces real-time response streaming, typewriter effects, and response time metrics"
-      layer: 1
-      depends_on:
-        - services.streaming-service
-        - events.message-received
-        - events.tokens-processed
-        - models.message
-      depended_on_by: []
-      serves_experience: [conversation_experience]
-      breaking_change_impact: "HIGH - Affects all response streaming and user feedback"
-      
-    status-badge-system:
-      file: features/ui/status-badge-system/contract.ts
-      role: "Enforces visual status indicators, response type badges, and transparent metadata display"
-      layer: 1
-      depends_on:
-        - services.model-registry-service
-        - events.message-received
-        - events.reasoning-events
-        - models.message
-      depended_on_by: []
-      serves_experience: [conversation_experience]
-      breaking_change_impact: "MEDIUM - Affects transparency and status visibility"
-      
-    reasoning-panel-ui:
-      file: features/ui/reasoning-panel-ui/contract.ts
-      role: "Enforces transparent AI reasoning display, milestone tracking, and reasoning exploration"
-      layer: 1
-      depends_on:
-        - services.reasoning-service
-        - events.reasoning-events
-        - models.reasoning-milestone
-      depended_on_by: []
-      serves_experience: [conversation_experience]
-      breaking_change_impact: "MEDIUM - Affects reasoning transparency features"
-      
-    artifact-panel-ui:
-      file: features/ui/artifact-panel-ui/contract.ts
-      role: "Enforces automatic artifact detection, content formatting, and artifact management"
-      layer: 1
-      depends_on:
-        - services.artifact-service
-        - events.artifact-created
-        - events.artifact-updated
-        - models.artifact
-      depended_on_by: []
-      serves_experience: [conversation_experience]
-      breaking_change_impact: "MEDIUM - Affects artifact display and management"
-      
-    message-flow-ui:
-      file: features/ui/message-flow-ui/contract.ts
-      role: "Enforces smooth message interactions, intuitive organization, and natural conversation flow"
-      layer: 1
-      depends_on:
-        - services.message-service
-        - events.message-sent
-        - events.message-received
-        - models.message
-      depended_on_by: []
-      serves_experience: [conversation_experience]
-      breaking_change_impact: "HIGH - Affects core conversation interaction flow"
-      
-    error-recovery-ui:
-      file: features/ui/error-recovery-ui/contract.ts
-      role: "Enforces graceful error handling, transparent recovery, and conversation flow continuity"
-      layer: 1
-      depends_on:
-        - services.error-recovery-service
-        - events.error-occurred
-        - events.recovery-attempted
-        - models.error-context
-      depended_on_by: []
-      serves_experience: [conversation_experience]
-      breaking_change_impact: "HIGH - Affects error handling and user experience reliability"
-      
-    context-indicators-ui:
-      file: features/ui/context-indicators-ui/contract.ts
-      role: "Enforces contextual awareness visualization, conversation memory indicators, and topic tracking"
-      layer: 1
-      depends_on:
-        - services.memory-service
-        - events.context-updated
-        - events.memory-cleaned
-        - models.memory-context
-      depended_on_by: []
-      serves_experience: [conversation_experience]
-      breaking_change_impact: "MEDIUM - Affects context transparency and memory visualization"
     image-processor:
       file: packages/shared/features/vision/image-processor/contract.ts
       role: "Processes images for vision models, handles formats, and manages image data"
@@ -1424,8 +1324,8 @@ domains:
     
   ui:
     description: "User interface components and layout management"
-    features: [dual-pane-layout, reasoning-panel-ui, text-model-selector, vision-model-selector, response-streaming-ui, status-badge-system, artifact-panel-ui, message-flow-ui, error-recovery-ui, context-indicators-ui]
-    primary_experience: conversation_experience
+    features: [dual-pane-layout, reasoning-panel, text-model-selector, vision-model-selector]
+    primary_experience: layout_experience
     
   vision:
     description: "Image processing and multimodal capabilities"

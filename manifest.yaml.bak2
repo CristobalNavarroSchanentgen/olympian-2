@@ -358,43 +358,18 @@ experience_contracts:
 # EXPERIENCE-FEATURE MAPPING
 # Ensures all features serve clear UI user experience goals
 
-experience_integration:
-  conversation_experience:
+experience_integration:  ai-development-assistance:
     primary_features:
       - conversation-manager
       - message-processor
       - smart-model-router
-    ui_contract: experiences/ui/conversation.ts
-    user_expectations:
-      - Smooth message flow without technical complexity
-      - Clear feedback on processing states
-      - Consistent conversation history access
-      
-  layout_experience:
-    primary_features:
-      - conversation-manager
-      - artifact-manager
-    ui_contract: experiences/ui/layout.ts
-    user_expectations:
-      - Intuitive navigation between conversations
-      - Responsive design across devices
-      - Accessible interface elements
-      
-  settings_experience:
-    primary_features:
-      - All features (configuration consumers)
-    ui_contract: experiences/ui/settings.ts
-    user_expectations:
-      - Simple preference management
-      - Immediate setting effect visibility
-      - Persistent user customizations
-      
-  mcp_experience:
-    primary_features:
-      - server-manager
       - tool-executor
-    ui_contract: experiences/ui/mcp.ts
-    user_expectations:
-      - Clear tool availability status
-      - Intuitive tool interaction patterns
-      - Helpful error messages and guidance
+    supporting_features:
+      - memory-manager
+      - artifact-manager
+      - model-selectors
+    success_dependencies:
+      - All features must coordinate seamlessly
+      - User never sees technical complexity
+      - Every interaction advances user goal
+      - System learns and adapts to user patterns

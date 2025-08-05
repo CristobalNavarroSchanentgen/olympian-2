@@ -1,12 +1,8 @@
-"use strict";
 /**
  * Vision Model Selector Implementation
  * Manages vision-capable model selection using registry
  */
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.VisionModelSelector = void 0;
-exports.createVisionModelSelector = createVisionModelSelector;
-class VisionModelSelector {
+export class VisionModelSelector {
     modelRegistryService;
     visionModelFilterAdapter;
     selectionPersistenceAdapter;
@@ -94,9 +90,8 @@ class VisionModelSelector {
         }
     }
 }
-exports.VisionModelSelector = VisionModelSelector;
 // Factory function for easy instantiation
-function createVisionModelSelector(modelRegistryService, visionModelFilterAdapter, selectionPersistenceAdapter, imageDetectionAdapter) {
+export function createVisionModelSelector(modelRegistryService, visionModelFilterAdapter, selectionPersistenceAdapter, imageDetectionAdapter) {
     return new VisionModelSelector(modelRegistryService, visionModelFilterAdapter, selectionPersistenceAdapter, imageDetectionAdapter);
 }
 //# sourceMappingURL=index.js.map

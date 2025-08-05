@@ -1,11 +1,7 @@
-"use strict";
 /**
  * Image Detection Adapter
  * Detects images in message inputs for vision model routing
  */
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.createImageDetectionAdapter = createImageDetectionAdapter;
-exports.analyzeInputForRouting = analyzeInputForRouting;
 const IMAGE_MIME_TYPES = [
     'image/jpeg',
     'image/jpg',
@@ -15,7 +11,7 @@ const IMAGE_MIME_TYPES = [
     'image/svg+xml',
     'image/bmp'
 ];
-function createImageDetectionAdapter() {
+export function createImageDetectionAdapter() {
     return {
         detectImages(input) {
             if (!input.attachments || input.attachments.length === 0) {
@@ -43,7 +39,7 @@ function createImageDetectionAdapter() {
     };
 }
 // Helper function to analyze input and provide routing recommendations
-function analyzeInputForRouting(input) {
+export function analyzeInputForRouting(input) {
     const adapter = createImageDetectionAdapter();
     return {
         hasImages: adapter.detectImages(input),

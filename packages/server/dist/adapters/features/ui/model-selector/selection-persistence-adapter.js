@@ -1,11 +1,7 @@
-"use strict";
 /**
  * Selection Persistence Adapter
  * Handles saving and loading model selections
  */
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.createSelectionPersistenceAdapter = createSelectionPersistenceAdapter;
-exports.validateSelectionPersistence = validateSelectionPersistence;
 // In-memory storage for now (will be enhanced with proper persistence later)
 class InMemorySelectionStorage {
     textModel = null;
@@ -32,7 +28,7 @@ class InMemorySelectionStorage {
 }
 // Singleton instance
 const storage = new InMemorySelectionStorage();
-function createSelectionPersistenceAdapter() {
+export function createSelectionPersistenceAdapter() {
     return {
         async saveTextModelSelection(modelName) {
             await storage.saveTextModel(modelName);
@@ -52,7 +48,7 @@ function createSelectionPersistenceAdapter() {
     };
 }
 // Helper function to validate selection persistence
-async function validateSelectionPersistence(adapter) {
+export async function validateSelectionPersistence(adapter) {
     try {
         const testTextModel = 'test-text-model';
         const testVisionModel = 'test-vision-model';

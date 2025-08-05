@@ -18,6 +18,8 @@ RUN npm ci --include=dev
 # Copy source files
 COPY packages/shared/ ./packages/shared/
 COPY packages/server/ ./packages/server/
+COPY features/ ./features/
+COPY adapters/ ./adapters/
 COPY tsconfig.json ./
 
 # Build shared package first, then server

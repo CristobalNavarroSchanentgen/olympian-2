@@ -111,7 +111,7 @@ export class ContextIndicatorsUI implements ContextIndicatorsUIContract {
       visual: {
         color: 'yellow',
         icon: 'alert-triangle',
-        position: 'banner',
+        position: "sidebar",
         priority: 'medium'
       }
     };
@@ -123,7 +123,7 @@ export class ContextIndicatorsUI implements ContextIndicatorsUIContract {
   async provideContextualFeedback(messageId: string, intelligenceMetrics: any): Promise<void> {
     const feedback: ContextIndicator = {
       id: `feedback-${messageId}`,
-      type: 'context',
+      type: "summary",
       content: `Context score: ${intelligenceMetrics.contextRetentionScore}`,
       relevance: intelligenceMetrics.contextRetentionScore,
       timestamp: new Date(),

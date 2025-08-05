@@ -1,12 +1,8 @@
-"use strict";
 /**
  * Text Model Selector Implementation
  * Manages "text-generation" model selection using registry
  */
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.TextModelSelector = void 0;
-exports.createTextModelSelector = createTextModelSelector;
-class TextModelSelector {
+export class TextModelSelector {
     modelRegistryService;
     textModelFilterAdapter;
     selectionPersistenceAdapter;
@@ -102,9 +98,8 @@ class TextModelSelector {
         }
     }
 }
-exports.TextModelSelector = TextModelSelector;
 // Factory function for easy instantiation
-function createTextModelSelector(modelRegistryService, textModelFilterAdapter, selectionPersistenceAdapter) {
+export function createTextModelSelector(modelRegistryService, textModelFilterAdapter, selectionPersistenceAdapter) {
     return new TextModelSelector(modelRegistryService, textModelFilterAdapter, selectionPersistenceAdapter);
 }
 //# sourceMappingURL=index.js.map

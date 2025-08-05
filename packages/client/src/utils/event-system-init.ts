@@ -1,4 +1,4 @@
-import { eventBus } from '@olympian/shared/utils/event-bus';
+import { defaultEventBus as eventBus } from '@olympian/shared/utils/event-bus';
 import { debugMiddleware, validationMiddleware, metricsMiddleware } from '@olympian/shared/utils/event-middleware';
 
 /**

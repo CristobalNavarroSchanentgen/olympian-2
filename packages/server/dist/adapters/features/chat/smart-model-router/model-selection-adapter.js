@@ -1,10 +1,7 @@
-"use strict";
 /**
  * Model Selection Adapter - Server Implementation
  */
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.ModelSelectionAdapterImpl = void 0;
-class ModelSelectionAdapterImpl {
+export class ModelSelectionAdapterImpl {
     filterTextModels(models) {
         return models.filter(model => model.capabilities.includes('text-generation') &&
             !(model.hasVision === true && !model.capabilities.includes('text-generation')));
@@ -75,5 +72,4 @@ class ModelSelectionAdapterImpl {
             selection.timestamp > 0;
     }
 }
-exports.ModelSelectionAdapterImpl = ModelSelectionAdapterImpl;
 //# sourceMappingURL=model-selection-adapter.js.map

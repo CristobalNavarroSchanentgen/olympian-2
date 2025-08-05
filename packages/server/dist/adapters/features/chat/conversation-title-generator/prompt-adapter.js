@@ -1,11 +1,8 @@
-"use strict";
 /**
  * Prompt Adapter
  * Handles prompt creation and response parsing for title generation
  */
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.PromptAdapter = void 0;
-class PromptAdapter {
+export class PromptAdapter {
     createTitlePrompt(message, maxLength) {
         // Clean and truncate message if too long
         const cleanMessage = message.trim().substring(0, 200);
@@ -40,5 +37,4 @@ class PromptAdapter {
         return title.replace(/[<>\"'&]/g, '').trim();
     }
 }
-exports.PromptAdapter = PromptAdapter;
 //# sourceMappingURL=prompt-adapter.js.map

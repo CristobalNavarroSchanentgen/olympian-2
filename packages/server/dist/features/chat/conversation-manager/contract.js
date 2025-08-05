@@ -1,7 +1,6 @@
-"use strict";
 /**
  * Conversation Manager Contract
  * Manages conversation lifecycle and metadata
  */
-Object.defineProperty(exports, "__esModule", { value: true });
+export {};
 //# sourceMappingURL=contract.js.map

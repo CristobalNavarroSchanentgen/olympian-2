@@ -66,7 +66,7 @@ export class ResponseStreamingUI implements ResponseStreamingUIContract {
       await this.applyTypewriterEffect(messageId, token);
     }
     
-    streamingState.progress = isComplete ? 1.0 : Math.min(0.9, streamingState.progress + 0.1);
+    streamingState.progress = isComplete ? 1.0 : Math.min(0.9, (streamingState.progress || 0) + 0.1);
   }
 
   async completeStreaming(messageId: string, metrics: StreamingMetrics): Promise<void> {

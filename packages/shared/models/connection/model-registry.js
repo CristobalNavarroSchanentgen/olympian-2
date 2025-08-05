@@ -1,13 +1,8 @@
-"use strict";
 /**
  * Model Registry - Predefined model capabilities
  */
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.PREDEFINED_MODEL_REGISTRY = void 0;
-exports.getModelFromRegistry = getModelFromRegistry;
-exports.getAllRegisteredModels = getAllRegisteredModels;
 // Hardcoded model registry for custom configuration
-exports.PREDEFINED_MODEL_REGISTRY = [
+export const PREDEFINED_MODEL_REGISTRY = [
     {
         modelName: 'llama3.2-vision:11b',
         name: 'llama3.2-vision:11b',
@@ -105,10 +100,10 @@ exports.PREDEFINED_MODEL_REGISTRY = [
         hasVision: false
     }
 ];
-function getModelFromRegistry(modelName) {
-    return exports.PREDEFINED_MODEL_REGISTRY.find(m => m.modelName === modelName);
+export function getModelFromRegistry(modelName) {
+    return PREDEFINED_MODEL_REGISTRY.find(m => m.modelName === modelName);
 }
-function getAllRegisteredModels() {
-    return [...exports.PREDEFINED_MODEL_REGISTRY];
+export function getAllRegisteredModels() {
+    return [...PREDEFINED_MODEL_REGISTRY];
 }
 //# sourceMappingURL=model-registry.js.map

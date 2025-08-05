@@ -1,11 +1,8 @@
-"use strict";
 /**
  * Ollama Title Adapter
  * Transforms title generation requests for Ollama API
  */
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.OllamaTitleAdapter = void 0;
-class OllamaTitleAdapter {
+export class OllamaTitleAdapter {
     httpClient;
     baseUrl;
     constructor(httpClient, baseUrl = 'http://localhost:11434') {
@@ -46,5 +43,4 @@ class OllamaTitleAdapter {
         }
     }
 }
-exports.OllamaTitleAdapter = OllamaTitleAdapter;
 //# sourceMappingURL=ollama-title-adapter.js.map

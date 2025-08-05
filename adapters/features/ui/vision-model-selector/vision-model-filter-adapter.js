@@ -1,12 +1,8 @@
-"use strict";
 /**
  * Vision Model Filter Adapter
  * Filters models for vision capability
  */
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.createVisionModelFilterAdapter = createVisionModelFilterAdapter;
-exports.getVisionModelsWithMetadata = getVisionModelsWithMetadata;
-function createVisionModelFilterAdapter() {
+export function createVisionModelFilterAdapter() {
     return {
         filterVisionModels(models) {
             return models.filter(model => model.hasVision === true);
@@ -14,7 +10,7 @@ function createVisionModelFilterAdapter() {
     };
 }
 // Helper function to get vision models with additional metadata
-function getVisionModelsWithMetadata(models) {
+export function getVisionModelsWithMetadata(models) {
     const visionModels = createVisionModelFilterAdapter().filterVisionModels(models);
     return visionModels.map(model => ({
         ...model,

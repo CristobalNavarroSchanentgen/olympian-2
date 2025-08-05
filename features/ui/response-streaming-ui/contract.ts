@@ -9,7 +9,7 @@
  * Contract Enforcement: naturalCommunication, fluidInteractionFlow
  */
 
-import { Message } from @olympian/shared/models/chat/message;
+import { Message } from "@olympian/shared/models/chat/message";
 
 export interface StreamingMetrics {
   responseStartTime: number;        // < 100ms typing indicator requirement
@@ -96,7 +96,7 @@ export interface ResponseStreamingUIContract {
 }
 
 export interface StreamingError {
-  type: network | model | timeout | quota | unknown;
+  type: "network" | "model" | "timeout" | "quota" | "unknown";
   message: string;
   recoverable: boolean;
   suggestedAction?: string;
@@ -104,7 +104,7 @@ export interface StreamingError {
 
 export interface RetryOptions {
   maxRetries: number;
-  backoffStrategy: linear | exponential;
+  backoffStrategy: "linear" | "exponential";
   fallbackModel?: string;
   gracefulDegradation: boolean;
 }

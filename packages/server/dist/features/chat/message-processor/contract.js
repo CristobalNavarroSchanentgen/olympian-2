@@ -1,7 +1,6 @@
-"use strict";
 /**
  * Message Processor Contract
  * Handles message creation, processing, and streaming
  */
-Object.defineProperty(exports, "__esModule", { value: true });
+export {};
 //# sourceMappingURL=contract.js.map

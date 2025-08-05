@@ -1,11 +1,7 @@
-"use strict";
 /**
  * Feature Implementation: Model Registry Manager
  */
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.ModelRegistryManager = void 0;
-exports.createModelRegistryManager = createModelRegistryManager;
-class ModelRegistryManager {
+export class ModelRegistryManager {
     deps;
     constructor(deps) {
         this.deps = deps;
@@ -100,9 +96,8 @@ class ModelRegistryManager {
         };
     }
 }
-exports.ModelRegistryManager = ModelRegistryManager;
 // Factory function
-function createModelRegistryManager(deps) {
+export function createModelRegistryManager(deps) {
     return new ModelRegistryManager(deps);
 }
 //# sourceMappingURL=index.js.map

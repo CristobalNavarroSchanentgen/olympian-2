@@ -1,6 +1,5 @@
-"use strict";
 /**
  * Health Status Models
  */
-Object.defineProperty(exports, "__esModule", { value: true });
+export {};
 //# sourceMappingURL=health-status.js.map

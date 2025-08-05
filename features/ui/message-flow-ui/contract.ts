@@ -96,7 +96,7 @@ export interface MessageFlowUIContract {
    * Handle input field interactions
    * Contract: natural text input with shift+enter support
    */
-  handleInputInteraction(event: InputEvent): Promise<void>;
+  handleInputInteraction(event: any): Promise<void>;
   
   /**
    * Display timestamp information

@@ -352,12 +352,12 @@ export class ErrorRecoveryUI implements ErrorRecoveryUIContract {
 
   private generateUserFriendlyMessage(error: ErrorContext): string {
     const messages = {
-      network: 'Connection issue detected. We''re trying to reconnect...',
+      network: 'Connection issue detected. We\'re trying to reconnect...',
       model: 'AI model temporarily unavailable. Switching to backup...',
       timeout: 'Request taking longer than expected. Please try again.',
       quota: 'Usage limit reached. Please wait or upgrade your plan.',
       validation: 'Invalid input detected. Please check and try again.',
-      unknown: 'Something went wrong. We''re working to fix it.'
+      unknown: 'Something went wrong. We\'re working to fix it.'
     };
     
     return messages[error.errorType] || messages.unknown;

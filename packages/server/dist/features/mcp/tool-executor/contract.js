@@ -1,7 +1,6 @@
-"use strict";
 /**
  * MCP Tool Executor Contract
  * Handles tool discovery and execution via MCP protocol
  */
-Object.defineProperty(exports, "__esModule", { value: true });
+export {};
 //# sourceMappingURL=contract.js.map

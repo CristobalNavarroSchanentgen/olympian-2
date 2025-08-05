@@ -1,11 +1,10 @@
 {
-  "extends": "../../tsconfig.json",
   "compilerOptions": {
     "target": "ES2022",
-    "module": "commonjs",
+    "module": "es2022",
+    "moduleResolution": "node",
     "lib": ["ES2022"],
     "outDir": "./dist",
-    "rootDir": "./src",
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
@@ -13,19 +12,31 @@
     "declaration": true,
     "sourceMap": true,
     "resolveJsonModule": true,
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
     "paths": {
       "@olympian/shared": ["../shared/src"],
       "@olympian/shared/*": ["../shared/src/*"]
     },
-    "baseUrl": "."
+    "baseUrl": "../../"
   },
   "include": [
-    "src/**/*.ts"
+    "src/**/*.ts",
+    "../../features/**/index.ts",
+    "../../features/**/contract.ts",
+    "../../adapters/**/*.ts"
   ],
   "exclude": [
     "node_modules",
     "dist",
-    "**/*.test.ts"
+    "**/*.test.ts",
+    "**/*.backup.ts",
+    "**/*.backup2.ts",
+    "../../adapters/features/observability/browser-logger/**",
+    "../../features/observability/browser-logger/**",
+    "../../features/ui/**/browser-*.ts",
+    "src/backup/**",
+    "src/index.backup.ts"
   ],
   "references": [
     { "path": "../shared" }

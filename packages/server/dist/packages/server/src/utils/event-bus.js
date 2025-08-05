@@ -1,10 +1,7 @@
-"use strict";
 /**
  * Simple Event Bus Utility
  * Pure functions for event management
  */
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.eventBus = void 0;
 class EventBus {
     listeners = new Map();
     emit(eventName, data) {
@@ -34,5 +31,5 @@ class EventBus {
         }
     }
 }
-exports.eventBus = new EventBus();
+export const eventBus = new EventBus();
 //# sourceMappingURL=event-bus.js.map

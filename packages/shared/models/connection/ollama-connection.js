@@ -1,6 +1,5 @@
-"use strict";
 /**
  * Ollama Connection Models
  */
-Object.defineProperty(exports, "__esModule", { value: true });
+export {};
 //# sourceMappingURL=ollama-connection.js.map

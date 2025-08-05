@@ -1,11 +1,8 @@
-"use strict";
 /**
  * Prompt Adapter for Title Generation
  * Creates optimized prompts for generating conversation titles
  */
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.promptAdapter = void 0;
-exports.promptAdapter = {
+export const promptAdapter = {
     createTitlePrompt(firstMessage) {
         const cleanMessage = firstMessage.trim().substring(0, 200);
         return `Generate a concise, descriptive title for a conversation that starts with this message: "${cleanMessage}"

@@ -14,7 +14,8 @@
     "declaration": true,
     "declarationMap": true,
     "sourceMap": true,
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "composite": true
   },
   "include": [
     "src/**/*.ts"

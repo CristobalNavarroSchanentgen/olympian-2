@@ -1,16 +1,12 @@
-"use strict";
 /**
  * Text Model Filter Adapter
  * Filters models for text-generation capability
  */
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.createTextModelFilterAdapter = createTextModelFilterAdapter;
-exports.getTextModelsWithMetadata = getTextModelsWithMetadata;
 function isVisionOnlyModel(model) {
     // A model is vision-only if it has vision but no text-generation capability
     return model.hasVision === true && !model.capabilities.includes('text-generation');
 }
-function createTextModelFilterAdapter() {
+export function createTextModelFilterAdapter() {
     return {
         filterTextModels(models) {
             return models.filter(model => 
@@ -22,7 +18,7 @@ function createTextModelFilterAdapter() {
     };
 }
 // Helper function to get text-specific models with additional metadata
-function getTextModelsWithMetadata(models) {
+export function getTextModelsWithMetadata(models) {
     const textModels = createTextModelFilterAdapter().filterTextModels(models);
     return textModels.map(model => ({
         ...model,

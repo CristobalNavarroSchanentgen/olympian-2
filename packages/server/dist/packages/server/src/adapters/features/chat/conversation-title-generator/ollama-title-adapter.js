@@ -1,15 +1,12 @@
-"use strict";
 /**
  * Ollama Title Adapter
  * Transforms title generation requests into Ollama API calls
  */
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.ollamaTitleAdapter = void 0;
-const http_client_1 = require("../../../../utils/http-client");
-exports.ollamaTitleAdapter = {
+import { httpClient } from '../../../../utils/http-client';
+export const ollamaTitleAdapter = {
     async generateTitle(request) {
         try {
-            const response = await http_client_1.httpClient.post('/api/ollama/generate', {
+            const response = await httpClient.post('/api/ollama/generate', {
                 model: request.model,
                 prompt: request.prompt,
                 options: {

@@ -1,3 +1,8 @@
+import { Conversation } from "@olympian/shared/models/chat/conversation";
+
+
+
+
 // Contract for dual-pane layout feature
 export interface DualPaneLayoutProps {
   conversationPanel: {

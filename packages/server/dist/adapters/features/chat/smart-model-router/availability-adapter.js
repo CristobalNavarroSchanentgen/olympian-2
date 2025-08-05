@@ -1,11 +1,8 @@
-"use strict";
 /**
  * Availability Adapter
  * Checks model health and availability status
  */
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.createAvailabilityAdapter = createAvailabilityAdapter;
-function createAvailabilityAdapter(ollamaBaseUrl = 'http://localhost:11434') {
+export function createAvailabilityAdapter(ollamaBaseUrl = 'http://localhost:11434') {
     return {
         async checkModelHealth(modelName) {
             try {

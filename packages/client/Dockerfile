@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1
 
 # Build stage
-FROM node:20-alpine as builder
+FROM node:20-alpine AS builder
 
 WORKDIR /app
 
@@ -16,6 +16,9 @@ RUN npm ci --include=dev
 # Copy source files and configurations
 COPY packages/shared/ ./packages/shared/
 COPY packages/client/ ./packages/client/
+COPY packages/server/ ./packages/server/
+COPY features/ ./features/
+COPY adapters/ ./adapters/
 COPY tsconfig.json ./
 
 # Build shared package first, then client

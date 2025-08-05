@@ -1,11 +1,8 @@
-"use strict";
 /**
  * HTTP Adapter for Ollama Connector
  * Transforms between HTTP client utility and ollama-connector feature expectations
  */
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.OllamaHttpAdapter = void 0;
-class OllamaHttpAdapter {
+export class OllamaHttpAdapter {
     httpClient;
     baseUrl;
     constructor(httpClient, baseUrl = '/api/ollama') {
@@ -21,5 +18,4 @@ class OllamaHttpAdapter {
         return response.data;
     }
 }
-exports.OllamaHttpAdapter = OllamaHttpAdapter;
 //# sourceMappingURL=http-adapter.js.map

@@ -1,7 +1,6 @@
-"use strict";
 /**
  * Ollama Connector Contract
  * Defines interfaces for connecting to and managing Ollama service
  */
-Object.defineProperty(exports, "__esModule", { value: true });
+export {};
 //# sourceMappingURL=contract.js.map

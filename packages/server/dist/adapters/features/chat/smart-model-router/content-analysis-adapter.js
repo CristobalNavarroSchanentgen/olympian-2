@@ -1,10 +1,7 @@
-"use strict";
 /**
  * Content Analysis Adapter
  * Analyzes message content to determine model requirements
  */
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.createContentAnalysisAdapter = createContentAnalysisAdapter;
 // Keywords that suggest different capabilities
 const TOOL_KEYWORDS = [
     'calculate', 'compute', 'search', 'find', 'lookup', 'get', 'fetch',
@@ -16,7 +13,7 @@ const REASONING_KEYWORDS = [
     'compare', 'contrast', 'evaluate', 'assess', 'judge', 'decide',
     'plan', 'strategy', 'approach', 'solve', 'problem', 'complex'
 ];
-function createContentAnalysisAdapter() {
+export function createContentAnalysisAdapter() {
     return {
         async analyzeTextComplexity(content) {
             const words = content.toLowerCase().split(/\s+/);

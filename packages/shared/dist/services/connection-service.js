@@ -1,5 +1,5 @@
 /**
- * Connection service interface
+ * Connection service contract
  */
 export {};
 //# sourceMappingURL=connection-service.js.map

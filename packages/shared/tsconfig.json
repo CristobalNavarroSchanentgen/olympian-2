@@ -5,7 +5,7 @@
     "moduleResolution": "node",
     "lib": ["ES2022"],
     "outDir": "./dist",
-    "rootDir": "./",
+    "rootDir": "./src",
     "strict": true,
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
@@ -17,19 +17,11 @@
     "resolveJsonModule": true
   },
   "include": [
-    "models/**/*.ts",
-    "utils/**/*.ts",
-    "services/**/*.ts",
-    "events/**/*.ts",
-    "config/**/*.ts",
-    "features/**/contract.ts",
-    "index.ts"
+    "src/**/*.ts"
   ],
   "exclude": [
     "node_modules",
     "dist",
-    "**/*.test.ts",
-    "adapters/**/*.ts",
-    "features/**/index.ts"
+    "**/*.test.ts"
   ]
 }

@@ -1,16 +1,15 @@
-/**
- * Shared Package Entry Point - Minimal Working Version
- */
-export type { Artifact, ArtifactType } from './models/artifacts/artifact';
-export type { Version } from './models/artifacts/version';
-export type { Conversation } from './models/chat/conversation';
-export type { Message, MessageRole } from './models/chat/message';
-export type { McpServerConfig } from './models/mcp/server-config';
-export type { OllamaConnection } from './models/connection/ollama-connection';
-export * from './utils/token-counter';
-export * from './utils/http-client';
-export * from './utils/config-parser';
-export * from './utils/image-processor';
-export type { ConversationManagerContract } from './features/chat/conversation-manager/contract';
-export type { MessageProcessorContract } from './features/chat/message-processor/contract';
+export * from './utils/event-bus';
+export declare const SHARED_PACKAGE_CONFIG: {
+    readonly name: "@olympian/shared";
+    readonly version: "1.0.0";
+    readonly architecture: "ai-native-contracts";
+    readonly layer_hierarchy: readonly ["experience", "features", "services", "events", "models", "utils"];
+};
+export interface ContractManifest {
+    name: string;
+    version: string;
+    architecture_type: string;
+    contracts: Record<string, any>;
+}
+export declare function validateContractIntegrity(): boolean;
 //# sourceMappingURL=index.d.ts.map

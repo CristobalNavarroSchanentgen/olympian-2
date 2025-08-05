@@ -1,5 +1,5 @@
 /**
- * Message service interface
+ * Message service contract
  */
 export {};
 //# sourceMappingURL=message-service.js.map

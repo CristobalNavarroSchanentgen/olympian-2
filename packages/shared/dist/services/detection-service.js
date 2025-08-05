@@ -1,5 +1,5 @@
 /**
- * Model capability detection service interface
+ * Model capability detection service contract
  */
 export {};
 //# sourceMappingURL=detection-service.js.map

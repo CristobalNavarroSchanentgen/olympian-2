@@ -1,67 +1,55 @@
-/**
- * Event Bus - AI-Native Architecture
- *
- * Simple event system for pub/sub communication.
- * Pure utility - no business logic or external dependencies.
- */
-class EventBus {
-    listeners = new Map();
-    middlewares = [];
-    /**
-     * Subscribe to events of a specific type
-     */
-    subscribe(eventType, callback) {
-        if (!this.listeners.has(eventType)) {
-            this.listeners.set(eventType, new Set());
-        }
-        this.listeners.get(eventType).add(callback);
-        return {
-            unsubscribe: () => {
-                const callbacks = this.listeners.get(eventType);
-                if (callbacks) {
-                    callbacks.delete(callback);
-                    if (callbacks.size === 0) {
-                        this.listeners.delete(eventType);
+// AI-Native Event Bus Utility (Layer 5)
+// Pure functions for event system management and routing
+// Zero dependencies, zero side effects - accessible through adapters only
+// Simple in-memory event bus implementation
+// This is a pure utility - no context awareness
+class SimpleEventBus {
+    subscribers = new Map();
+    emit(eventName, payload) {
+        const handlers = this.subscribers.get(eventName);
+        if (handlers) {
+            // Execute handlers in next tick to avoid blocking
+            Promise.resolve().then(() => {
+                handlers.forEach(handler => {
+                    try {
+                        handler(payload);
                     }
-                }
-            }
+                    catch (error) {
+                        console.error(`Event handler error for ${eventName}:`, error);
+                    }
+                });
+            });
+        }
+    }
+    subscribe(eventName, handler) {
+        if (!this.subscribers.has(eventName)) {
+            this.subscribers.set(eventName, new Set());
+        }
+        this.subscribers.get(eventName).add(handler);
+        return {
+            unsubscribe: () => this.unsubscribe(eventName, handler)
         };
     }
-    /**
-     * Publish an event to all subscribers
-     */
-    async publish(event) {
-        // Apply middleware first
-        this.middlewares.forEach(middleware => middleware(event));
-        const callbacks = this.listeners.get(event.type);
-        if (!callbacks)
-            return;
-        // Execute all callbacks (async support)
-        const promises = Array.from(callbacks).map(callback => {
-            try {
-                return callback(event);
+    unsubscribe(eventName, handler) {
+        const handlers = this.subscribers.get(eventName);
+        if (handlers) {
+            handlers.delete(handler);
+            if (handlers.size === 0) {
+                this.subscribers.delete(eventName);
             }
-            catch (error) {
-                console.error(`Error in event callback for ${event.type}:`, error);
-                return Promise.resolve();
-            }
-        });
-        await Promise.all(promises);
+        }
     }
-    /**
-     * Add middleware for event processing
-     */
-    addMiddleware(middleware) {
-        this.middlewares.push(middleware);
-    }
-    /**
-     * Remove all listeners (for cleanup)
-     */
     clear() {
-        this.listeners.clear();
-        this.middlewares.length = 0;
+        this.subscribers.clear();
+    }
+    getSubscriberCount(eventName) {
+        return this.subscribers.get(eventName)?.size ?? 0;
     }
 }
-// Export singleton instance
-export const eventBus = new EventBus();
+// Factory function for creating event bus instances
+export function createEventBus() {
+    return new SimpleEventBus();
+}
+// Default singleton instance for simple use cases
+export const defaultEventBus = createEventBus();
 //# sourceMappingURL=event-bus.js.map

@@ -8,4 +8,3 @@ export const validationMiddleware = (event) => {
 export const metricsMiddleware = (event) => {
     // Metrics tracking placeholder
 };
-//# sourceMappingURL=event-middleware.js.map
